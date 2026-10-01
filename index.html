@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BS Smart – Fast Food &amp; Restaurant</title>
+<link rel="icon" type="image/jpeg" href="assets/img/logo.jpeg">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top">
+      <img src="assets/img/logo.jpeg" alt="BS Smart logo">
+      <span>BS Smart</span>
+    </a>
+
+    <div class="nav-right">
+      <div class="clock">
+        <div class="clock-time" id="clockTime">--:--:--</div>
+        <div class="clock-date" id="clockDate">--</div>
+      </div>
+      <a class="nav-cta" href="#order">My order <b id="navCount">0</b></a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap hero-in">
+    <div class="hero-text">
+      <h1>Good Food,<br>Good Mood.</h1>
+      <p>“Burgers, pizza, BBQ aur Desi — har bite mein fresh taste aur zabardast flavor! Apni pasand ke delicious items choose karein, special discounts ka maza lein aur garma-garam khana enjoy karein. Order karein.</p>
+      <div class="meta">
+        <span class="pill">Fast Food &amp; Restaurant</span>
+        <span class="pill">Dine-in · Takeaway · Delivery</span>
+        <span class="pill">📍 Sector 5-J, North Karachi, near Kala School</span>
+        <span class="pill">📞 0345-2183819</span>
+        <span class="pill">📞 0312-2029588</span>
+      </div>
+    </div>
+    <img class="hero-logo" src="assets/img/logo.jpeg" alt="BS Smart – Good Food Good Mood">
+  </div>
+</header>
+
+<div class="wrap">
+  <main>
+    <section>
+      <h2 class="sec-title">Our menu</h2>
+      <div class="tabs" id="tabs" role="group" aria-label="Menu categories"></div>
+      <div class="grid" id="menu"></div>
+    </section>
+
+    <aside id="order" aria-label="Your order">
+      <h2>Your order</h2>
+      <div id="lines"></div>
+
+      <label for="disc">Discount</label>
+      <div class="disc-row">
+        <input id="disc" type="number" min="0" step="any" placeholder="0">
+        <select id="discType" aria-label="Discount type">
+          <option value="%">%</option>
+          <option value="Rs">Rs.</option>
+        </select>
+      </div>
+
+      <div id="totals"></div>
+
+      <label for="type">Order type</label>
+      <select id="type">
+        <option>Dine-in</option>
+        <option>Takeaway</option>
+        <option>Delivery</option>
+      </select>
+
+      <button class="go" id="go" disabled>Place order &amp; print receipt</button>
+      <button class="clear" id="clear">Clear order</button>
+    </aside>
+  </main>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    BS Smart – Fast Food &amp; Restaurant · Good Food, Good Mood<br>
+    Sector 5-J, North Karachi, near Kala School<br>
+    M Fareed: 0345-2183819 · M Haseeb: 0312-2029588
+  </div>
+</footer>
+
+<!-- Receipt popup -->
+<div id="overlay" role="dialog" aria-modal="true" aria-label="Receipt">
+  <div>
+    <div class="sheet" id="receipt"></div>
+    <div class="actions">
+      <button class="pbtn" id="print">Print receipt</button>
+      <button class="cbtn" id="close">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/script.js"></script>
+</body>
+</html>
