@@ -25,6 +25,12 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{ou
 .nav-cta{background:var(--gold);color:var(--black);text-decoration:none;border-radius:99px;padding:7px 16px;font-weight:700}
 .nav-cta b{background:var(--black);color:var(--gold);border-radius:99px;padding:0 8px;margin-left:6px}
 
+/* Social icons */
+.social{display:flex;align-items:center;gap:10px}
+.social a{width:34px;height:34px;display:grid;place-items:center;border:1.5px solid var(--gold);border-radius:50%;color:var(--gold);transition:.2s}
+.social a:hover{background:var(--gold);color:var(--black)}
+.social svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
 /* Navbar clock */
 .nav-right{display:flex;align-items:center;gap:18px}
 .clock{text-align:right;line-height:1.15}
@@ -122,4 +128,9 @@ input,select{width:100%;padding:8px 10px;border:1px solid #cfc49f;border-radius:
   .clock-date{display:none}
   .clock-time{font-size:1rem}
   .nav-right{gap:10px}
+}
+@media (max-width:560px){
+  .social{gap:6px}
+  .social a{width:28px;height:28px}
+  .social svg{width:15px;height:15px}
 }
