@@ -40,6 +40,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{ou
 .nav .wrap{max-width:none;padding:0 24px}
 
 
+.search{margin:6px 0 0}
+.search input{width:100%;padding:11px 16px;border:2px solid var(--black);border-radius:99px;font:inherit;background:var(--white)}
+.search input:focus{border-color:var(--gold)}
+.no-result{grid-column:1/-1;color:var(--muted);padding:20px 0}
+
 /* Hero */
 .hero{background:var(--black);color:var(--white);padding:44px 0 52px}
 .hero-in{display:flex;align-items:center;justify-content:space-between;gap:30px}
