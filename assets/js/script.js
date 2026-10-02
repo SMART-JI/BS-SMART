@@ -13,7 +13,7 @@ const CURRENCY = "Rs.";
   {id:102, cat:"Deals", name:"Couple Deal", desc:"2 Zinger Burgers + Loaded Fries + 2 Soft Drinks",             price:1350, img:""},
   {id:103, cat:"Deals", name:"Pizza Deal",  desc:"Medium Tikka Pizza + 8 Nuggets + 2 Soft Drinks",              price:1650, img:""},
   {id:104, cat:"Deals", name:"Family Deal", desc:"Medium Pizza + 2 Zinger Burgers + Loaded Fries + 4 Soft Drinks", price:2650, img:""},
-  {id:1,  cat:"Burgers", name:"Zinger Burger",         desc:"Crispy chicken fillet, mayo, lettuce",    price:450,  img:"assets/img/menu/Zinger.jpg"},
+  {id:1,  cat:"Burgers", name:"Zinger Burger",         desc:"Crispy chicken fillet, mayo, lettuce",    price:450,  img:"assets/img/menu/zinger.jpg"},
   {id:2,  cat:"Burgers", name:"Beef Smash Burger",     desc:"Double patty, cheese, special sauce",     price:690,  img:"assets/img/menu/smash-burger.jpg"},
   {id:3,  cat:"Burgers", name:"Chicken Club Sandwich", desc:"Grilled chicken, egg, cheese, fries",     price:520,  img:"assets/img/menu/club-sandwich.jpg"},
   {id:4,  cat:"Pizza",   name:"Chicken Tikka Pizza",   desc:"Medium, tikka chunks and onion",          price:1250, img:"assets/img/menu/tikka-pizza.jpg"},
