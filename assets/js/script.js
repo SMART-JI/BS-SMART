@@ -8,14 +8,14 @@ const TAX_RATE = 0;
 const CURRENCY = "Rs.";
  
 const MENU = [
-  {id:1,  cat:"Burgers", name:"Zinger Burger",         desc:"Crispy chicken fillet, mayo, lettuce",    price:450,  img:"assets/img/menu/zinger.jpg"},
+  {id:1,  cat:"Burgers", name:"Zinger Burger",         desc:"Crispy chicken fillet, mayo, lettuce",    price:450,  img:"assets/img/menu/Zinger.jpg"},
   {id:2,  cat:"Burgers", name:"Beef Smash Burger",     desc:"Double patty, cheese, special sauce",     price:690,  img:"assets/img/menu/smash-burger.jpg"},
   {id:3,  cat:"Burgers", name:"Chicken Club Sandwich", desc:"Grilled chicken, egg, cheese, fries",     price:520,  img:"assets/img/menu/club-sandwich.jpg"},
   {id:4,  cat:"Pizza",   name:"Chicken Tikka Pizza",   desc:"Medium, tikka chunks and onion",          price:1250, img:"assets/img/menu/tikka-pizza.jpg"},
   {id:5,  cat:"Pizza",   name:"Fajita Pizza",          desc:"Medium, peppers, olives and cheese",      price:1250, img:"assets/img/menu/fajita-pizza.jpg"},
   {id:6,  cat:"Pizza",   name:"Pepperoni Pizza",       desc:"Medium, beef pepperoni, mozzarella",      price:1350, img:"assets/img/menu/pepperoni-pizza.jpg"},
   {id:7,  cat:"Snacks",  name:"Loaded Fries",          desc:"Fries with cheese sauce and chicken",     price:420,  img:"assets/img/menu/loaded-fries.jpg"},
-  {id:8,  cat:"Snacks",  name:"Chicken Nuggets",       desc:"8 pieces with dip",                       price:380,  img:"assets/img/menu/nuggets.jpg"},
+  {id:7,  cat:"Snacks",  name:"Loaded Fries",          desc:"Fries with cheese sauce and chicken",     price:420,  img:"assets/img/menu/loaded-fries.jpg"},
   {id:9,  cat:"Snacks",  name:"Crispy Wings",          desc:"6 pieces, hot or BBQ",                    price:450,  img:"assets/img/menu/wings.jpg"},
   {id:10, cat:"Desi",    name:"Chicken Tikka",         desc:"Charcoal-grilled, 2 pieces with chutney", price:480,  img:"assets/img/menu/chicken-tikka.jpg"},
   {id:11, cat:"Desi",    name:"Chicken Karahi (Half)", desc:"Tomato, ginger and green chilli",         price:1450, img:"assets/img/menu/karahi.jpg"},
@@ -24,7 +24,8 @@ const MENU = [
   {id:14, cat:"Drinks",  name:"Mint Margarita",        desc:"Mint, lemon, soda",                       price:250,  img:"assets/img/menu/margarita.jpg"},
   {id:15, cat:"Drinks",  name:"Doodh Patti Chai",      desc:"Kadak, made to order",                    price:120,  img:"assets/img/menu/chai.jpg"},
   {id:16, cat:"Drinks",  name:"Soft Drink (345ml)",    desc:"Cola, lemon-lime or orange",              price:100,  img:"assets/img/menu/soft-drink.jpg"},
-  {id:17, cat:"Drinks",  name:"Chocolate Shake",       desc:"Thick and cold",                          price:350,  img:"assets/img/menu/shake.jpg"}
+  {id:17, cat:"Drinks",  name:"Chocolate Shake",       desc:"Thick and cold",                          price:350,  img:"assets/img/menu/shake.jpg"},
+  {id:18, cat:"Burgers", name:"Chicken Mayo Roll",     desc:"Crispy chicken fillet, mayo, lettuce",    price:200,  img:"assets/img/menu/shake.jpg"},
 ];
  
 const $ = id => document.getElementById(id);
@@ -98,7 +99,7 @@ function renderCart(){
       </span>
       <span>${fmt(m.price * q)}</span>
     </div>`;
-  }).join("") : `<div class="empty">Abhi koi item nahi. Menu se "Add" dabayein.</div>`;
+  }).join("") : `<div class="empty">There are no items yet. Click "Add" from the menu.</div>`;
  
   $("lines").querySelectorAll(".qty button").forEach(b =>
     b.onclick = () => change(+b.dataset.id, +b.dataset.d));
@@ -202,7 +203,6 @@ if ($("search")) $("search").oninput = () => {
   renderMenu();
 };
  
-// Order dabate hi receipt dikhegi aur print dialog khulega
 $("go").onclick = () => {
   buildReceipt();
   $("overlay").classList.add("show");
@@ -231,6 +231,167 @@ function tickClock(){
 }
 tickClock();
 setInterval(tickClock, 1000);
+
+// ====== Orders, Payment aur Stock ======
+const DEFAULT_STOCK = 50;   // har item ka shuru ka stock (yahan badal sakte hain)
+const lsGet = (k, fb) => { try { return JSON.parse(localStorage.getItem(k)) ?? fb; } catch (e) { return fb; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+
+let orders = lsGet("bsOrders", []);
+let stock  = lsGet("bsStock", {});
+MENU.forEach(m => { if (stock[m.id] === undefined) stock[m.id] = DEFAULT_STOCK; });
+
+const dayKey = d => new Date(d).toDateString();
+const todayOrders = () => orders.filter(o => dayKey(o.t) === dayKey(Date.now()));
+const sumTotal = list => list.reduce((s, o) => s + o.total, 0);
+
+const _buildReceipt = buildReceipt;
+buildReceipt = function(){
+  const snap = {...cart}, t = totals();
+  _buildReceipt();
+  let no = "";
+  try { no = String(localStorage.getItem("bsOrderNo") || "").padStart(4, "0"); } catch (e) {}
+  orders.push({
+    no, t: Date.now(), total: t.total, disc: t.disc,
+    type: val("type") || "Dine-in",
+    items: Object.entries(snap).map(([id, n]) => ({id: +id, name: MENU.find(m => m.id == id).name, q: n}))
+  });
+  Object.entries(snap).forEach(([id, n]) => { stock[id] = Math.max(0, (stock[id] || 0) - n); });
+  lsSet("bsOrders", orders);
+  lsSet("bsStock", stock);
+  updateStats();
+};
+
+const _change = change;
+change = function(id, d){
+  if (d > 0 && (cart[id] || 0) >= (stock[id] ?? DEFAULT_STOCK)) {
+    alert(MENU.find(m => m.id == id).name + " ka stock sirf " + (stock[id] || 0) + " bacha hai.");
+    return;
+  }
+  _change(id, d);
+};
+
+function updateStats(){
+  const to = todayOrders();
+  $("statOrders").textContent = to.length;
+  $("statPay").textContent = fmt(sumTotal(to));
+  const low = MENU.filter(m => (stock[m.id] ?? 0) <= 5).length;
+  const s = $("statStock");
+  s.textContent = low ? low + " low" : "OK";
+  s.className = low ? "warn" : "";
+}
+
+function openPanel(type){
+  const to = todayOrders();
+  let title = "", html = "";
+
+  if (type === "orders") {
+    title = "Total Orders";
+    const rows = [...to].reverse().map(o => `<tr>
+      <td>#${o.no}</td>
+      <td>${new Date(o.t).toLocaleTimeString("en-US", {hour: "2-digit", minute: "2-digit"})}</td>
+      <td>${o.items.map(i => i.q + " x " + esc(i.name)).join(", ")}</td>
+      <td class="num">${fmt(o.total)}</td></tr>`).join("");
+    html = `<div class="stats">
+        <div class="stat"><span>Today's Orders</span><strong>${to.length}</strong></div>
+        <div class="stat"><span>Orders so far</span><strong>${orders.length}</strong></div>
+      </div>
+      ${rows ? `<div class="tblwrap"><table class="ptable"><thead><tr><th>Order</th><th>Time</th><th>Items</th><th class="num">Total</th></tr></thead><tbody>${rows}</tbody></table></div>`
+             : `<p class="pnote">No orders have been placed today.</p>`}`;
+  }
+
+  if (type === "payment") {
+    title = "Total Payment";
+    const types = ["Dine-in", "Takeaway", "Delivery"].map(tp => {
+      const l = to.filter(o => o.type === tp);
+      return `<tr><td>${tp}</td><td class="num">${l.length}</td><td class="num">${fmt(sumTotal(l))}</td></tr>`;
+    }).join("");
+    html = `<div class="stats">
+        <div class="stat"><span>Today's Rewards</span><strong>${fmt(sumTotal(to))}</strong></div>
+        <div class="stat"><span>The results so far</span><strong>${fmt(sumTotal(orders))}</strong></div>
+        <div class="stat"><span>Today's discount</span><strong>${fmt(to.reduce((s, o) => s + o.disc, 0))}</strong></div>
+      </div>
+      <div class="tblwrap"><table class="ptable"><thead><tr><th>Order type</th><th class="num">Orders</th><th class="num">Amount</th></tr></thead><tbody>${types}</tbody></table></div>`;
+  }
+
+  if (type === "stock") {
+    title = "Stock";
+    const rows = MENU.map(m => `<tr class="${stock[m.id] <= 5 ? "low" : ""}">
+      <td>${esc(m.name)}</td><td>${esc(m.cat)}</td>
+      <td class="num"><input type="number" min="0" data-sid="${m.id}" value="${stock[m.id]}" aria-label="${esc(m.name)} stock"></td></tr>`).join("");
+    html = `<p class="pnote">The stock automatically decreases when an order is placed. If there is a new item, change the number. A red mark appears on 5 or less.</p>
+      <div class="tblwrap"><table class="ptable"><thead><tr><th>Item</th><th>Category</th><th class="num">Stock</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }
+
+  $("panelTitle").textContent = title;
+  $("panelBody").innerHTML = html;
+  $("panel").classList.add("show");
+}
+
+$("panelBody").addEventListener("change", e => {
+  const inp = e.target.closest("input[data-sid]");
+  if (!inp) return;
+  const v = Math.max(0, parseInt(inp.value) || 0);
+  stock[inp.dataset.sid] = v;
+  inp.value = v;
+  lsSet("bsStock", stock);
+  inp.closest("tr").classList.toggle("low", v <= 5);
+  updateStats();
+});
+
+const closePanel = () => $("panel").classList.remove("show");
+$("panelClose").onclick = closePanel;
+$("panel").onclick = e => { if (e.target === $("panel")) closePanel(); };
+document.addEventListener("keydown", e => { if (e.key === "Escape") closePanel(); });
+document.querySelectorAll("[data-panel]").forEach(b => b.onclick = () => openPanel(b.dataset.panel));
+updateStats();
+
+// ====== Clear buttons (Orders / Payment / Stock) ======
+let curPanel = "";
+const _openPanel = openPanel;
+openPanel = function(type){
+  curPanel = type;
+  _openPanel(type);
+
+  let html = "";
+  if (type === "orders" || type === "payment") {
+    html = `<div class="clear-box">
+      <button type="button" class="cbtn-warn" data-act="clearToday">Clear today's account.</button>
+      <button type="button" class="cbtn-danger" data-act="clearAll">Clear all</button>
+    </div>`;
+  }
+  if (type === "stock") {
+    html = `<div class="clear-box">
+      <button type="button" class="cbtn-warn" data-act="resetStock">Stock reset (all item ${DEFAULT_STOCK})</button>
+    </div>`;
+  }
+  $("panelBody").insertAdjacentHTML("beforeend", html);
+};
+
+$("panelBody").addEventListener("click", e => {
+  const b = e.target.closest("[data-act]");
+  if (!b) return;
+  const act = b.dataset.act;
+
+  if (act === "clearToday") {
+    if (!confirm("Aaj ke saare orders aur payment clear ho jayenge. Pakka?")) return;
+    orders = orders.filter(o => dayKey(o.t) !== dayKey(Date.now()));
+  }
+  if (act === "clearAll") {
+    if (!confirm("Ab tak ka saara hisaab (orders aur payment) hamesha ke liye clear ho jayega. Pakka?")) return;
+    orders = [];
+    try { localStorage.setItem("bsOrderNo", "0"); } catch (err) {}
+  }
+  if (act === "resetStock") {
+    if (!confirm("Saare items ka stock " + DEFAULT_STOCK + " par wapas chala jayega. Pakka?")) return;
+    MENU.forEach(m => { stock[m.id] = DEFAULT_STOCK; });
+    lsSet("bsStock", stock);
+  }
+
+  lsSet("bsOrders", orders);
+  updateStats();
+  openPanel(curPanel);
+});
  
 
 
