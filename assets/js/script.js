@@ -4,10 +4,15 @@ const RESTAURANT = {
   address: "Sector 5-J, North Karachi, near Kala School",
   phone: "0345-2183819 / 0312-2029588"
 };
+
 const TAX_RATE = 0; 
 const CURRENCY = "Rs.";
- 
-const MENU = [
+
+  const MENU = [
+  {id:101, cat:"Deals", name:"Solo Deal",   desc:"Zinger Burger + Fries + Soft Drink",                          price:850,  img:""},
+  {id:102, cat:"Deals", name:"Couple Deal", desc:"2 Zinger Burgers + Loaded Fries + 2 Soft Drinks",             price:1350, img:""},
+  {id:103, cat:"Deals", name:"Pizza Deal",  desc:"Medium Tikka Pizza + 8 Nuggets + 2 Soft Drinks",              price:1650, img:""},
+  {id:104, cat:"Deals", name:"Family Deal", desc:"Medium Pizza + 2 Zinger Burgers + Loaded Fries + 4 Soft Drinks", price:2650, img:""},
   {id:1,  cat:"Burgers", name:"Zinger Burger",         desc:"Crispy chicken fillet, mayo, lettuce",    price:450,  img:"assets/img/menu/Zinger.jpg"},
   {id:2,  cat:"Burgers", name:"Beef Smash Burger",     desc:"Double patty, cheese, special sauce",     price:690,  img:"assets/img/menu/smash-burger.jpg"},
   {id:3,  cat:"Burgers", name:"Chicken Club Sandwich", desc:"Grilled chicken, egg, cheese, fries",     price:520,  img:"assets/img/menu/club-sandwich.jpg"},
@@ -392,11 +397,3 @@ $("panelBody").addEventListener("click", e => {
   updateStats();
   openPanel(curPanel);
 });
- 
-
-
-
-
-
-
-
