@@ -8,7 +8,7 @@ const TAX_RATE = 0;
 const CURRENCY = "Rs.";
  
 const MENU = [
-  {id:1,  cat:"Burgers", name:"Zinger Burger",         desc:"Crispy chicken fillet, mayo, lettuce",    price:450,  img:"assets/img/menu/Zinger.jpg"},
+  {id:1,  cat:"Burgers", name:"Zinger Burger",         desc:"Crispy chicken fillet, mayo, lettuce",    price:450,  img:"assets/img/menu/zinger.jpg"},
   {id:2,  cat:"Burgers", name:"Beef Smash Burger",     desc:"Double patty, cheese, special sauce",     price:690,  img:"assets/img/menu/smash-burger.jpg"},
   {id:3,  cat:"Burgers", name:"Chicken Club Sandwich", desc:"Grilled chicken, egg, cheese, fries",     price:520,  img:"assets/img/menu/club-sandwich.jpg"},
   {id:4,  cat:"Pizza",   name:"Chicken Tikka Pizza",   desc:"Medium, tikka chunks and onion",          price:1250, img:"assets/img/menu/tikka-pizza.jpg"},
