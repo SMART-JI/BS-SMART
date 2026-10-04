@@ -5,14 +5,15 @@ const RESTAURANT = {
   phone: "0345-2183819 / 0312-2029588"
 };
 
-const TAX_RATE = 0; 
+const TAX_RATE = 0;
 const CURRENCY = "Rs.";
 
-  const MENU = [
-  {id:101, cat:"Deals", name:"Solo Deal",   desc:"Zinger Burger + Fries + Soft Drink",                          price:850,  img:""},
-  {id:102, cat:"Deals", name:"Couple Deal", desc:"2 Zinger Burgers + Loaded Fries + 2 Soft Drinks",             price:1350, img:""},
-  {id:103, cat:"Deals", name:"Pizza Deal",  desc:"Medium Tikka Pizza + 8 Nuggets + 2 Soft Drinks",              price:1650, img:""},
+const MENU = [
+  {id:101, cat:"Deals", name:"Solo Deal",   desc:"Zinger Burger + Fries + Soft Drink",                             price:850,  img:""},
+  {id:102, cat:"Deals", name:"Couple Deal", desc:"2 Zinger Burgers + Loaded Fries + 2 Soft Drinks",                price:1350, img:""},
+  {id:103, cat:"Deals", name:"Pizza Deal",  desc:"Medium Tikka Pizza + 8 Nuggets + 2 Soft Drinks",                 price:1650, img:""},
   {id:104, cat:"Deals", name:"Family Deal", desc:"Medium Pizza + 2 Zinger Burgers + Loaded Fries + 4 Soft Drinks", price:2650, img:""},
+
   {id:1,  cat:"Burgers", name:"Zinger Burger",         desc:"Crispy chicken fillet, mayo, lettuce",    price:450,  img:"assets/img/menu/zinger.jpg"},
   {id:2,  cat:"Burgers", name:"Beef Smash Burger",     desc:"Double patty, cheese, special sauce",     price:690,  img:"assets/img/menu/smash-burger.jpg"},
   {id:3,  cat:"Burgers", name:"Chicken Club Sandwich", desc:"Grilled chicken, egg, cheese, fries",     price:520,  img:"assets/img/menu/club-sandwich.jpg"},
@@ -20,7 +21,7 @@ const CURRENCY = "Rs.";
   {id:5,  cat:"Pizza",   name:"Fajita Pizza",          desc:"Medium, peppers, olives and cheese",      price:1250, img:"assets/img/menu/fajita-pizza.jpg"},
   {id:6,  cat:"Pizza",   name:"Pepperoni Pizza",       desc:"Medium, beef pepperoni, mozzarella",      price:1350, img:"assets/img/menu/pepperoni-pizza.jpg"},
   {id:7,  cat:"Snacks",  name:"Loaded Fries",          desc:"Fries with cheese sauce and chicken",     price:420,  img:"assets/img/menu/loaded-fries.jpg"},
-  {id:7,  cat:"Snacks",  name:"Loaded Fries",          desc:"Fries with cheese sauce and chicken",     price:420,  img:"assets/img/menu/loaded-fries.jpg"},
+  {id:8,  cat:"Snacks",  name:"Chicken Nuggets",       desc:"8 pieces with dip",                       price:380,  img:"assets/img/menu/nuggets.jpg"},
   {id:9,  cat:"Snacks",  name:"Crispy Wings",          desc:"6 pieces, hot or BBQ",                    price:450,  img:"assets/img/menu/wings.jpg"},
   {id:10, cat:"Desi",    name:"Chicken Tikka",         desc:"Charcoal-grilled, 2 pieces with chutney", price:480,  img:"assets/img/menu/chicken-tikka.jpg"},
   {id:11, cat:"Desi",    name:"Chicken Karahi (Half)", desc:"Tomato, ginger and green chilli",         price:1450, img:"assets/img/menu/karahi.jpg"},
@@ -30,20 +31,21 @@ const CURRENCY = "Rs.";
   {id:15, cat:"Drinks",  name:"Doodh Patti Chai",      desc:"Kadak, made to order",                    price:120,  img:"assets/img/menu/chai.jpg"},
   {id:16, cat:"Drinks",  name:"Soft Drink (345ml)",    desc:"Cola, lemon-lime or orange",              price:100,  img:"assets/img/menu/soft-drink.jpg"},
   {id:17, cat:"Drinks",  name:"Chocolate Shake",       desc:"Thick and cold",                          price:350,  img:"assets/img/menu/shake.jpg"},
-  {id:18, cat:"Burgers", name:"Chicken Mayo Roll",     desc:"Crispy chicken fillet, mayo, lettuce",    price:200,  img:"assets/img/menu/shake.jpg"},
+  {id:18, cat:"Burgers", name:"Chicken Mayo Roll",     desc:"Crispy chicken fillet, mayo, lettuce",    price:200,  img:""}
 ];
- 
+
 const $ = id => document.getElementById(id);
 const val = id => { const e = $(id); return e ? e.value : ""; };
 const setVal = (id, v) => { const e = $(id); if (e) e.value = v; };
 const fmt = n => CURRENCY + " " + Math.round(n).toLocaleString("en-PK");
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
- 
+
 let cart = {};
+let lastOrder = {};   // aakhri order ka snapshot (kitchen slip ke liye)
 let cat = "All";
 let q = "";
 const cats = ["All", ...new Set(MENU.map(m => m.cat))];
- 
+
 function renderTabs(){
   $("tabs").innerHTML = cats.map(c =>
     `<button class="tab" aria-pressed="${c === cat}" data-c="${c}">${c}</button>`).join("");
@@ -53,13 +55,13 @@ function renderTabs(){
     renderMenu();
   });
 }
- 
+
 function renderMenu(){
   const list = MENU.filter(m =>
     (cat === "All" || m.cat === cat) &&
     (m.name + " " + m.desc + " " + m.cat).toLowerCase().includes(q)
   );
- 
+
   $("menu").innerHTML = list.length ? list.map(m => `
     <article class="item">
       ${m.img ? `<img class="em" src="${esc(m.img)}" alt="" onerror="this.style.display='none'">` : ""}
@@ -70,19 +72,19 @@ function renderMenu(){
         <button class="add" data-id="${m.id}">Add</button>
       </div>
     </article>`).join("") : `<div class="no-result">Koi item nahi mila. Koi aur naam try karein.</div>`;
- 
+
   $("menu").querySelectorAll(".add").forEach(b => b.onclick = () => change(+b.dataset.id, 1));
 }
- 
+
 function change(id, d){
   cart[id] = (cart[id] || 0) + d;
   if (cart[id] <= 0) delete cart[id];
   renderCart();
 }
- 
+
 function totals(){
   const sub = Object.entries(cart).reduce(
-    (s, [id, q]) => s + MENU.find(m => m.id == id).price * q, 0);
+    (s, [id, n]) => s + MENU.find(m => m.id == id).price * n, 0);
   const dv = Math.max(parseFloat(val("disc")) || 0, 0);
   const isPct = (val("discType") || "%") === "%";
   const disc = isPct ? sub * Math.min(dv, 100) / 100 : Math.min(dv, sub);
@@ -90,25 +92,25 @@ function totals(){
   const tax = after * TAX_RATE;
   return {sub, disc, val: dv, isPct, tax, total: after + tax};
 }
- 
+
 function renderCart(){
   const ids = Object.keys(cart);
- 
+
   $("lines").innerHTML = ids.length ? ids.map(id => {
-    const m = MENU.find(x => x.id == id), q = cart[id];
+    const m = MENU.find(x => x.id == id), n = cart[id];
     return `<div class="line">
       <span>${esc(m.name)}</span>
       <span class="qty">
-        <button data-id="${id}" data-d="-1" aria-label="Kam karein">−</button>${q}
+        <button data-id="${id}" data-d="-1" aria-label="Kam karein">−</button>${n}
         <button data-id="${id}" data-d="1" aria-label="Zyada karein">+</button>
       </span>
-      <span>${fmt(m.price * q)}</span>
+      <span>${fmt(m.price * n)}</span>
     </div>`;
-  }).join("") : `<div class="empty">There are no items yet. Click "Add" from the menu.</div>`;
- 
+  }).join("") : `<div class="empty">Abhi koi item nahi. Menu se "Add" dabayein.</div>`;
+
   $("lines").querySelectorAll(".qty button").forEach(b =>
     b.onclick = () => change(+b.dataset.id, +b.dataset.d));
- 
+
   const t = totals();
   const showSub = t.disc > 0 || TAX_RATE > 0;
   $("totals").innerHTML = ids.length ? `
@@ -116,12 +118,12 @@ function renderCart(){
     ${t.disc > 0 ? `<div class="tot off"><span>Discount${t.isPct ? " (" + t.val + "%)" : ""}</span><span>- ${fmt(t.disc)}</span></div>` : ""}
     ${TAX_RATE > 0 ? `<div class="tot"><span>Tax (${Math.round(TAX_RATE * 100)}%)</span><span>${fmt(t.tax)}</span></div>` : ""}
     <div class="tot big"><span>Total</span><span>${fmt(t.total)}</span></div>` : "";
- 
+
   $("go").disabled = !ids.length;
   const nc = $("navCount");
   if (nc) nc.textContent = Object.values(cart).reduce((a, b) => a + b, 0);
 }
- 
+
 function nextOrderNo(){
   let n = 1;
   try {
@@ -132,19 +134,20 @@ function nextOrderNo(){
   }
   return String(n).padStart(4, "0");
 }
- 
+
 function buildReceipt(){
+  lastOrder = {...cart};
   const t = totals(), now = new Date(), no = nextOrderNo();
-  const rows = Object.entries(cart).map(([id, q]) => {
+  const rows = Object.entries(cart).map(([id, n]) => {
     const m = MENU.find(x => x.id == id);
-    return `<div class="r"><span>${q} x ${esc(m.name)}</span><span>${fmt(m.price * q)}</span></div>`;
+    return `<div class="r"><span>${n} x ${esc(m.name)}</span><span>${fmt(m.price * n)}</span></div>`;
   }).join("");
- 
+
   const date = now.toLocaleDateString("en-GB");
   const time = now.toLocaleTimeString("en-GB", {hour: "2-digit", minute: "2-digit"});
- 
+
   $("receipt").innerHTML = `
-    <img class="logo" src="logo.jpeg" alt="">
+    <img class="logo" src="assets/img/logo.jpeg" alt="">
     <h2>${esc(RESTAURANT.name)}</h2>
     <div class="c">${esc(RESTAURANT.sub)}<br>${esc(RESTAURANT.address)}<br>Tel: ${esc(RESTAURANT.phone)}</div>
     <hr>
@@ -161,7 +164,7 @@ function buildReceipt(){
     <hr>
     <div class="c">Good Food, Good Mood<br>Shukriya! Dobara tashreef layein.</div>`;
 }
- 
+
 // Kitchen slip: sirf items aur quantity, qeemat nahi
 function kitchenSlipHTML(){
   const rows = $("receipt").querySelectorAll(".r");
@@ -169,9 +172,9 @@ function kitchenSlipHTML(){
   const dt   = rows[1] ? rows[1].lastElementChild.textContent : "";
   const type = rows[2] ? rows[2].lastElementChild.textContent : "";
 
-  const items = Object.entries(cart).map(([id, q]) => {
+  const items = Object.entries(lastOrder).map(([id, n]) => {
     const m = MENU.find(x => x.id == id);
-    return `<div class="k-item">${q} x ${esc(m.name)}</div>` +
+    return `<div class="k-item">${n} x ${esc(m.name)}</div>` +
            (m.cat === "Deals" ? `<div class="k-desc">${esc(m.desc)}</div>` : "");
   }).join("");
 
@@ -187,6 +190,7 @@ function kitchenSlipHTML(){
     <div class="c">--- Kitchen Copy ---</div>`;
 }
 
+// Ek print mein 2 slips: customer ki aur kitchen ki
 function printReceipt(){
   const customer = $("receipt").innerHTML;
   const kitchen  = kitchenSlipHTML();
@@ -227,46 +231,43 @@ function printReceipt(){
   if (img && !img.complete) { img.onload = doPrint; img.onerror = doPrint; }
   else { doPrint(); }
 }
-  const img = d.querySelector("img.logo");
-  if (img && !img.complete) { img.onload = doPrint; img.onerror = doPrint; }
-  else { doPrint(); }
-}
- 
+
 function resetOrder(){
   cart = {};
   setVal("disc", "");
   renderCart();
 }
- 
+
 // ====== Buttons ======
 if ($("disc")) $("disc").oninput = renderCart;
 if ($("discType")) $("discType").onchange = renderCart;
- 
+
 // ====== Search ======
 if ($("search")) $("search").oninput = () => {
   q = $("search").value.trim().toLowerCase();
   renderMenu();
 };
- 
+
+// Order dabate hi receipt dikhegi aur print dialog khulega
 $("go").onclick = () => {
   buildReceipt();
   $("overlay").classList.add("show");
   setTimeout(printReceipt, 400);
 };
- 
+
 $("print").onclick = printReceipt;
- 
+
 $("close").onclick = () => {
   $("overlay").classList.remove("show");
   resetOrder();
 };
- 
+
 $("clear").onclick = resetOrder;
- 
+
 renderTabs();
 renderMenu();
 renderCart();
- 
+
 // ====== Live clock (navbar) ======
 function tickClock(){
   const n = new Date();
@@ -290,6 +291,7 @@ const dayKey = d => new Date(d).toDateString();
 const todayOrders = () => orders.filter(o => dayKey(o.t) === dayKey(Date.now()));
 const sumTotal = list => list.reduce((s, o) => s + o.total, 0);
 
+// Order place hote hi record karo aur stock kam karo
 const _buildReceipt = buildReceipt;
 buildReceipt = function(){
   const snap = {...cart}, t = totals();
@@ -307,6 +309,7 @@ buildReceipt = function(){
   updateStats();
 };
 
+// Stock se zyada item add na ho
 const _change = change;
 change = function(id, d){
   if (d > 0 && (cart[id] || 0) >= (stock[id] ?? DEFAULT_STOCK)) {
@@ -338,11 +341,11 @@ function openPanel(type){
       <td>${o.items.map(i => i.q + " x " + esc(i.name)).join(", ")}</td>
       <td class="num">${fmt(o.total)}</td></tr>`).join("");
     html = `<div class="stats">
-        <div class="stat"><span>Today's Orders</span><strong>${to.length}</strong></div>
-        <div class="stat"><span>Orders so far</span><strong>${orders.length}</strong></div>
+        <div class="stat"><span>Aaj ke orders</span><strong>${to.length}</strong></div>
+        <div class="stat"><span>Ab tak ke orders</span><strong>${orders.length}</strong></div>
       </div>
       ${rows ? `<div class="tblwrap"><table class="ptable"><thead><tr><th>Order</th><th>Time</th><th>Items</th><th class="num">Total</th></tr></thead><tbody>${rows}</tbody></table></div>`
-             : `<p class="pnote">No orders have been placed today.</p>`}`;
+             : `<p class="pnote">Aaj abhi koi order nahi hua.</p>`}`;
   }
 
   if (type === "payment") {
@@ -352,9 +355,9 @@ function openPanel(type){
       return `<tr><td>${tp}</td><td class="num">${l.length}</td><td class="num">${fmt(sumTotal(l))}</td></tr>`;
     }).join("");
     html = `<div class="stats">
-        <div class="stat"><span>Today's Rewards</span><strong>${fmt(sumTotal(to))}</strong></div>
-        <div class="stat"><span>The results so far</span><strong>${fmt(sumTotal(orders))}</strong></div>
-        <div class="stat"><span>Today's discount</span><strong>${fmt(to.reduce((s, o) => s + o.disc, 0))}</strong></div>
+        <div class="stat"><span>Aaj ki sale</span><strong>${fmt(sumTotal(to))}</strong></div>
+        <div class="stat"><span>Ab tak ki sale</span><strong>${fmt(sumTotal(orders))}</strong></div>
+        <div class="stat"><span>Aaj ka discount</span><strong>${fmt(to.reduce((s, o) => s + o.disc, 0))}</strong></div>
       </div>
       <div class="tblwrap"><table class="ptable"><thead><tr><th>Order type</th><th class="num">Orders</th><th class="num">Amount</th></tr></thead><tbody>${types}</tbody></table></div>`;
   }
@@ -364,7 +367,7 @@ function openPanel(type){
     const rows = MENU.map(m => `<tr class="${stock[m.id] <= 5 ? "low" : ""}">
       <td>${esc(m.name)}</td><td>${esc(m.cat)}</td>
       <td class="num"><input type="number" min="0" data-sid="${m.id}" value="${stock[m.id]}" aria-label="${esc(m.name)} stock"></td></tr>`).join("");
-    html = `<p class="pnote">The stock automatically decreases when an order is placed. If there is a new item, change the number. A red mark appears on 5 or less.</p>
+    html = `<p class="pnote">Order hone par stock khud kam hota hai. Naya maal aaye to number badal dein. 5 ya us se kam par laal nishan aata hai.</p>
       <div class="tblwrap"><table class="ptable"><thead><tr><th>Item</th><th>Category</th><th class="num">Stock</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
 
@@ -401,13 +404,13 @@ openPanel = function(type){
   let html = "";
   if (type === "orders" || type === "payment") {
     html = `<div class="clear-box">
-      <button type="button" class="cbtn-warn" data-act="clearToday">Clear today's account.</button>
-      <button type="button" class="cbtn-danger" data-act="clearAll">Clear all</button>
+      <button type="button" class="cbtn-warn" data-act="clearToday">Aaj ka hisaab clear karein</button>
+      <button type="button" class="cbtn-danger" data-act="clearAll">Sab clear karein</button>
     </div>`;
   }
   if (type === "stock") {
     html = `<div class="clear-box">
-      <button type="button" class="cbtn-warn" data-act="resetStock">Stock reset (all item ${DEFAULT_STOCK})</button>
+      <button type="button" class="cbtn-warn" data-act="resetStock">Stock reset karein (har item ${DEFAULT_STOCK})</button>
     </div>`;
   }
   $("panelBody").insertAdjacentHTML("beforeend", html);
