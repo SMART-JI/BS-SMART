@@ -162,31 +162,71 @@ function buildReceipt(){
     <div class="c">Good Food, Good Mood<br>Shukriya! Dobara tashreef layein.</div>`;
 }
  
+// Kitchen slip: sirf items aur quantity, qeemat nahi
+function kitchenSlipHTML(){
+  const rows = $("receipt").querySelectorAll(".r");
+  const no   = rows[0] ? rows[0].lastElementChild.textContent : "";
+  const dt   = rows[1] ? rows[1].lastElementChild.textContent : "";
+  const type = rows[2] ? rows[2].lastElementChild.textContent : "";
+
+  const items = Object.entries(cart).map(([id, q]) => {
+    const m = MENU.find(x => x.id == id);
+    return `<div class="k-item">${q} x ${esc(m.name)}</div>` +
+           (m.cat === "Deals" ? `<div class="k-desc">${esc(m.desc)}</div>` : "");
+  }).join("");
+
+  return `
+    <h2>KITCHEN ORDER</h2>
+    <div class="c big">Order # ${no}</div>
+    <div class="c">${dt}</div>
+    <hr>
+    <div class="c big">${type}</div>
+    <hr>
+    ${items}
+    <hr>
+    <div class="c">--- Kitchen Copy ---</div>`;
+}
+
 function printReceipt(){
-  const html = $("receipt").innerHTML;
+  const customer = $("receipt").innerHTML;
+  const kitchen  = kitchenSlipHTML();
+
   const f = document.createElement("iframe");
   f.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0";
   document.body.appendChild(f);
- 
+
   const d = f.contentWindow.document;
   d.open();
   d.write(`<html><head><title>Receipt</title><style>
-    @page{margin:4mm}
-    body{margin:0;width:72mm;font:13px/1.45 'Courier New',monospace;color:#000}
-    h2{text-align:center;font-size:18px;margin:4px 0}
+    @page{margin:2mm}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{margin:0;width:72mm;font:bold 14px/1.5 'Courier New',monospace;color:#000;-webkit-text-stroke:.35px #000}
+    h2{text-align:center;font-size:20px;margin:4px 0}
     .c{text-align:center}
-    hr{border:0;border-top:1px dashed #000;margin:8px 0}
+    .big{font-size:18px;font-weight:800}
+    hr{border:0;border-top:2px dashed #000;margin:8px 0}
     .r{display:flex;justify-content:space-between;gap:8px}
-    .b{font-weight:700;font-size:15px}
-    .logo{display:block;width:70px;height:70px;border-radius:50%;margin:0 auto 6px;filter:grayscale(1)}
-  </style></head><body>${html}</body></html>`);
+    .b{font-size:17px}
+    .logo{display:block;width:70px;height:70px;border-radius:50%;margin:0 auto 6px;filter:grayscale(1) contrast(1.4)}
+    .k-item{font-size:18px;font-weight:800;margin-top:6px}
+    .k-desc{font-size:13px;margin:0 0 4px 12px}
+    .tag{margin-top:6px;font-size:12px}
+    .kitchen{break-before:page;page-break-before:always}
+  </style></head><body>
+    <div class="slip">${customer}<div class="c tag">--- Customer Copy ---</div></div>
+    <div class="slip kitchen">${kitchen}</div>
+  </body></html>`);
   d.close();
- 
+
   const doPrint = () => {
     f.contentWindow.focus();
     f.contentWindow.print();
     setTimeout(() => f.remove(), 2000);
   };
+  const img = d.querySelector("img.logo");
+  if (img && !img.complete) { img.onload = doPrint; img.onerror = doPrint; }
+  else { doPrint(); }
+}
   const img = d.querySelector("img.logo");
   if (img && !img.complete) { img.onload = doPrint; img.onerror = doPrint; }
   else { doPrint(); }
