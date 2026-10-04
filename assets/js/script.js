@@ -691,15 +691,22 @@ function renderMenuForm(msg) {
     </div>`;
 }
 
-function renderMenuList() {
-  const rows = MENU.map(m => `<tr>
+let mq = "";   // Manage Menu ki search
+
+function renderMenuList(){
+  const list = MENU.filter(m =>
+    (m.name + " " + m.cat + " " + (m.desc || "")).toLowerCase().includes(mq));
+
+  const rows = list.map(m => `<tr>
       <td>${m.img ? `<img class="mthumb" src="${esc(m.img)}" alt="">` : ""}</td>
       <td><strong>${esc(m.name)}</strong><br><span class="pnote">${esc(m.cat)}</span></td>
       <td class="num">${fmt(m.price)}</td>
       <td class="macts">
         <button type="button" class="btn-edit" data-act="edit" data-id="${m.id}">Edit</button>
         <button type="button" class="btn-del" data-act="del" data-id="${m.id}">Delete</button>
-      </td></tr>`).join("");
+      </td></tr>`).join("")
+    || `<tr><td colspan="4" class="pnote">Koi item nahi mila. Doosra naam try karein.</td></tr>`;
+
   $("mList").innerHTML = `
     <div class="tblwrap"><table class="ptable">
       <thead><tr><th></th><th>Item</th><th class="num">Price</th><th></th></tr></thead>
@@ -710,9 +717,14 @@ function renderMenuList() {
     </div>`;
 }
 
-function renderMenuEditor(msg) {
+function renderMenuEditor(msg){
   $("panelTitle").textContent = "Manage Menu";
-  $("panelBody").innerHTML = `<div id="mFormBox"></div><div id="mList"></div>`;
+  $("panelBody").innerHTML = `
+    <div id="mFormBox"></div>
+    <div class="msearch">
+      <input id="mSearch" type="search" placeholder="Item search karein (naam ya category)" autocomplete="off" aria-label="Search menu items" value="${esc(mq)}">
+    </div>
+    <div id="mList"></div>`;
   renderMenuForm(msg);
   renderMenuList();
   $("panel").classList.add("show");
@@ -833,8 +845,13 @@ $("panelBody").addEventListener("change", e => {
     });
   }
 });
+$("panelBody").addEventListener("input", e => {
+  if (e.target.id !== "mSearch") return;
+  mq = e.target.value.trim().toLowerCase();
+  renderMenuList();
+});
 
-const closePanel = () => $("panel").classList.remove("show");
+const closePanel = () => { mq = ""; $("panel").classList.remove("show"); };
 $("panelClose").onclick = closePanel;
 $("panel").onclick = e => { if (e.target === $("panel")) closePanel(); };
 document.querySelectorAll("[data-panel]").forEach(b => b.onclick = () => openPanel(b.dataset.panel));
