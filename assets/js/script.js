@@ -411,8 +411,9 @@ function customerSlipHTML(snap, t, meta) {
     <h2>${esc(RESTAURANT.name)}</h2>
     <div class="c">${esc(RESTAURANT.sub)}<br>${esc(RESTAURANT.address)}<br>Tel: ${esc(RESTAURANT.phone)}</div>
     <hr>
-    <div class="r"><span>Order #</span><span>${meta.no}</span></div>
+       <div class="r"><span>Order #</span><span>${meta.no}</span></div>
     <div class="r"><span>Date</span><span>${meta.dt}</span></div>
+    <div class="r"><span>Time</span><span>${meta.tm}</span></div>
     <div class="r"><span>Type</span><span>${esc(meta.type)}</span></div>
     <hr>
     ${rows}
@@ -468,22 +469,26 @@ function printReceipt() {
 
   const d = f.contentWindow.document;
   d.open();
-  d.write(`<html><head><title>Receipt</title><style>
-    @page{margin:2mm}
+      d.write(`<html><head><title>Receipt</title><style>
+    @page{size:auto;margin:0}
     *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    body{margin:0;padding:0 3mm;box-sizing:border-box;width:72mm;font:bold 14px/1.5 'Courier New',monospace;color:#000;-webkit-text-stroke:.35px #000}
-    h2{text-align:center;font-size:20px;margin:4px 0}
+    html{width:100%}
+    body{margin:0;padding:0 3mm;box-sizing:border-box;width:100%;
+      font:700 17px/1.5 Tahoma,Verdana,'Segoe UI',Arial,sans-serif;color:#000;
+      font-variant-numeric:tabular-nums;
+      -webkit-text-stroke:.4px #000}
+    h2{text-align:center;font-size:25px;font-weight:800;letter-spacing:.5px;margin:4px 0}
     .c{text-align:center}
-    .big{font-size:18px;font-weight:800}
-    hr{border:0;border-top:2px dashed #000;margin:8px 0}
-    .r{display:flex;justify-content:space-between;gap:8px}
-    .r span:first-child{flex:1;min-width:0}
+    .big{font-size:22px;font-weight:800}
+    hr{border:0;border-top:2px dashed #000;margin:9px 0}
+    .r{display:flex;justify-content:space-between;gap:6px}
+    .r span:first-child{flex:1;min-width:0;overflow-wrap:anywhere}
     .r span:last-child{white-space:nowrap}
-    .b{font-size:17px}
-    .logo{display:block;width:70px;height:70px;border-radius:50%;margin:0 auto 6px;filter:grayscale(1) contrast(1.4)}
-    .k-item{font-size:18px;font-weight:800;margin-top:6px}
-    .k-desc{font-size:13px;margin:0 0 4px 12px}
-    .tag{margin-top:6px;font-size:12px}
+    .b{font-size:22px;font-weight:800}
+    .logo{display:block;width:90px;height:90px;border-radius:50%;margin:0 auto 6px;filter:grayscale(1) contrast(1.6)}
+    .k-item{font-size:22px;font-weight:800;margin-top:6px}
+    .k-desc{font-size:16px;margin:0 0 4px 12px}
+    .tag{margin-top:6px;font-size:14px;letter-spacing:.5px}
     .pg{break-before:page;page-break-before:always}
   </style></head><body>${itemSlipsHTML()}</body></html>`);
   d.close();
@@ -497,19 +502,19 @@ function printReceipt() {
   if (img && !img.complete) { img.onload = doPrint; img.onerror = doPrint; }
   else { doPrint(); }
 }
-
-function placeOrder() {
+function placeOrder(){
   if (!cartCount()) return;
-  const snap = { ...cart }, t = totals(), no = nextOrderNo(), now = new Date();
-  const dt = now.toLocaleDateString("en-GB") + " " + now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  const snap = {...cart}, t = totals(), no = nextOrderNo(), now = new Date();
+  const dt = now.toLocaleDateString("en-GB");
+  const tm = now.toLocaleTimeString("en-US", {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true});
   const type = val("type") || "Dine-in";
 
-  lastMeta = { no, dt, type, items: snap };
+  lastMeta = {no, dt, tm, type, items: snap};
   buildReceipt(snap, t, lastMeta);
 
   orders.push({
     no, t: Date.now(), total: t.total, disc: t.disc, type,
-    items: Object.entries(snap).map(([id, n]) => ({ id: +id, name: MENU.find(m => m.id == id).name, q: n }))
+    items: Object.entries(snap).map(([id, n]) => ({id: +id, name: MENU.find(m => m.id == id).name, q: n}))
   });
   Object.entries(snap).forEach(([id, n]) => { stock[id] = Math.max(0, (stock[id] || 0) - n); });
   lsSet("bsOrders", orders);
