@@ -474,6 +474,21 @@
     display: inline-block
   }
 
+  .msearch {
+    margin: 0 0 10px
+  }
+
+  .msearch input {
+    border: 2px solid var(--black);
+    border-radius: 99px;
+    padding: 9px 16px
+  }
+
+  .msearch input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 4px rgba(245, 184, 0, .25)
+  }
+
   .nav-cta b {
     background: var(--black);
     color: var(--gold);
