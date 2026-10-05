@@ -513,6 +513,19 @@ function printReceipt() {
   };
   Promise.race([ready, new Promise(res => setTimeout(res, 1500))]).then(go);
 }
+// Order hone par awaz
+function speak(text) {
+  if (!soundOn || !("speechSynthesis" in window)) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-IN";
+    u.rate = 0.95;
+    u.pitch = 1;
+    u.volume = 1;
+    speechSynthesis.speak(u);
+  } catch (e) { }
+}
 function placeOrder() {
   if (!cartCount()) return;
   const snap = { ...cart }, t = totals(), no = nextOrderNo(), now = new Date();
@@ -535,6 +548,9 @@ function placeOrder() {
   $("overlay").classList.add("show");
   confetti();
   sfx("order");
+  setTimeout(printReceipt, 400);
+    sfx("order");
+  setTimeout(() => speak("Nabeel Sir, order successfully"), 900);
   setTimeout(printReceipt, 400);
 }
 
