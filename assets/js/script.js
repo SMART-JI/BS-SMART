@@ -598,18 +598,41 @@ function openPanel(type) {
       </div>`;
   }
 
-  if (type === "payment") {
+   if (type === "payment") {
     title = "Total Payment";
     const types = ["Dine-in", "Takeaway", "Delivery"].map(tp => {
       const l = to.filter(o => o.type === tp);
       return `<tr><td>${tp}</td><td class="num">${l.length}</td><td class="num">${fmt(sumTotal(l))}</td></tr>`;
     }).join("");
+
+    // Din ke hisaab se record (naya se purana)
+    const days = {};
+    orders.forEach(o => {
+      const k = dayKey(o.t);
+      if (!days[k]) days[k] = { t: o.t, n: 0, sum: 0 };
+      days[k].n++;
+      days[k].sum += o.total;
+    });
+    const dayRows = Object.values(days).sort((a, b) => b.t - a.t).map(d => {
+      const dt = new Date(d.t);
+      return `<tr>
+        <td>${dt.getDate()}-${dt.getMonth() + 1}-${dt.getFullYear()}</td>
+        <td class="num">${d.n}</td>
+        <td class="num">${fmt(d.sum)}</td></tr>`;
+    }).join("");
+
     html = `<div class="stats">
         <div class="stat"><span>Today's sales</span><strong>${fmt(sumTotal(to))}</strong></div>
         <div class="stat"><span>All-time sales</span><strong>${fmt(sumTotal(orders))}</strong></div>
         <div class="stat"><span>Today's discount</span><strong>${fmt(to.reduce((s, o) => s + o.disc, 0))}</strong></div>
       </div>
       <div class="tblwrap"><table class="ptable"><thead><tr><th>Order type</th><th class="num">Orders</th><th class="num">Amount</th></tr></thead><tbody>${types}</tbody></table></div>
+
+      <h3 class="hist-t">📅 Daily Record</h3>
+      ${dayRows
+        ? `<div class="tblwrap"><table class="ptable"><thead><tr><th>Date</th><th class="num">Orders</th><th class="num">Amount</th></tr></thead><tbody>${dayRows}</tbody></table></div>`
+        : `<p class="pnote">No record exists yet.</p>`}
+
       <div class="clear-box">
         <button type="button" class="cbtn-warn" data-act="clearToday">Clear today's records</button>
         <button type="button" class="cbtn-danger" data-act="clearAll">Clear everything</button>
