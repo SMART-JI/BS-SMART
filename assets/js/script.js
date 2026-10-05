@@ -464,47 +464,55 @@ function buildReceipt(snap, t, meta) {
   lastCustomer = customerSlipHTML(snap, t, meta);
   $("receipt").innerHTML = itemSlipsHTML();
 }
+function printCSS(){
+  const F = PRINT_FONT_PX;
+  return `
+    @page{size:auto;margin:0}
+    *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    html,body{margin:0;padding:0}
+    body{width:${PRINT_WIDTH_MM}mm;margin-left:${PRINT_LEFT_MM}mm;font:${PRINT_WEIGHT} ${F}px/1.45 Arial,Helvetica,sans-serif;color:#000}
+    h2{text-align:center;font-size:${F + 5}px;font-weight:700;margin:3px 0}
+    .c{text-align:center}
+    .big{font-size:${F + 3}px;font-weight:700}
+    hr{border:0;border-top:1px dashed #000;margin:6px 0}
+    .r{display:flex;justify-content:space-between;align-items:flex-start;gap:6px}
+    .r span:first-child{flex:1;min-width:0;overflow-wrap:anywhere}
+    .r span:last-child{white-space:nowrap;text-align:right}
+    .b{font-size:${F + 3}px;font-weight:700}
+    .logo{display:block;width:64px;height:64px;border-radius:50%;margin:0 auto 4px;filter:grayscale(1) contrast(1.4)}
+    .k-item{font-size:${F + 3}px;font-weight:700;margin-top:5px;overflow-wrap:anywhere}
+    .k-desc{font-size:${F - 1}px;margin:0 0 3px 10px}
+    .tag{margin-top:5px;font-size:${F - 2}px}
+    .pg{break-before:page;page-break-before:always}
+  `;
+}
 
-function printReceipt() {
+function printHTML(body){
   const f = document.createElement("iframe");
   f.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0";
   document.body.appendChild(f);
 
   const d = f.contentWindow.document;
   d.open();
-      d.write(`<html><head><title>Receipt</title><style>
-    @page{size:auto;margin:0}
-    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    html{width:100%}
-    body{margin:0;padding:0 3mm;box-sizing:border-box;width:100%;
-      font:700 17px/1.5 Tahoma,Verdana,'Segoe UI',Arial,sans-serif;color:#000;
-      font-variant-numeric:tabular-nums;
-      -webkit-text-stroke:.4px #000}
-    h2{text-align:center;font-size:25px;font-weight:800;letter-spacing:.5px;margin:4px 0}
-    .c{text-align:center}
-    .big{font-size:22px;font-weight:800}
-    hr{border:0;border-top:2px dashed #000;margin:9px 0}
-    .r{display:flex;justify-content:space-between;gap:6px}
-    .r span:first-child{flex:1;min-width:0;overflow-wrap:anywhere}
-    .r span:last-child{white-space:nowrap}
-    .b{font-size:22px;font-weight:800}
-    .logo{display:block;width:90px;height:90px;border-radius:50%;margin:0 auto 6px;filter:grayscale(1) contrast(1.6)}
-    .k-item{font-size:22px;font-weight:800;margin-top:6px}
-    .k-desc{font-size:16px;margin:0 0 4px 12px}
-    .tag{margin-top:6px;font-size:14px;letter-spacing:.5px}
-    .pg{break-before:page;page-break-before:always}
-  </style></head><body>${itemSlipsHTML()}</body></html>`);
+  d.write(`<html><head><title>Print</title><style>${printCSS()}</style></head><body>${body}</body></html>`);
   d.close();
 
-  const doPrint = () => {
+  let done = false;
+  const go = () => {
+    if (done) return;
+    done = true;
     f.contentWindow.focus();
     f.contentWindow.print();
     setTimeout(() => f.remove(), 2000);
   };
   const img = d.querySelector("img.logo");
-  if (img && !img.complete) { img.onload = doPrint; img.onerror = doPrint; }
-  else { doPrint(); }
+  if (img && !img.complete) { img.onload = go; img.onerror = go; setTimeout(go, 1500); }
+  else { setTimeout(go, 200); }
 }
+
+function printReceipt(){ printHTML(itemSlipsHTML()); }
+ 
+
 function placeOrder(){
   if (!cartCount()) return;
   const snap = {...cart}, t = totals(), no = nextOrderNo(), now = new Date();
