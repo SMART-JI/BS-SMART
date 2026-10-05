@@ -2285,6 +2285,10 @@
     color: var(--ink);
     border-color: #3a3a3a
   }
+  #change { display: none; margin-top: 8px; padding: 10px 12px; border-radius: 10px; font-weight: 800; }
+#change.show { display: block; }
+#change.ok { background: #e6f6e9; color: #1b7a2f; border: 1px solid #1b7a2f; }
+#change.short { background: #fdeceb; color: #c0392b; border: 1px solid #c0392b; }
 
   body.dark .tab[aria-pressed="true"] {
     background: var(--gold);
