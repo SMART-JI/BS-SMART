@@ -1,3 +1,6 @@
+// =========================================================
+//  SETTINGS (change your settings here)
+// =========================================================
 const RESTAURANT = {
   name: "BS Smart",
   sub: "Fast Food & Restaurant",
@@ -7,12 +10,6 @@ const RESTAURANT = {
 const TAX_RATE = 0;          // use 0.13 for 13% tax
 const CURRENCY = "Rs.";
 const DEFAULT_STOCK = 50;    // starting stock of every item
-
-// ====== PRINT SETTINGS ======
-const PRINT_WIDTH_MM = 48;   // 58mm roll = 48, 80mm roll = 72
-const PRINT_LEFT_MM  = 0;    // left se kate to 2 ya 3 karein
-const PRINT_FONT_PX  = 13;   // font ka size
-const PRINT_WEIGHT   = 400;  // 400 normal, 700 bold
 
 // Starting menu (can be changed later from Manage Menu).
 // Items with category "Deals" only show in the Deals view.
@@ -464,68 +461,71 @@ function buildReceipt(snap, t, meta) {
   lastCustomer = customerSlipHTML(snap, t, meta);
   $("receipt").innerHTML = itemSlipsHTML();
 }
-function printCSS(){
-  const F = PRINT_FONT_PX;
-  return `
-    @page{size:auto;margin:0}
-    *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    html,body{margin:0;padding:0}
-    body{width:${PRINT_WIDTH_MM}mm;margin-left:${PRINT_LEFT_MM}mm;font:${PRINT_WEIGHT} ${F}px/1.45 Arial,Helvetica,sans-serif;color:#000}
-    h2{text-align:center;font-size:${F + 5}px;font-weight:700;margin:3px 0}
-    .c{text-align:center}
-    .big{font-size:${F + 3}px;font-weight:700}
-    hr{border:0;border-top:1px dashed #000;margin:6px 0}
-    .r{display:flex;justify-content:space-between;align-items:flex-start;gap:6px}
-    .r span:first-child{flex:1;min-width:0;overflow-wrap:anywhere}
-    .r span:last-child{white-space:nowrap;text-align:right}
-    .b{font-size:${F + 3}px;font-weight:700}
-    .logo{display:block;width:64px;height:64px;border-radius:50%;margin:0 auto 4px;filter:grayscale(1) contrast(1.4)}
-    .k-item{font-size:${F + 3}px;font-weight:700;margin-top:5px;overflow-wrap:anywhere}
-    .k-desc{font-size:${F - 1}px;margin:0 0 3px 10px}
-    .tag{margin-top:5px;font-size:${F - 2}px}
-    .pg{break-before:page;page-break-before:always}
-  `;
-}
 
-function printHTML(body){
+// ====== PRINT SETTINGS ======
+const PRINT_WIDTH_MM = 48;   // 58mm roll = 48, 80mm roll = 72
+const PRINT_LEFT_MM  = 0;    // slip left se kate to 2 ya 3 karein
+const PRINT_FONT_PX  = 13;   // font ka size
+const PRINT_WEIGHT   = 400;  // 400 normal, 700 bold
+
+function printReceipt() {
+  if (!lastCustomer) { toast("No order to print"); return; }
+
+  const old = document.getElementById("printFrame");
+  if (old) old.remove();
+
   const f = document.createElement("iframe");
-  f.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0";
+  f.id = "printFrame";
+  f.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden";
   document.body.appendChild(f);
 
   const d = f.contentWindow.document;
   d.open();
-  d.write(`<html><head><title>Print</title><style>${printCSS()}</style></head><body>${body}</body></html>`);
+  d.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><base href="${document.baseURI}"><title>Receipt</title><style>
+    @page { size: ${PRINT_WIDTH_MM}mm auto; margin: 0; }
+    html, body { margin: 0; padding: 0; background: #fff; }
+    body { width: ${PRINT_WIDTH_MM}mm; padding-left: ${PRINT_LEFT_MM}mm; box-sizing: content-box;
+           font-family: Arial, Helvetica, sans-serif; font-size: ${PRINT_FONT_PX}px;
+           font-weight: ${PRINT_WEIGHT}; color: #000; }
+    .slip { width: 100%; padding: 2mm 0; }
+    .pg { page-break-before: always; break-before: page; }
+    h2 { text-align: center; margin: 2px 0; font-size: 1.3em; }
+    hr { border: 0; border-top: 1px dashed #000; margin: 4px 0; }
+    .r { display: flex; justify-content: space-between; gap: 6px; }
+    .r span:first-child { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    .r span:last-child { white-space: nowrap; }
+    .c { text-align: center; }
+    .b { font-weight: 700; font-size: 1.15em; }
+    .big { font-size: 1.4em; font-weight: 700; }
+    .tag { font-size: .85em; margin-top: 4px; }
+    .logo { display: block; margin: 0 auto 2px; width: 26mm; max-width: 100%; filter: grayscale(1); }
+    .k-item { font-size: 1.2em; font-weight: 700; margin: 2px 0; }
+    .k-desc { font-size: .85em; margin: 0 0 4px 8px; }
+  </style></head><body>${itemSlipsHTML()}</body></html>`);
   d.close();
 
-  let done = false;
+  const imgs = [...d.images];
+  const ready = Promise.all(imgs.map(im => im.complete ? 1 :
+    new Promise(res => { im.onload = im.onerror = res; })));
   const go = () => {
-    if (done) return;
-    done = true;
-    f.contentWindow.focus();
-    f.contentWindow.print();
-    setTimeout(() => f.remove(), 2000);
+    try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { }
+    setTimeout(() => f.remove(), 60000);
   };
-  const img = d.querySelector("img.logo");
-  if (img && !img.complete) { img.onload = go; img.onerror = go; setTimeout(go, 1500); }
-  else { setTimeout(go, 200); }
+  Promise.race([ready, new Promise(res => setTimeout(res, 1500))]).then(go);
 }
-
-function printReceipt(){ printHTML(itemSlipsHTML()); }
- 
-
-function placeOrder(){
+function placeOrder() {
   if (!cartCount()) return;
-  const snap = {...cart}, t = totals(), no = nextOrderNo(), now = new Date();
+  const snap = { ...cart }, t = totals(), no = nextOrderNo(), now = new Date();
   const dt = now.toLocaleDateString("en-GB");
-  const tm = now.toLocaleTimeString("en-US", {hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true});
+  const tm = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
   const type = val("type") || "Dine-in";
 
-  lastMeta = {no, dt, tm, type, items: snap};
+  lastMeta = { no, dt, tm, type, items: snap };
   buildReceipt(snap, t, lastMeta);
 
   orders.push({
     no, t: Date.now(), total: t.total, disc: t.disc, type,
-    items: Object.entries(snap).map(([id, n]) => ({id: +id, name: MENU.find(m => m.id == id).name, q: n}))
+    items: Object.entries(snap).map(([id, n]) => ({ id: +id, name: MENU.find(m => m.id == id).name, q: n }))
   });
   Object.entries(snap).forEach(([id, n]) => { stock[id] = Math.max(0, (stock[id] || 0) - n); });
   lsSet("bsOrders", orders);
@@ -704,7 +704,7 @@ function renderMenuForm(msg) {
 
 let mq = "";   // Manage Menu ki search
 
-function renderMenuList(){
+function renderMenuList() {
   const list = MENU.filter(m =>
     (m.name + " " + m.cat + " " + (m.desc || "")).toLowerCase().includes(mq));
 
@@ -728,7 +728,7 @@ function renderMenuList(){
     </div>`;
 }
 
-function renderMenuEditor(msg){
+function renderMenuEditor(msg) {
   $("panelTitle").textContent = "Manage Menu";
   $("panelBody").innerHTML = `
     <div id="mFormBox"></div>
