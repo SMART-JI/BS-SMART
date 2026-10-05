@@ -1588,16 +1588,20 @@ if (yr) yr.textContent = new Date().getFullYear();
  })();
 
 // =========================================================
-//  LIVE PUBLISH: website se seedha GitHub par
+//  LIVE PUBLISH: website se seedha GitHub par (menu)
 // =========================================================
-const ghGet = () => lsGet("bsGH", { owner: "smart-ji", repo: "BS-SMART", branch: "main", token: "", auto: false });
+const GH_FILE = "data/bs-data.json";
+const ghGet = () => lsGet("bsGH", { owner: "SMART-JI", repo: "BS-SMART", branch: "main", token: "", auto: false });
 let ghTimer;
 
 async function ghPublish(silent) {
   const g = ghGet();
-  if (!g.token || !g.owner || !g.repo) { if (!silent) toast("Pehle GitHub ki details save karein"); return false; }
+  if (!g.token || !g.owner || !g.repo) {
+    if (!silent) toast("Pehle GitHub ki details save karein");
+    return false;
+  }
 
-  const api = `https://api.github.com/repos/${encodeURIComponent(g.owner)}/${encodeURIComponent(g.repo)}/contents/data/bs-data.json`;
+  const api = `https://api.github.com/repos/${encodeURIComponent(g.owner)}/${encodeURIComponent(g.repo)}/contents/${GH_FILE}`;
   const headers = { Authorization: "Bearer " + g.token, Accept: "application/vnd.github+json" };
 
   try {
@@ -1606,13 +1610,18 @@ async function ghPublish(silent) {
     if (r0.ok) sha = (await r0.json()).sha;
     else if (r0.status !== 404) throw new Error(r0.status);
 
-    const data = { version: 1, ...currentSettings(), menu: JSON.parse(JSON.stringify(MENU)) };
+    const data = { version: 1, updated: Date.now(), menu: JSON.parse(JSON.stringify(MENU)) };
     const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
 
     const r1 = await fetch(api, {
       method: "PUT",
       headers: { ...headers, "Content-Type": "application/json" },
-      body: JSON.stringify({ message: "BS Smart: menu/settings update", content, branch: g.branch, ...(sha ? { sha } : {}) })
+      body: JSON.stringify({
+        message: "BS Smart: menu update",
+        content,
+        branch: g.branch,
+        ...(sha ? { sha } : {})
+      })
     });
     if (!r1.ok) throw new Error(r1.status);
 
@@ -1624,7 +1633,7 @@ async function ghPublish(silent) {
   }
 }
 
-// Menu ya settings save hote hi (agar auto on ho) khud publish
+// Menu save hote hi (agar auto on ho) khud publish
 function queueGH() {
   const g = ghGet();
   if (!g.auto || !g.token) return;
@@ -1633,18 +1642,31 @@ function queueGH() {
 }
 const _saveMenuGH = saveMenu;
 saveMenu = function () { const ok = _saveMenuGH(); queueGH(); return ok; };
-const _saveSettingsGH = saveSettings;
-saveSettings = function () { _saveSettingsGH(); queueGH(); };
 
-// Settings panel mein GitHub ka hissa
-const _renderSettingsGH = renderSettings;
-renderSettings = function (msg) {
-  _renderSettingsGH(msg);
+// Site khulte hi live menu uthayein (agar is device par local menu na ho)
+async function loadLiveMenu() {
+  if (lsGet("bsMenu", null)) return;
+  try {
+    const r = await fetch(GH_FILE + "?t=" + Date.now(), { cache: "no-store" });
+    if (!r.ok) return;
+    const d = await r.json();
+    if (Array.isArray(d.menu) && d.menu.length) {
+      MENU.splice(0, MENU.length, ...d.menu);
+      refreshMenuUI();
+    }
+  } catch (e) { }
+}
+loadLiveMenu();
+
+// Live publish panel
+function openGHPanel(msg) {
+  curPanel = "gh";
   const g = ghGet();
-  $("panelBody").insertAdjacentHTML("beforeend", `
+  $("panelTitle").textContent = "🚀 Live publish (GitHub)";
+  $("panelBody").innerHTML = `
     <div class="mform">
-      <h3>🚀 Live publish (GitHub)</h3>
-      <p class="pnote">Token sirf is computer ke browser mein save hota hai. Ye wahi token ho jo sirf BS-SMART repo ko "Contents: Read and write" deta ho.</p>
+      ${msg ? `<p class="mmsg">${esc(msg)}</p>` : ""}
+      <p class="pnote">Token sirf is computer ke browser mein save hota hai. Sirf BS-SMART repo ka "Contents: Read and write" wala token lagayein, aur ye setup sirf apne personal device par karein.</p>
       <div class="mgrid">
         <div><label for="gOwner">GitHub username</label><input id="gOwner" value="${esc(g.owner)}"></div>
         <div><label for="gRepo">Repo naam</label><input id="gRepo" value="${esc(g.repo)}"></div>
@@ -1652,15 +1674,20 @@ renderSettings = function (msg) {
         <div><label for="gToken">Token</label><input id="gToken" type="password" autocomplete="off" placeholder="${g.token ? "(saved hai, badalna ho to naya likhein)" : "github_pat_..."}"></div>
       </div>
       <label style="display:flex;gap:8px;align-items:center;margin-top:10px">
-        <input id="gAuto" type="checkbox" style="width:auto"${g.auto ? " checked" : ""}> Menu ya settings save hote hi khud publish karein
+        <input id="gAuto" type="checkbox" style="width:auto"${g.auto ? " checked" : ""}> Menu save hote hi khud publish karein
       </label>
       <div class="mbtns">
         <button type="button" class="cbtn-warn" data-gact="ghpub">🚀 Abhi publish karein</button>
         <button type="button" class="btn-lite" data-gact="ghsave">Details save</button>
         <button type="button" class="btn-lite" data-gact="ghclear">Token hatayein</button>
       </div>
-    </div>`);
-};
+      <div class="mbtns">
+        <button type="button" class="btn-lite" data-gact="ghlocal">Is device ka local menu hatayein (live menu uthayein)</button>
+      </div>
+    </div>`;
+  $("panel").classList.add("show");
+  $("panel").scrollTop = 0;
+}
 
 function ghSaveFields() {
   const old = ghGet();
@@ -1677,11 +1704,36 @@ $("panelBody").addEventListener("click", async e => {
   const b = e.target.closest("[data-gact]");
   if (!b) return;
   const a = b.dataset.gact;
-  if (a === "ghsave") { ghSaveFields(); renderSettings("GitHub ki details save ho gayin."); }
+  if (a === "ghsave") { ghSaveFields(); openGHPanel("GitHub ki details save ho gayin."); }
   if (a === "ghpub") { ghSaveFields(); await ghPublish(false); }
   if (a === "ghclear") {
-    const g = ghGet(); g.token = ""; g.auto = false;
+    const g = ghGet();
+    g.token = "";
+    g.auto = false;
     lsSet("bsGH", g);
-    renderSettings("Token hata diya gaya.");
+    openGHPanel("Token hata diya gaya.");
+  }
+  if (a === "ghlocal") {
+    if (!confirm("Is device ka local menu hat jayega aur live menu load hoga. Theek hai?")) return;
+    try { localStorage.removeItem("bsMenu"); } catch (err) { }
+    location.reload();
   }
 });
+
+// Header me 🚀 button
+(function () {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.id = "ghBtn";
+  b.title = "Live publish";
+  b.setAttribute("aria-label", "Live publish");
+  b.textContent = "🚀";
+  b.onclick = () => openGHPanel();
+  const box = document.querySelector(".hb-in .social");
+  if (box) {
+    box.insertBefore(b, box.firstChild);
+  } else {
+    b.style.cssText = "position:fixed;left:12px;bottom:12px;z-index:60;width:42px;height:42px;border-radius:50%;border:0;font-size:20px;cursor:pointer;background:#f5b800";
+    document.body.appendChild(b);
+  }
+})();
