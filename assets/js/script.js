@@ -14,29 +14,300 @@ const DEFAULT_STOCK = 50;    // starting stock of every item
 // Starting menu (can be changed later from Manage Menu).
 // Items with category "Deals" only show in the Deals view.
 const DEFAULT_MENU = [
-  { id: 101, cat: "Deals", name: "Solo Deal", desc: "Zinger Burger + Fries + Soft Drink", price: 850, img: "" },
-  { id: 102, cat: "Deals", name: "Couple Deal", desc: "2 Zinger Burgers + Loaded Fries + 2 Soft Drinks", price: 1350, img: "" },
-  { id: 103, cat: "Deals", name: "Pizza Deal", desc: "Medium Tikka Pizza + 8 Nuggets + 2 Soft Drinks", price: 1650, img: "" },
-  { id: 104, cat: "Deals", name: "Family Deal", desc: "Medium Pizza + 2 Zinger Burgers + Loaded Fries + 4 Soft Drinks", price: 2650, img: "" },
+  {
+    id: 1,
+    cat: "FastFood",
+    name: "Zinger Burger",
+    desc: "Crispy chicken zinger burger",
+    price: 300,
+    img: ""
+  },
+  {
+    id: 2,
+    cat: "FastFood",
+    name: "Zinger Burger Cheese",
+    desc: "Zinger burger with cheese",
+    price: 350,
+    img: ""
+  },
+  {
+    id: 3,
+    cat: "FastFood",
+    name: "Zinger Burger Jumbo",
+    desc: "Jumbo crispy chicken zinger burger",
+    price: 450,
+    img: ""
+  },
+  {
+    id: 4,
+    cat: "FastFood",
+    name: "Beef Burger",
+    desc: "Juicy beef burger",
+    price: 300,
+    img: ""
+  },
+  {
+    id: 5,
+    cat: "FastFood",
+    name: "Beef Burger Cheese",
+    desc: "Beef burger with cheese",
+    price: 350,
+    img: ""
+  },
+  {
+    id: 6,
+    cat: "FastFood",
+    name: "Club Sandwich",
+    desc: "Fresh chicken club sandwich",
+    price: 400,
+    img: ""
+  },
+  {
+    id: 7,
+    cat: "FastFood",
+    name: "Chicken Sandwich",
+    desc: "Delicious chicken sandwich",
+    price: 450,
+    img: ""
+  },
+  {
+    id: 8,
+    cat: "FastFood",
+    name: "BBQ Sandwich",
+    desc: "Chicken sandwich with BBQ flavor",
+    price: 450,
+    img: ""
+  },
+  {
+    id: 9,
+    cat: "FastFood",
+    name: "Plan Fries",
+    desc: "Fries",
+    price: 150,
+    img: ""
+  },
+  {
+    id: 10,
+    cat: "FastFood",
+    name: "Mayo Fries",
+    desc: "Mayo Yammi Fries",
+    price: 200,
+    img: ""
+  },
+  {
+    id: 11,
+    cat: "FastFood",
+    name: "Cheese Fries",
+    desc: "Cheese Yammi Fries",
+    price: 200,
+    img: ""
+  },
+  {
+    id: 12,
+    cat: "EXTRAS",
+    name: "Paratha (SMALL)",
+    desc: " Yammi ",
+    price: 50,
+    img: ""
+  },
+  {
+    id: 13,
+    cat: "EXTRAS",
+    name: "Paratha (LARGE)",
+    desc: "Yammi",
+    price: 100,
+    img: ""
+  },
+  {
+    id: 13,
+    cat: "EXTRAS",
+    name: "Chapati",
+    desc: "Yammi",
+    price: 20,
+    img: ""
+  },
+  {
+    id: 14,
+    cat: "BBQ",
+    name: "Zinger Roll",
+    desc: "Crispy chicken zinger roll",
+    price: 150,
+    img: ""
+  },
+  {
+    id: 15,
+    cat: "BBQ",
+    name: "Zinger Jumbo Roll",
+    desc: "Jumbo crispy chicken zinger roll",
+    price: 250,
+    img: ""
+  },
+  {
+    id: 16,
+    cat: "BBQ",
+    name: "Boti Roll",
+    desc: "Chicken boti roll",
+    price: 150,
+    img: ""
+  },
+  {
+    id: 17,
+    cat: "BBQ",
+    name: "Kabab Roll",
+    desc: "Chicken kabab roll",
+    price: 150,
+    img: ""
+  },
+  {
+    id: 18,
+    cat: "BBQ",
+    name: "Chicken Roll",
+    desc: "Chicken roll",
+    price: 150,
+    img: ""
+  },
+  {
+    id: 19,
+    cat: "BBQ",
+    name: "Chicken Mayo Garlic Roll",
+    desc: "Chicken roll with mayo garlic sauce",
+    price: 150,
+    img: ""
+  },
+  {
+    id: 20,
+    cat: "BBQ",
+    name: "Chicken Malai Boti Roll",
+    desc: "Creamy chicken malai boti roll",
+    price: 150,
+    img: ""
+  },
+  {
+    id: 21,
+    cat: "BBQ",
+    name: "Chicken Crispy Roll",
+    desc: "Crispy chicken roll",
+    price: 150,
+    img: ""
+  },
+  {
+    id: 22,
+    cat: "Pizza",
+    name: "Chicken Fajita",
+    desc: "Chicken fajita pizza",
+    price: 300,
+    prices: {
+      Small: 300,
+      Medium: 500,
+      Large: 700
+    },
+    img: ""
+  },
+  {
+    id: 23,
+    cat: "Pizza",
+    name: "Chicken Tikka",
+    desc: "Chicken tikka pizza",
+    price: 300,
+    prices: {
+      Small: 300,
+      Medium: 500,
+      Large: 700
+    },
+    img: ""
+  },
+  {
+    id: 24,
+    cat: "Pizza",
+    name: "Chicken Malai",
+    desc: "Creamy chicken malai pizza",
+    price: 300,
+    prices: {
+      Small: 300,
+      Medium: 500,
+      Large: 700
+    },
+    img: ""
+  },
+  {
+    id: 25,
+    cat: "Pizza",
+    name: "BBQ Chicken",
+    desc: "BBQ chicken pizza",
+    price: 300,
+    prices: {
+      Small: 300,
+      Medium: 500,
+      Large: 700
+    },
+    img: ""
+  },
+  {
+    id: 26,
+    cat: "Pizza",
+    name: "Chicken Supreme",
+    desc: "Loaded chicken supreme pizza",
+    price: 300,
+    prices: {
+      Small: 300,
+      Medium: 500,
+      Large: 700
+    },
+    img: ""
+  },
+  {
+    id: 27,
+    cat: "Pizza",
+    name: "Chicken Shish",
+    desc: "Chicken shish pizza",
+    price: 300,
+    prices: {
+      Small: 300,
+      Medium: 500,
+      Large: 700
+    },
+    img: ""
+  },
+  {
+    id: 28,
+    cat: "Pizza",
+    name: "Chicken Cheese",
+    desc: "Chicken cheese pizza",
+    price: 300,
+    prices: {
+      Small: 300,
+      Medium: 500,
+      Large: 700
+    },
+    img: ""
+  },
+  {
+    id: 29,
+    cat: "Pizza",
+    name: "Vegetable",
+    desc: "Fresh vegetable pizza",
+    price: 300,
+    prices: {
+      Small: 300,
+      Medium: 500,
+      Large: 700
+    },
+    img: ""
+  },
+  {
+    id: 30,
+    cat: "Pizza",
+    name: "Special (BS Smart)",
+    desc: "Special signature pizza",
+    price: 400,
+    prices: {
+      Small: 400,
+      Medium: 700,
+      Large: 1000
+    },
+    img: ""
+  }
 
-  { id: 1, cat: "Burgers", name: "Zinger Burger", desc: "Crispy chicken fillet, mayo, lettuce", price: 450, img: "assets/img/menu/zinger.jpg" },
-  { id: 2, cat: "Burgers", name: "Beef Smash Burger", desc: "Double patty, cheese, special sauce", price: 690, img: "assets/img/menu/smash-burger.jpg" },
-  { id: 3, cat: "Burgers", name: "Chicken Club Sandwich", desc: "Grilled chicken, egg, cheese, fries", price: 520, img: "assets/img/menu/club-sandwich.jpg" },
-  { id: 4, cat: "Pizza", name: "Chicken Tikka Pizza", desc: "Medium, tikka chunks and onion", price: 1250, img: "assets/img/menu/tikka-pizza.jpg" },
-  { id: 5, cat: "Pizza", name: "Fajita Pizza", desc: "Medium, peppers, olives and cheese", price: 1250, img: "assets/img/menu/fajita-pizza.jpg" },
-  { id: 6, cat: "Pizza", name: "Pepperoni Pizza", desc: "Medium, beef pepperoni, mozzarella", price: 1350, img: "assets/img/menu/pepperoni-pizza.jpg" },
-  { id: 7, cat: "Snacks", name: "Loaded Fries", desc: "Fries with cheese sauce and chicken", price: 420, img: "assets/img/menu/loaded-fries.jpg" },
-  { id: 8, cat: "Snacks", name: "Chicken Nuggets", desc: "8 pieces with dip", price: 380, img: "assets/img/menu/nuggets.jpg" },
-  { id: 9, cat: "Snacks", name: "Crispy Wings", desc: "6 pieces, hot or BBQ", price: 450, img: "assets/img/menu/wings.jpg" },
-  { id: 10, cat: "Desi", name: "Chicken Tikka", desc: "Charcoal-grilled, 2 pieces with chutney", price: 480, img: "assets/img/menu/chicken-tikka.jpg" },
-  { id: 11, cat: "Desi", name: "Chicken Karahi (Half)", desc: "Tomato, ginger and green chilli", price: 1450, img: "assets/img/menu/karahi.jpg" },
-  { id: 12, cat: "Desi", name: "Chicken Biryani", desc: "With raita", price: 520, img: "assets/img/menu/biryani.jpg" },
-  { id: 13, cat: "Desi", name: "Roghni Naan", desc: "Tandoor-baked, sesame", price: 70, img: "assets/img/menu/naan.jpg" },
-  { id: 14, cat: "Drinks", name: "Mint Margarita", desc: "Mint, lemon, soda", price: 250, img: "assets/img/menu/margarita.jpg" },
-  { id: 15, cat: "Drinks", name: "Doodh Patti Chai", desc: "Kadak, made to order", price: 120, img: "assets/img/menu/chai.jpg" },
-  { id: 16, cat: "Drinks", name: "Soft Drink (345ml)", desc: "Cola, lemon-lime or orange", price: 100, img: "assets/img/menu/soft-drink.jpg" },
-  { id: 17, cat: "Drinks", name: "Chocolate Shake", desc: "Thick and cold", price: 350, img: "assets/img/menu/shake.jpg" },
-  { id: 18, cat: "Burgers", name: "Chicken Mayo Roll", desc: "Crispy chicken fillet, mayo, lettuce", price: 200, img: "" }
 ];
 
 // =========================================================
@@ -341,6 +612,22 @@ function updateCartbar(count) {
   bar.classList.toggle("show", count > 0 && !orderVisible);
 }
 
+function renderChange() {
+  const box = $("change");
+  if (!box) return;
+  const paid = parseFloat(val("paid")) || 0;
+  if (!paid || !cartCount()) { box.className = ""; box.textContent = ""; return; }
+  const diff = paid - totals().total;
+  if (diff >= 0) {
+    box.className = "show ok";
+    box.textContent = "💵 To give back.: " + fmt(diff);
+  } else {
+    box.className = "show short";
+    box.textContent = "⚠️ Abhi " + fmt(-diff) + " kam hain";
+  }
+}
+
+
 function renderCart() {
   const ids = Object.keys(cart);
 
@@ -374,7 +661,8 @@ function renderCart() {
   }
   prevCount = count;
   prevIds = ids;
-  renderUpsell();
+   renderUpsell();
+  renderChange();
   updateCartbar(count);
 }
 
@@ -382,6 +670,7 @@ function resetOrder() {
   cart = {};
   prevIds = [];
   setVal("disc", "");
+    setVal("paid", "");
   renderCart();
 }
 
@@ -422,6 +711,8 @@ function customerSlipHTML(snap, t, meta) {
     ${t.disc > 0 ? `<div class="r"><span>Discount${t.isPct ? " (" + t.val + "%)" : ""}</span><span>- ${fmt(t.disc)}</span></div>` : ""}
     ${TAX_RATE > 0 ? `<div class="r"><span>Tax (${Math.round(TAX_RATE * 100)}%)</span><span>${fmt(t.tax)}</span></div>` : ""}
     <div class="r b"><span>TOTAL</span><span>${fmt(t.total)}</span></div>
+        ${meta.paid > 0 ? `<div class="r"><span>Cash</span><span>${fmt(meta.paid)}</span></div>
+    <div class="r"><span>Wapis (Change)</span><span>${fmt(Math.max(meta.paid - t.total, 0))}</span></div>` : ""}
     <hr>
     <div class="c">Good Food, Good Mood<br>Thank you! Please visit again.</div>
     <div class="c tag">--- Customer Copy ---</div>`;
@@ -533,7 +824,7 @@ function placeOrder() {
   const tm = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
   const type = val("type") || "Dine-in";
 
-  lastMeta = { no, dt, tm, type, items: snap };
+    lastMeta = { no, dt, tm, type, items: snap, paid: parseFloat(val("paid")) || 0 };
   buildReceipt(snap, t, lastMeta);
 
   orders.push({
@@ -909,6 +1200,7 @@ document.querySelectorAll("[data-panel]").forEach(b => b.onclick = () => openPan
 // =========================================================
 //  BUTTONS AND EVENTS
 // =========================================================
+$("paid").oninput = renderChange;
 $("disc").oninput = renderCart;
 $("discType").onchange = renderCart;
 $("search").oninput = () => { q = $("search").value.trim().toLowerCase(); renderMenu(); };
@@ -1586,4 +1878,3 @@ if (yr) yr.textContent = new Date().getFullYear();
     }
   };
  })();
-
