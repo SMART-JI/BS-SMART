@@ -2260,6 +2260,8 @@
     animation-delay: -2.1s
   }
 
+  .hist-t{font-size:1.15rem;margin:18px 0 6px}
+
   /* Dark mode */
   body.dark {
     --bg: #121212;
