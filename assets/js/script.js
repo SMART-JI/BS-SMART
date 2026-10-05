@@ -193,122 +193,229 @@ const DEFAULT_MENU = [
   {
     id: 22,
     cat: "Pizza",
-    name: "Chicken Fajita",
+    name: "Chicken Fajita (SMALL)",
     desc: "Chicken fajita pizza",
     price: 300,
-    prices: {
-      Small: 300,
-      Medium: 500,
-      Large: 700
-    },
     img: ""
   },
   {
     id: 23,
     cat: "Pizza",
-    name: "Chicken Tikka",
-    desc: "Chicken tikka pizza",
-    price: 300,
-    prices: {
-      Small: 300,
-      Medium: 500,
-      Large: 700
-    },
+    name: "Chicken Fajita (MEDIUM)",
+    desc: "Chicken fajita pizza",
+    price: 500,
     img: ""
   },
   {
     id: 24,
     cat: "Pizza",
-    name: "Chicken Malai",
-    desc: "Creamy chicken malai pizza",
-    price: 300,
-    prices: {
-      Small: 300,
-      Medium: 500,
-      Large: 700
-    },
+    name: "Chicken Fajita (LARGE)",
+    desc: "Chicken fajita pizza",
+    price: 700,
     img: ""
   },
+
   {
     id: 25,
     cat: "Pizza",
-    name: "BBQ Chicken",
-    desc: "BBQ chicken pizza",
+    name: "Chicken Tikka (SMALL)",
+    desc: "Chicken tikka pizza",
     price: 300,
-    prices: {
-      Small: 300,
-      Medium: 500,
-      Large: 700
-    },
     img: ""
   },
   {
     id: 26,
     cat: "Pizza",
-    name: "Chicken Supreme",
-    desc: "Loaded chicken supreme pizza",
-    price: 300,
-    prices: {
-      Small: 300,
-      Medium: 500,
-      Large: 700
-    },
+    name: "Chicken Tikka (MEDIUM)",
+    desc: "Chicken tikka pizza",
+    price: 500,
     img: ""
   },
   {
     id: 27,
     cat: "Pizza",
-    name: "Chicken Shish",
-    desc: "Chicken shish pizza",
-    price: 300,
-    prices: {
-      Small: 300,
-      Medium: 500,
-      Large: 700
-    },
+    name: "Chicken Tikka (LARGE)",
+    desc: "Chicken tikka pizza",
+    price: 700,
     img: ""
   },
+
   {
     id: 28,
     cat: "Pizza",
-    name: "Chicken Cheese",
-    desc: "Chicken cheese pizza",
+    name: "Chicken Malai (SMALL)",
+    desc: "Chicken malai pizza",
     price: 300,
-    prices: {
-      Small: 300,
-      Medium: 500,
-      Large: 700
-    },
     img: ""
   },
   {
     id: 29,
     cat: "Pizza",
-    name: "Vegetable",
-    desc: "Fresh vegetable pizza",
-    price: 300,
-    prices: {
-      Small: 300,
-      Medium: 500,
-      Large: 700
-    },
+    name: "Chicken Malai (MEDIUM)",
+    desc: "Chicken malai pizza",
+    price: 500,
     img: ""
   },
   {
     id: 30,
     cat: "Pizza",
-    name: "Special (BS Smart)",
+    name: "Chicken Malai (LARGE)",
+    desc: "Chicken malai pizza",
+    price: 700,
+    img: ""
+  },
+
+  {
+    id: 31,
+    cat: "Pizza",
+    name: "BBQ Chicken (SMALL)",
+    desc: "BBQ chicken pizza",
+    price: 300,
+    img: ""
+  },
+  {
+    id: 32,
+    cat: "Pizza",
+    name: "BBQ Chicken (MEDIUM)",
+    desc: "BBQ chicken pizza",
+    price: 500,
+    img: ""
+  },
+  {
+    id: 33,
+    cat: "Pizza",
+    name: "BBQ Chicken (LARGE)",
+    desc: "BBQ chicken pizza",
+    price: 700,
+    img: ""
+  },
+
+  {
+    id: 34,
+    cat: "Pizza",
+    name: "Chicken Supreme (SMALL)",
+    desc: "Chicken supreme pizza",
+    price: 300,
+    img: ""
+  },
+  {
+    id: 35,
+    cat: "Pizza",
+    name: "Chicken Supreme (MEDIUM)",
+    desc: "Chicken supreme pizza",
+    price: 500,
+    img: ""
+  },
+  {
+    id: 36,
+    cat: "Pizza",
+    name: "Chicken Supreme (LARGE)",
+    desc: "Chicken supreme pizza",
+    price: 700,
+    img: ""
+  },
+
+  {
+    id: 37,
+    cat: "Pizza",
+    name: "Chicken Shish (SMALL)",
+    desc: "Chicken shish pizza",
+    price: 300,
+    img: ""
+  },
+  {
+    id: 38,
+    cat: "Pizza",
+    name: "Chicken Shish (MEDIUM)",
+    desc: "Chicken shish pizza",
+    price: 500,
+    img: ""
+  },
+  {
+    id: 39,
+    cat: "Pizza",
+    name: "Chicken Shish (LARGE)",
+    desc: "Chicken shish pizza",
+    price: 700,
+    img: ""
+  },
+
+  {
+    id: 40,
+    cat: "Pizza",
+    name: "Chicken Cheese (SMALL)",
+    desc: "Chicken cheese pizza",
+    price: 300,
+    img: ""
+  },
+  {
+    id: 41,
+    cat: "Pizza",
+    name: "Chicken Cheese (MEDIUM)",
+    desc: "Chicken cheese pizza",
+    price: 500,
+    img: ""
+  },
+  {
+    id: 42,
+    cat: "Pizza",
+    name: "Chicken Cheese (LARGE)",
+    desc: "Chicken cheese pizza",
+    price: 700,
+    img: ""
+  },
+
+  {
+    id: 43,
+    cat: "Pizza",
+    name: "Vegetable (SMALL)",
+    desc: "Fresh vegetable pizza",
+    price: 300,
+    img: ""
+  },
+  {
+    id: 44,
+    cat: "Pizza",
+    name: "Vegetable (MEDIUM)",
+    desc: "Fresh vegetable pizza",
+    price: 500,
+    img: ""
+  },
+  {
+    id: 45,
+    cat: "Pizza",
+    name: "Vegetable (LARGE)",
+    desc: "Fresh vegetable pizza",
+    price: 700,
+    img: ""
+  },
+
+  {
+    id: 46,
+    cat: "Pizza",
+    name: "Special (BS Smart) (SMALL)",
     desc: "Special signature pizza",
     price: 400,
-    prices: {
-      Small: 400,
-      Medium: 700,
-      Large: 1000
-    },
+    img: ""
+  },
+  {
+    id: 47,
+    cat: "Pizza",
+    name: "Special (BS Smart) (MEDIUM)",
+    desc: "Special signature pizza",
+    price: 700,
+    img: ""
+  },
+  {
+    id: 48,
+    cat: "Pizza",
+    name: "Special (BS Smart) (LARGE)",
+    desc: "Special signature pizza",
+    price: 1000,
     img: ""
   }
-
 ];
+
 
 // =========================================================
 //  HELPERS
