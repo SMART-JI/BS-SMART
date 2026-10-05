@@ -1585,4 +1585,103 @@ if (yr) yr.textContent = new Date().getFullYear();
       });
     }
   };
-})();
+ })();
+
+// =========================================================
+//  LIVE PUBLISH: website se seedha GitHub par
+// =========================================================
+const ghGet = () => lsGet("bsGH", { owner: "smart-ji", repo: "BS-SMART", branch: "main", token: "", auto: false });
+let ghTimer;
+
+async function ghPublish(silent) {
+  const g = ghGet();
+  if (!g.token || !g.owner || !g.repo) { if (!silent) toast("Pehle GitHub ki details save karein"); return false; }
+
+  const api = `https://api.github.com/repos/${encodeURIComponent(g.owner)}/${encodeURIComponent(g.repo)}/contents/data/bs-data.json`;
+  const headers = { Authorization: "Bearer " + g.token, Accept: "application/vnd.github+json" };
+
+  try {
+    let sha;
+    const r0 = await fetch(api + "?ref=" + encodeURIComponent(g.branch), { headers });
+    if (r0.ok) sha = (await r0.json()).sha;
+    else if (r0.status !== 404) throw new Error(r0.status);
+
+    const data = { version: 1, ...currentSettings(), menu: JSON.parse(JSON.stringify(MENU)) };
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+
+    const r1 = await fetch(api, {
+      method: "PUT",
+      headers: { ...headers, "Content-Type": "application/json" },
+      body: JSON.stringify({ message: "BS Smart: menu/settings update", content, branch: g.branch, ...(sha ? { sha } : {}) })
+    });
+    if (!r1.ok) throw new Error(r1.status);
+
+    toast("Live publish ho gaya ✓ (1-2 minute mein sab ko dikhega)");
+    return true;
+  } catch (e) {
+    toast("Publish nahi hua (error " + e.message + ")");
+    return false;
+  }
+}
+
+// Menu ya settings save hote hi (agar auto on ho) khud publish
+function queueGH() {
+  const g = ghGet();
+  if (!g.auto || !g.token) return;
+  clearTimeout(ghTimer);
+  ghTimer = setTimeout(() => ghPublish(true), 2500);
+}
+const _saveMenuGH = saveMenu;
+saveMenu = function () { const ok = _saveMenuGH(); queueGH(); return ok; };
+const _saveSettingsGH = saveSettings;
+saveSettings = function () { _saveSettingsGH(); queueGH(); };
+
+// Settings panel mein GitHub ka hissa
+const _renderSettingsGH = renderSettings;
+renderSettings = function (msg) {
+  _renderSettingsGH(msg);
+  const g = ghGet();
+  $("panelBody").insertAdjacentHTML("beforeend", `
+    <div class="mform">
+      <h3>🚀 Live publish (GitHub)</h3>
+      <p class="pnote">Token sirf is computer ke browser mein save hota hai. Ye wahi token ho jo sirf BS-SMART repo ko "Contents: Read and write" deta ho.</p>
+      <div class="mgrid">
+        <div><label for="gOwner">GitHub username</label><input id="gOwner" value="${esc(g.owner)}"></div>
+        <div><label for="gRepo">Repo naam</label><input id="gRepo" value="${esc(g.repo)}"></div>
+        <div><label for="gBranch">Branch</label><input id="gBranch" value="${esc(g.branch)}"></div>
+        <div><label for="gToken">Token</label><input id="gToken" type="password" autocomplete="off" placeholder="${g.token ? "(saved hai, badalna ho to naya likhein)" : "github_pat_..."}"></div>
+      </div>
+      <label style="display:flex;gap:8px;align-items:center;margin-top:10px">
+        <input id="gAuto" type="checkbox" style="width:auto"${g.auto ? " checked" : ""}> Menu ya settings save hote hi khud publish karein
+      </label>
+      <div class="mbtns">
+        <button type="button" class="cbtn-warn" data-gact="ghpub">🚀 Abhi publish karein</button>
+        <button type="button" class="btn-lite" data-gact="ghsave">Details save</button>
+        <button type="button" class="btn-lite" data-gact="ghclear">Token hatayein</button>
+      </div>
+    </div>`);
+};
+
+function ghSaveFields() {
+  const old = ghGet();
+  lsSet("bsGH", {
+    owner: $("gOwner").value.trim(),
+    repo: $("gRepo").value.trim(),
+    branch: $("gBranch").value.trim() || "main",
+    token: $("gToken").value.trim() || old.token,
+    auto: $("gAuto").checked
+  });
+}
+
+$("panelBody").addEventListener("click", async e => {
+  const b = e.target.closest("[data-gact]");
+  if (!b) return;
+  const a = b.dataset.gact;
+  if (a === "ghsave") { ghSaveFields(); renderSettings("GitHub ki details save ho gayin."); }
+  if (a === "ghpub") { ghSaveFields(); await ghPublish(false); }
+  if (a === "ghclear") {
+    const g = ghGet(); g.token = ""; g.auto = false;
+    lsSet("bsGH", g);
+    renderSettings("Token hata diya gaya.");
+  }
+});
