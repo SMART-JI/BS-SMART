@@ -1587,9 +1587,6 @@ if (yr) yr.textContent = new Date().getFullYear();
   };
  })();
 
-// =========================================================
-//  LIVE PUBLISH: website se seedha GitHub par (menu)
-// =========================================================
 const GH_FILE = "data/bs-data.json";
 const ghGet = () => lsGet("bsGH", { owner: "SMART-JI", repo: "BS-SMART", branch: "main", token: "", auto: false });
 let ghTimer;
@@ -1643,7 +1640,6 @@ function queueGH() {
 const _saveMenuGH = saveMenu;
 saveMenu = function () { const ok = _saveMenuGH(); queueGH(); return ok; };
 
-// Site khulte hi live menu uthayein (agar is device par local menu na ho)
 async function loadLiveMenu() {
   if (lsGet("bsMenu", null)) return;
   try {
@@ -1720,7 +1716,6 @@ $("panelBody").addEventListener("click", async e => {
   }
 });
 
-// Header me 🚀 button
 (function () {
   const b = document.createElement("button");
   b.type = "button";
