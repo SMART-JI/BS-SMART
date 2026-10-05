@@ -1,6 +1,3 @@
-// =========================================================
-//  SETTINGS (change your settings here)
-// =========================================================
 const RESTAURANT = {
   name: "BS Smart",
   sub: "Fast Food & Restaurant",
@@ -10,6 +7,12 @@ const RESTAURANT = {
 const TAX_RATE = 0;          // use 0.13 for 13% tax
 const CURRENCY = "Rs.";
 const DEFAULT_STOCK = 50;    // starting stock of every item
+
+// ====== PRINT SETTINGS ======
+const PRINT_WIDTH_MM = 48;   // 58mm roll = 48, 80mm roll = 72
+const PRINT_LEFT_MM  = 0;    // left se kate to 2 ya 3 karein
+const PRINT_FONT_PX  = 13;   // font ka size
+const PRINT_WEIGHT   = 400;  // 400 normal, 700 bold
 
 // Starting menu (can be changed later from Manage Menu).
 // Items with category "Deals" only show in the Deals view.
