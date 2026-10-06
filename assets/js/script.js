@@ -119,7 +119,7 @@ const DEFAULT_MENU = [
     img: ""
   },
   {
-    id: 50,
+    id: 13,
     cat: "EXTRAS",
     name: "Chapati",
     desc: "Yammi",
@@ -685,7 +685,8 @@ function totals() {
   const disc = isPct ? sub * Math.min(dv, 100) / 100 : Math.min(dv, sub);
   const after = sub - disc;
   const tax = after * TAX_RATE;
-  return { sub, disc, val: dv, isPct, tax, total: after + tax };
+   const del = val("type") === "Delivery" ? Math.max(parseFloat(val("delFee")) || 0, 0) : 0;
+  return {sub, disc, val: dv, isPct, tax, del, total: after + tax + del};
 }
 
 // "Add these too": suggest a drink or snack if the cart has none
@@ -751,12 +752,13 @@ function renderCart() {
     </div>`;
   }).join("") : `<div class="empty">No items yet. Tap "Add" on the menu.</div>`;
 
-  const t = totals();
-  const showSub = t.disc > 0 || TAX_RATE > 0;
+   const t = totals();
+  const showSub = t.disc > 0 || TAX_RATE > 0 || t.del > 0;
   $("totals").innerHTML = ids.length ? `
     ${showSub ? `<div class="tot"><span>Subtotal</span><span>${fmt(t.sub)}</span></div>` : ""}
     ${t.disc > 0 ? `<div class="tot off"><span>Discount${t.isPct ? " (" + t.val + "%)" : ""}</span><span>- ${fmt(t.disc)}</span></div>` : ""}
     ${TAX_RATE > 0 ? `<div class="tot"><span>Tax (${Math.round(TAX_RATE * 100)}%)</span><span>${fmt(t.tax)}</span></div>` : ""}
+    ${t.del > 0 ? `<div class="tot"><span>Delivery charges</span><span>${fmt(t.del)}</span></div>` : ""}
     <div class="tot big"><span>Total</span><span>${fmt(t.total)}</span></div>` : "";
 
   $("go").disabled = !ids.length;
@@ -768,7 +770,7 @@ function renderCart() {
   }
   prevCount = count;
   prevIds = ids;
-   renderUpsell();
+  renderUpsell();
   renderChange();
   updateCartbar(count);
 }
@@ -777,7 +779,8 @@ function resetOrder() {
   cart = {};
   prevIds = [];
   setVal("disc", "");
-    setVal("paid", "");
+    setVal("delFee", "");
+  setVal("paid", "");
   renderCart();
 }
 
@@ -817,6 +820,7 @@ function customerSlipHTML(snap, t, meta) {
     ${(t.disc > 0 || TAX_RATE > 0) ? `<div class="r"><span>Subtotal</span><span>${fmt(t.sub)}</span></div>` : ""}
     ${t.disc > 0 ? `<div class="r"><span>Discount${t.isPct ? " (" + t.val + "%)" : ""}</span><span>- ${fmt(t.disc)}</span></div>` : ""}
     ${TAX_RATE > 0 ? `<div class="r"><span>Tax (${Math.round(TAX_RATE * 100)}%)</span><span>${fmt(t.tax)}</span></div>` : ""}
+        ${t.del > 0 ? `<div class="r"><span>Delivery charges</span><span>${fmt(t.del)}</span></div>` : ""}
     <div class="r b"><span>TOTAL</span><span>${fmt(t.total)}</span></div>
         ${meta.paid > 0 ? `<div class="r"><span>Cash</span><span>${fmt(meta.paid)}</span></div>
     <div class="r"><span>Wapis (Change)</span><span>${fmt(Math.max(meta.paid - t.total, 0))}</span></div>` : ""}
@@ -862,9 +866,9 @@ function buildReceipt(snap, t, meta) {
 
 // ====== PRINT SETTINGS ======
 const PRINT_WIDTH_MM = 48;   // 58mm roll = 48, 80mm roll = 72
-const PRINT_LEFT_MM  = 0;    // slip left se kate to 2 ya 3 karein
-const PRINT_FONT_PX  = 13;   // font ka size
-const PRINT_WEIGHT   = 400;  // 400 normal, 700 bold
+const PRINT_LEFT_MM = 0;    // slip left se kate to 2 ya 3 karein
+const PRINT_FONT_PX = 13;   // font ka size
+const PRINT_WEIGHT = 400;  // 400 normal, 700 bold
 
 function printReceipt() {
   if (!lastCustomer) { toast("No order to print"); return; }
@@ -931,7 +935,7 @@ function placeOrder() {
   const tm = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
   const type = val("type") || "Dine-in";
 
-    lastMeta = { no, dt, tm, type, items: snap, paid: parseFloat(val("paid")) || 0 };
+  lastMeta = { no, dt, tm, type, items: snap, paid: parseFloat(val("paid")) || 0 };
   buildReceipt(snap, t, lastMeta);
 
   orders.push({
@@ -947,7 +951,7 @@ function placeOrder() {
   confetti();
   sfx("order");
   setTimeout(printReceipt, 400);
-    sfx("order");
+  sfx("order");
   setTimeout(() => speak("Nabeel Sir, order successfully"), 900);
   setTimeout(printReceipt, 400);
 }
@@ -996,7 +1000,7 @@ function openPanel(type) {
       </div>`;
   }
 
-   if (type === "payment") {
+  if (type === "payment") {
     title = "Total Payment";
     const types = ["Dine-in", "Takeaway", "Delivery"].map(tp => {
       const l = to.filter(o => o.type === tp);
@@ -1307,7 +1311,17 @@ document.querySelectorAll("[data-panel]").forEach(b => b.onclick = () => openPan
 // =========================================================
 //  BUTTONS AND EVENTS
 // =========================================================
+function syncDelivery() {
+  const on = val("type") === "Delivery";
+  $("delRow").hidden = !on;
+  if (!on) setVal("delFee", "");
+  renderCart();
+}
+$("type").addEventListener("change", syncDelivery);
+$("delFee").addEventListener("input", renderCart);
 $("paid").oninput = renderChange;
+$("type").addEventListener("change", syncDelivery);
+$("delFee").addEventListener("input", renderCart);
 $("disc").oninput = renderCart;
 $("discType").onchange = renderCart;
 $("search").oninput = () => { q = $("search").value.trim().toLowerCase(); renderMenu(); };
@@ -1984,4 +1998,4 @@ if (yr) yr.textContent = new Date().getFullYear();
       });
     }
   };
- })();
+})();
