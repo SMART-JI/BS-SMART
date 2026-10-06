@@ -11,712 +11,123 @@ const TAX_RATE = 0;          // use 0.13 for 13% tax
 const CURRENCY = "Rs.";
 const DEFAULT_STOCK = 50;    // starting stock of every item
 
+// ====== PRINT SETTINGS ======
+const PRINT_WIDTH_MM = 48;   // 58mm roll = 48, 80mm roll = 72
+const PRINT_LEFT_MM = 0;     // slip left se kate to 2 ya 3 karein
+const PRINT_FONT_PX = 13;    // font ka size
+const PRINT_WEIGHT = 400;    // 400 normal, 700 bold
+
 // Starting menu (can be changed later from Manage Menu).
 // Items with category "Deals" only show in the Deals view.
+// Har item ka id alag hona chahiye.
 const DEFAULT_MENU = [
-  {
-    id: 1,
-    cat: "FastFood",
-    name: "Zinger Burger",
-    desc: "Crispy chicken zinger burger",
-    price: 300,
-    img: ""
-  },
-  {
-    id: 2,
-    cat: "FastFood",
-    name: "Zinger Burger Cheese",
-    desc: "Zinger burger with cheese",
-    price: 350,
-    img: ""
-  },
-  {
-    id: 3,
-    cat: "FastFood",
-    name: "Zinger Burger Jumbo",
-    desc: "Jumbo crispy chicken zinger burger",
-    price: 450,
-    img: ""
-  },
-  {
-    id: 4,
-    cat: "FastFood",
-    name: "Beef Burger",
-    desc: "Juicy beef burger",
-    price: 300,
-    img: ""
-  },
-  {
-    id: 5,
-    cat: "FastFood",
-    name: "Beef Burger Cheese",
-    desc: "Beef burger with cheese",
-    price: 350,
-    img: ""
-  },
-  {
-    id: 6,
-    cat: "FastFood",
-    name: "Club Sandwich",
-    desc: "Fresh chicken club sandwich",
-    price: 400,
-    img: ""
-  },
-  {
-    id: 7,
-    cat: "FastFood",
-    name: "Chicken Sandwich",
-    desc: "Delicious chicken sandwich",
-    price: 450,
-    img: ""
-  },
-  {
-    id: 8,
-    cat: "FastFood",
-    name: "BBQ Sandwich",
-    desc: "Chicken sandwich with BBQ flavor",
-    price: 450,
-    img: ""
-  },
-  {
-    id: 9,
-    cat: "FastFood",
-    name: "Plan Fries",
-    desc: "Fries",
-    price: 150,
-    img: ""
-  },
-  {
-    id: 10,
-    cat: "FastFood",
-    name: "Mayo Fries",
-    desc: "Mayo Yammi Fries",
-    price: 200,
-    img: ""
-  },
-  {
-    id: 11,
-    cat: "FastFood",
-    name: "Cheese Fries",
-    desc: "Cheese Yammi Fries",
-    price: 200,
-    img: ""
-  },
-  {
-    id: 12,
-    cat: "EXTRAS",
-    name: "Paratha (SMALL)",
-    desc: " Yammi ",
-    price: 50,
-    img: ""
-  },
-  {
-    id: 13,
-    cat: "EXTRAS",
-    name: "Paratha (LARGE)",
-    desc: "Yammi",
-    price: 100,
-    img: ""
-  },
-  {
-    id: 13,
-    cat: "EXTRAS",
-    name: "Chapati",
-    desc: "Yammi",
-    price: 20,
-    img: ""
-  },
-  {
-    id: 14,
-    cat: "BBQ",
-    name: "Zinger Roll",
-    desc: "Crispy chicken zinger roll",
-    price: 150,
-    img: ""
-  },
-  {
-    id: 15,
-    cat: "BBQ",
-    name: "Zinger Jumbo Roll",
-    desc: "Jumbo crispy chicken zinger roll",
-    price: 250,
-    img: ""
-  },
-  {
-    id: 16,
-    cat: "BBQ",
-    name: "Boti Roll",
-    desc: "Chicken boti roll",
-    price: 150,
-    img: ""
-  },
-  {
-    id: 17,
-    cat: "BBQ",
-    name: "Kabab Roll",
-    desc: "Chicken kabab roll",
-    price: 150,
-    img: ""
-  },
-  {
-    id: 18,
-    cat: "BBQ",
-    name: "Chicken Roll",
-    desc: "Chicken roll",
-    price: 150,
-    img: ""
-  },
-  {
-    id: 19,
-    cat: "BBQ",
-    name: "Chicken Mayo Garlic Roll",
-    desc: "Chicken roll with mayo garlic sauce",
-    price: 150,
-    img: ""
-  },
-  {
-    id: 20,
-    cat: "BBQ",
-    name: "Chicken Malai Boti Roll",
-    desc: "Creamy chicken malai boti roll",
-    price: 150,
-    img: ""
-  },
-  {
-    id: 21,
-    cat: "BBQ",
-    name: "Chicken Crispy Roll",
-    desc: "Crispy chicken roll",
-    price: 150,
-    img: ""
-  },
-  {
-    id: 22,
-    cat: "Pizza",
-    name: "Chicken Fajita (SMALL)",
-    desc: "Chicken fajita pizza",
-    price: 300,
-    img: ""
-  },
-  {
-    id: 23,
-    cat: "Pizza",
-    name: "Chicken Fajita (MEDIUM)",
-    desc: "Chicken fajita pizza",
-    price: 500,
-    img: ""
-  },
-  {
-    id: 24,
-    cat: "Pizza",
-    name: "Chicken Fajita (LARGE)",
-    desc: "Chicken fajita pizza",
-    price: 700,
-    img: ""
-  },
+  { id: 1, cat: "FastFood", name: "Zinger Burger", desc: "Crispy chicken zinger burger", price: 300, img: "" },
+  { id: 2, cat: "FastFood", name: "Zinger Burger Cheese", desc: "Zinger burger with cheese", price: 350, img: "" },
+  { id: 3, cat: "FastFood", name: "Zinger Burger Jumbo", desc: "Jumbo crispy chicken zinger burger", price: 450, img: "" },
+  { id: 4, cat: "FastFood", name: "Beef Burger", desc: "Juicy beef burger", price: 300, img: "" },
+  { id: 5, cat: "FastFood", name: "Beef Burger Cheese", desc: "Beef burger with cheese", price: 350, img: "" },
+  { id: 6, cat: "FastFood", name: "Club Sandwich", desc: "Fresh chicken club sandwich", price: 400, img: "" },
+  { id: 7, cat: "FastFood", name: "Chicken Sandwich", desc: "Delicious chicken sandwich", price: 450, img: "" },
+  { id: 8, cat: "FastFood", name: "BBQ Sandwich", desc: "Chicken sandwich with BBQ flavor", price: 450, img: "" },
+  { id: 9, cat: "FastFood", name: "Plan Fries", desc: "Fries", price: 150, img: "" },
+  { id: 10, cat: "FastFood", name: "Mayo Fries", desc: "Mayo Yammi Fries", price: 200, img: "" },
+  { id: 11, cat: "FastFood", name: "Cheese Fries", desc: "Cheese Yammi Fries", price: 200, img: "" },
 
-  {
-    id: 25,
-    cat: "Pizza",
-    name: "Chicken Tikka (SMALL)",
-    desc: "Chicken tikka pizza",
-    price: 300,
-    img: ""
-  },
-  {
-    id: 26,
-    cat: "Pizza",
-    name: "Chicken Tikka (MEDIUM)",
-    desc: "Chicken tikka pizza",
-    price: 500,
-    img: ""
-  },
-  {
-    id: 27,
-    cat: "Pizza",
-    name: "Chicken Tikka (LARGE)",
-    desc: "Chicken tikka pizza",
-    price: 700,
-    img: ""
-  },
+  { id: 12, cat: "EXTRAS", name: "Paratha (SMALL)", desc: "Yammi", price: 50, img: "" },
+  { id: 13, cat: "EXTRAS", name: "Paratha (LARGE)", desc: "Yammi", price: 100, img: "" },
+  { id: 85, cat: "EXTRAS", name: "Chapati", desc: "Yammi", price: 20, img: "" },
 
-  {
-    id: 28,
-    cat: "Pizza",
-    name: "Chicken Malai (SMALL)",
-    desc: "Chicken malai pizza",
-    price: 300,
-    img: ""
-  },
-  {
-    id: 29,
-    cat: "Pizza",
-    name: "Chicken Malai (MEDIUM)",
-    desc: "Chicken malai pizza",
-    price: 500,
-    img: ""
-  },
-  {
-    id: 30,
-    cat: "Pizza",
-    name: "Chicken Malai (LARGE)",
-    desc: "Chicken malai pizza",
-    price: 700,
-    img: ""
-  },
+  { id: 14, cat: "BBQ", name: "Zinger Roll", desc: "Crispy chicken zinger roll", price: 150, img: "" },
+  { id: 15, cat: "BBQ", name: "Zinger Jumbo Roll", desc: "Jumbo crispy chicken zinger roll", price: 250, img: "" },
+  { id: 16, cat: "BBQ", name: "Boti Roll", desc: "Chicken boti roll", price: 150, img: "" },
+  { id: 17, cat: "BBQ", name: "Kabab Roll", desc: "Chicken kabab roll", price: 150, img: "" },
+  { id: 18, cat: "BBQ", name: "Chicken Roll", desc: "Chicken roll", price: 150, img: "" },
+  { id: 19, cat: "BBQ", name: "Chicken Mayo Garlic Roll", desc: "Chicken roll with mayo garlic sauce", price: 150, img: "" },
+  { id: 20, cat: "BBQ", name: "Chicken Malai Boti Roll", desc: "Creamy chicken malai boti roll", price: 150, img: "" },
+  { id: 21, cat: "BBQ", name: "Chicken Crispy Roll", desc: "Crispy chicken roll", price: 150, img: "" },
 
-  {
-    id: 31,
-    cat: "Pizza",
-    name: "BBQ Chicken (SMALL)",
-    desc: "BBQ chicken pizza",
-    price: 300,
-    img: ""
-  },
-  {
-    id: 32,
-    cat: "Pizza",
-    name: "BBQ Chicken (MEDIUM)",
-    desc: "BBQ chicken pizza",
-    price: 500,
-    img: ""
-  },
-  {
-    id: 33,
-    cat: "Pizza",
-    name: "BBQ Chicken (LARGE)",
-    desc: "BBQ chicken pizza",
-    price: 700,
-    img: ""
-  },
+  { id: 22, cat: "Pizza", name: "Chicken Fajita (SMALL)", desc: "Chicken fajita pizza", price: 300, img: "" },
+  { id: 23, cat: "Pizza", name: "Chicken Fajita (MEDIUM)", desc: "Chicken fajita pizza", price: 500, img: "" },
+  { id: 24, cat: "Pizza", name: "Chicken Fajita (LARGE)", desc: "Chicken fajita pizza", price: 700, img: "" },
 
-  {
-    id: 34,
-    cat: "Pizza",
-    name: "Chicken Supreme (SMALL)",
-    desc: "Chicken supreme pizza",
-    price: 300,
-    img: ""
-  },
-  {
-    id: 35,
-    cat: "Pizza",
-    name: "Chicken Supreme (MEDIUM)",
-    desc: "Chicken supreme pizza",
-    price: 500,
-    img: ""
-  },
-  {
-    id: 36,
-    cat: "Pizza",
-    name: "Chicken Supreme (LARGE)",
-    desc: "Chicken supreme pizza",
-    price: 700,
-    img: ""
-  },
+  { id: 25, cat: "Pizza", name: "Chicken Tikka (SMALL)", desc: "Chicken tikka pizza", price: 300, img: "" },
+  { id: 26, cat: "Pizza", name: "Chicken Tikka (MEDIUM)", desc: "Chicken tikka pizza", price: 500, img: "" },
+  { id: 27, cat: "Pizza", name: "Chicken Tikka (LARGE)", desc: "Chicken tikka pizza", price: 700, img: "" },
 
-  {
-    id: 37,
-    cat: "Pizza",
-    name: "Chicken Shish (SMALL)",
-    desc: "Chicken shish pizza",
-    price: 300,
-    img: ""
-  },
-  {
-    id: 38,
-    cat: "Pizza",
-    name: "Chicken Shish (MEDIUM)",
-    desc: "Chicken shish pizza",
-    price: 500,
-    img: ""
-  },
-  {
-    id: 39,
-    cat: "Pizza",
-    name: "Chicken Shish (LARGE)",
-    desc: "Chicken shish pizza",
-    price: 700,
-    img: ""
-  },
+  { id: 28, cat: "Pizza", name: "Chicken Malai (SMALL)", desc: "Chicken malai pizza", price: 300, img: "" },
+  { id: 29, cat: "Pizza", name: "Chicken Malai (MEDIUM)", desc: "Chicken malai pizza", price: 500, img: "" },
+  { id: 30, cat: "Pizza", name: "Chicken Malai (LARGE)", desc: "Chicken malai pizza", price: 700, img: "" },
 
-  {
-    id: 40,
-    cat: "Pizza",
-    name: "Chicken Cheese (SMALL)",
-    desc: "Chicken cheese pizza",
-    price: 300,
-    img: ""
-  },
-  {
-    id: 41,
-    cat: "Pizza",
-    name: "Chicken Cheese (MEDIUM)",
-    desc: "Chicken cheese pizza",
-    price: 500,
-    img: ""
-  },
-  {
-    id: 42,
-    cat: "Pizza",
-    name: "Chicken Cheese (LARGE)",
-    desc: "Chicken cheese pizza",
-    price: 700,
-    img: ""
-  },
+  { id: 31, cat: "Pizza", name: "BBQ Chicken (SMALL)", desc: "BBQ chicken pizza", price: 300, img: "" },
+  { id: 32, cat: "Pizza", name: "BBQ Chicken (MEDIUM)", desc: "BBQ chicken pizza", price: 500, img: "" },
+  { id: 33, cat: "Pizza", name: "BBQ Chicken (LARGE)", desc: "BBQ chicken pizza", price: 700, img: "" },
 
-  {
-    id: 43,
-    cat: "Pizza",
-    name: "Vegetable (SMALL)",
-    desc: "Fresh vegetable pizza",
-    price: 300,
-    img: ""
-  },
-  {
-    id: 44,
-    cat: "Pizza",
-    name: "Vegetable (MEDIUM)",
-    desc: "Fresh vegetable pizza",
-    price: 500,
-    img: ""
-  },
-  {
-    id: 45,
-    cat: "Pizza",
-    name: "Vegetable (LARGE)",
-    desc: "Fresh vegetable pizza",
-    price: 700,
-    img: ""
-  },
+  { id: 34, cat: "Pizza", name: "Chicken Supreme (SMALL)", desc: "Chicken supreme pizza", price: 300, img: "" },
+  { id: 35, cat: "Pizza", name: "Chicken Supreme (MEDIUM)", desc: "Chicken supreme pizza", price: 500, img: "" },
+  { id: 36, cat: "Pizza", name: "Chicken Supreme (LARGE)", desc: "Chicken supreme pizza", price: 700, img: "" },
 
-  {
-    id: 46,
-    cat: "Pizza",
-    name: "Special (BS Smart) (SMALL)",
-    desc: "Special signature pizza",
-    price: 400,
-    img: ""
-  },
-  {
-    id: 47,
-    cat: "Pizza",
-    name: "Special (BS Smart) (MEDIUM)",
-    desc: "Special signature pizza",
-    price: 700,
-    img: ""
-  },
-  {
-    id: 48,
-    cat: "Pizza",
-    name: "Special (BS Smart) (LARGE)",
-    desc: "Special signature pizza",
-    price: 1000,
-    img: ""
-  },
-  {
-  id: 49,
-  cat: "BBQ",
-  name: "Chicken Tikka (Chest)",
-  desc: "Chicken tikka chest piece",
-  price: 350,
-  img: ""
-},
-{
-  id: 50,
-  cat: "BBQ",
-  name: "Chicken Tikka (Leg)",
-  desc: "Chicken tikka leg piece",
-  price: 300,
-  img: ""
-},
-{
-  id: 51,
-  cat: "BBQ",
-  name: "Behari Tikka (Leg)",
-  desc: "Behari style tikka",
-  price: 350,
-  img: ""
-},
-{
-  id: 65,
-  cat: "BBQ",
-  name: "Behari Tikka (Chest)",
-  desc: "Behari style tikka",
-  price: 300,
-  img: ""
-},
-{
-  id: 52,
-  cat: "BBQ",
-  name: "Chicken Malai White Tikka (Plate)",
-  desc: "Creamy white malai chicken tikka",
-  price: 400,
-  img: ""
-},
-{
-  id: 53,
-  cat: "BBQ",
-  name: "Chicken Malai Boti (Plate)",
-  desc: "Tender malai chicken boti",
-  price: 400,
-  img: ""
-},
-{
-  id: 54,
-  cat: "BBQ",
-  name: "Behari Boti (Plate)",
-  desc: "Behari style boti plate",
-  price: 400,
-  img: ""
-},
-{
-  id: 55,
-  cat: "BBQ",
-  name: "Seekh Kabab (Plate)",
-  desc: "Seekh kabab plate",
-  price: 400,
-  img: ""
-},
-{
-  id: 56,
-  cat: "BBQ",
-  name: "Gola Kabab (Plate)",
-  desc: "Gola kabab plate",
-  price: 400,
-  img: ""
-},
-{
-  id: 57,
-  cat: "BBQ",
-  name: "Dhaga Kabab (Plate)",
-  desc: "Dhaga kabab plate",
-  price: 400,
-  img: ""
-},
-{
-  id: 58,
-  cat: "BBQ",
-  name: "Chicken Reshmi Kabab",
-  desc: "Soft and juicy reshmi kabab",
-  price: 400,
-  img: ""
-},
-{
-  id: 59,
-  cat: "BBQ",
-  name: "Turkish Kabab (Plate)",
-  desc: "Turkish kabab plate",
-  price: 400,
-  img: ""
-},
-{
-  id: 60,
-  cat: "BBQ",
-  name: "Chicken Boti (Plate)",
-  desc: "Classic chicken boti plate",
-  price: 400,
-  img: ""
-},
-{
-  id: 61,
-  cat: "BBQ",
-  name: "Chicken Balochi Boti (Plate)",
-  desc: "Balochi style chicken boti plate",
-  price: 400,
-  img: ""
-},
-{
-  id: 62,
-  cat: "BBQ",
-  name: "Chicken Malai Boti (Stick)",
-  desc: "Tender malai chicken boti stick",
-  price: 100,
-  img: ""
-},
-{
-  id: 63,
-  cat: "BBQ",
-  name: "Behari Boti (Stick)",
-  desc: "Behari style boti stick",
-  price: 100,
-  img: ""
-},
-{
-  id: 64,
-  cat: "BBQ",
-  name: "Seekh Kabab (Stick)",
-  desc: "Seekh kabab stick",
-  price: 100,
-  img: ""
-},
-{
-  id: 65,
-  cat: "BBQ",
-  name: "Chicken Boti (Stick)",
-  desc: "Classic chicken boti stick",
-  price: 100,
-  img: ""
-},
-{
-  id: 66,
-  cat: "BBQ",
-  name: "Chicken Balochi Boti (Stick)",
-  desc: "Balochi style chicken boti stick",
-  price: 100,
-  img: ""
-},
-{
-  id: 90,
-  cat: "Deals",
-  name: "Deal 1",
-  desc: "Rice, kabab platter, raita and Pepsi",
-  price: 1499,
-  img: ""
-},
-{
-  id: 68,
-  cat: "Deals",
-  name: "Deal 2",
-  desc: "Kabab platter, naan, raita and Pepsi",
-  price: 1299,
-  img: ""
-},
-{
-  id: 69,
-  cat: "Deals",
-  name: "Deal 3",
-  desc: "Kabab, naan, raita and Pepsi",
-  price: 850,
-  img: ""
-},
-{
-  id: 70,
-  cat: "Deals",
-  name: "Deal 4",
-  desc: "Chicken rice platter, raita and 2 drinks",
-  price: 799,
-  img: ""
-},
-{
-  id: 71,
-  cat: "Biryani",
-  name: "Chicken Biryani (1 KG)",
-  desc: "Chicken biryani 1 kg",
-  price: 560,
-  img: ""
-},
-{
-  id: 72,
-  cat: "Biryani",
-  name: "Chicken Biryani (3 Pao)",
-  desc: "Chicken biryani 3 pao",
-  price: 420,
-  img: ""
-},
-{
-  id: 73,
-  cat: "Biryani",
-  name: "Chicken Biryani (Half KG)",
-  desc: "Chicken biryani half kg",
-  price: 280,
-  img: ""
-},
-{
-  id: 74,
-  cat: "Biryani",
-  name: "Chicken Biryani (1 Pao)",
-  desc: "Chicken biryani 1 pao",
-  price: 140,
-  img: ""
-},
-{
-  id: 75,
-  cat: "Biryani",
-  name: "Chicken Biryani (Plate)",
-  desc: "Chicken biryani single plate",
-  price: 210,
-  img: ""
-},
-{
-  id: 76,
-  cat: "Biryani",
-  name: "Sada Biryani / Sada Pulao (1 KG)",
-  desc: "Plain biryani / pulao 1 kg",
-  price: 400,
-  img: ""
-},
-{
-  id: 77,
-  cat: "Biryani",
-  name: "Sada Biryani / Sada Pulao (3 Pao)",
-  desc: "Plain biryani / pulao 3 pao",
-  price: 300,
-  img: ""
-},
-{
-  id: 78,
-  cat: "Biryani",
-  name: "Sada Biryani / Sada Pulao (Half KG)",
-  desc: "Plain biryani / pulao half kg",
-  price: 200,
-  img: ""
-},
-{
-  id: 79,
-  cat: "Biryani",
-  name: "Sada Biryani / Sada Pulao (1 Pao)",
-  desc: "Plain biryani / pulao 1 pao",
-  price: 100,
-  img: ""
-},
-{
-  id: 80,
-  cat: "Biryani",
-  name: "Beef Pulao (1 KG)",
-  desc: "Beef pulao 1 kg",
-  price: 760,
-  img: ""
-},
-{
-  id: 81,
-  cat: "Biryani",
-  name: "Beef Pulao (3 Pao)",
-  desc: "Beef pulao 3 pao",
-  price: 570,
-  img: ""
-},
-{
-  id: 82,
-  cat: "Biryani",
-  name: "Beef Pulao (Half KG)",
-  desc: "Beef pulao half kg",
-  price: 380,
-  img: ""
-},
-{
-  id: 83,
-  cat: "Biryani",
-  name: "Beef Pulao (1 Pao)",
-  desc: "Beef pulao 1 pao",
-  price: 190,
-  img: ""
-},
-{
-  id: 84,
-  cat: "Biryani",
-  name: "Beef Pulao (Plate)",
-  desc: "Beef pulao single plate",
-  price: 280,
-  img: ""
-}
+  { id: 37, cat: "Pizza", name: "Chicken Shish (SMALL)", desc: "Chicken shish pizza", price: 300, img: "" },
+  { id: 38, cat: "Pizza", name: "Chicken Shish (MEDIUM)", desc: "Chicken shish pizza", price: 500, img: "" },
+  { id: 39, cat: "Pizza", name: "Chicken Shish (LARGE)", desc: "Chicken shish pizza", price: 700, img: "" },
+
+  { id: 40, cat: "Pizza", name: "Chicken Cheese (SMALL)", desc: "Chicken cheese pizza", price: 300, img: "" },
+  { id: 41, cat: "Pizza", name: "Chicken Cheese (MEDIUM)", desc: "Chicken cheese pizza", price: 500, img: "" },
+  { id: 42, cat: "Pizza", name: "Chicken Cheese (LARGE)", desc: "Chicken cheese pizza", price: 700, img: "" },
+
+  { id: 43, cat: "Pizza", name: "Vegetable (SMALL)", desc: "Fresh vegetable pizza", price: 300, img: "" },
+  { id: 44, cat: "Pizza", name: "Vegetable (MEDIUM)", desc: "Fresh vegetable pizza", price: 500, img: "" },
+  { id: 45, cat: "Pizza", name: "Vegetable (LARGE)", desc: "Fresh vegetable pizza", price: 700, img: "" },
+
+  { id: 46, cat: "Pizza", name: "Special (BS Smart) (SMALL)", desc: "Special signature pizza", price: 400, img: "" },
+  { id: 47, cat: "Pizza", name: "Special (BS Smart) (MEDIUM)", desc: "Special signature pizza", price: 700, img: "" },
+  { id: 48, cat: "Pizza", name: "Special (BS Smart) (LARGE)", desc: "Special signature pizza", price: 1000, img: "" },
+
+  { id: 49, cat: "BBQ", name: "Chicken Tikka (Chest)", desc: "Chicken tikka chest piece", price: 350, img: "" },
+  { id: 50, cat: "BBQ", name: "Chicken Tikka (Leg)", desc: "Chicken tikka leg piece", price: 300, img: "" },
+  { id: 51, cat: "BBQ", name: "Behari Tikka (Leg)", desc: "Behari style tikka", price: 350, img: "" },
+  { id: 65, cat: "BBQ", name: "Behari Tikka (Chest)", desc: "Behari style tikka", price: 300, img: "" },
+  { id: 52, cat: "BBQ", name: "Chicken Malai White Tikka (Plate)", desc: "Creamy white malai chicken tikka", price: 400, img: "" },
+  { id: 53, cat: "BBQ", name: "Chicken Malai Boti (Plate)", desc: "Tender malai chicken boti", price: 400, img: "" },
+  { id: 54, cat: "BBQ", name: "Behari Boti (Plate)", desc: "Behari style boti plate", price: 400, img: "" },
+  { id: 55, cat: "BBQ", name: "Seekh Kabab (Plate)", desc: "Seekh kabab plate", price: 400, img: "" },
+  { id: 56, cat: "BBQ", name: "Gola Kabab (Plate)", desc: "Gola kabab plate", price: 400, img: "" },
+  { id: 57, cat: "BBQ", name: "Dhaga Kabab (Plate)", desc: "Dhaga kabab plate", price: 400, img: "" },
+  { id: 58, cat: "BBQ", name: "Chicken Reshmi Kabab", desc: "Soft and juicy reshmi kabab", price: 400, img: "" },
+  { id: 59, cat: "BBQ", name: "Turkish Kabab (Plate)", desc: "Turkish kabab plate", price: 400, img: "" },
+  { id: 60, cat: "BBQ", name: "Chicken Boti (Plate)", desc: "Classic chicken boti plate", price: 400, img: "" },
+  { id: 61, cat: "BBQ", name: "Chicken Balochi Boti (Plate)", desc: "Balochi style chicken boti plate", price: 400, img: "" },
+  { id: 62, cat: "BBQ", name: "Chicken Malai Boti (Stick)", desc: "Tender malai chicken boti stick", price: 100, img: "" },
+  { id: 63, cat: "BBQ", name: "Behari Boti (Stick)", desc: "Behari style boti stick", price: 100, img: "" },
+  { id: 64, cat: "BBQ", name: "Seekh Kabab (Stick)", desc: "Seekh kabab stick", price: 100, img: "" },
+  { id: 86, cat: "BBQ", name: "Chicken Boti (Stick)", desc: "Classic chicken boti stick", price: 100, img: "" },
+  { id: 66, cat: "BBQ", name: "Chicken Balochi Boti (Stick)", desc: "Balochi style chicken boti stick", price: 100, img: "" },
+
+  { id: 90, cat: "Deals", name: "Deal 1", desc: "Half Kg Pulao (Sada), Leg Tikka, Bihari Boti (Half), Malai Boti (Half), Seekh Kabab (Half), Turkish Kabab (Half), 1 Ltr Drink, Raita", price: 1499, img: "" },
+  { id: 68, cat: "Deals", name: "Deal 2", desc: "Bihari Boti (Half), Seekh Kabab (Half), Chicken Reshmi Kabab (Half), Chicken Tikka (Leg), 2 Paratha, 1 Ltr Drink, Raita", price: 1199, img: "" },
+  { id: 69, cat: "Deals", name: "Deal 3", desc: "Afghani Boti (6 Seekh), Turkish Kabab (Half), 2 Paratha, 1 Ltr Drink, Raita", price: 850, img: "" },
+  { id: 70, cat: "Deals", name: "Deal 4", desc: "Pulao (Half Kg), Tikka (Chest), 2 Drinks (300ml), Raita", price: 799, img: "" },
+
+  { id: 71, cat: "Biryani", name: "Chicken Biryani (1 KG)", desc: "Chicken biryani 1 kg", price: 560, img: "" },
+  { id: 72, cat: "Biryani", name: "Chicken Biryani (3 Pao)", desc: "Chicken biryani 3 pao", price: 420, img: "" },
+  { id: 73, cat: "Biryani", name: "Chicken Biryani (Half KG)", desc: "Chicken biryani half kg", price: 280, img: "" },
+  { id: 74, cat: "Biryani", name: "Chicken Biryani (1 Pao)", desc: "Chicken biryani 1 pao", price: 140, img: "" },
+  { id: 75, cat: "Biryani", name: "Chicken Biryani (Plate)", desc: "Chicken biryani single plate", price: 210, img: "" },
+  { id: 76, cat: "Biryani", name: "Sada Biryani / Sada Pulao (1 KG)", desc: "Plain biryani / pulao 1 kg", price: 400, img: "" },
+  { id: 77, cat: "Biryani", name: "Sada Biryani / Sada Pulao (3 Pao)", desc: "Plain biryani / pulao 3 pao", price: 300, img: "" },
+  { id: 78, cat: "Biryani", name: "Sada Biryani / Sada Pulao (Half KG)", desc: "Plain biryani / pulao half kg", price: 200, img: "" },
+  { id: 79, cat: "Biryani", name: "Sada Biryani / Sada Pulao (1 Pao)", desc: "Plain biryani / pulao 1 pao", price: 100, img: "" },
+  { id: 80, cat: "Biryani", name: "Beef Pulao (1 KG)", desc: "Beef pulao 1 kg", price: 760, img: "" },
+  { id: 81, cat: "Biryani", name: "Beef Pulao (3 Pao)", desc: "Beef pulao 3 pao", price: 570, img: "" },
+  { id: 82, cat: "Biryani", name: "Beef Pulao (Half KG)", desc: "Beef pulao half kg", price: 380, img: "" },
+  { id: 83, cat: "Biryani", name: "Beef Pulao (1 Pao)", desc: "Beef pulao 1 pao", price: 190, img: "" },
+  { id: 84, cat: "Biryani", name: "Beef Pulao (Plate)", desc: "Beef pulao single plate", price: 280, img: "" }
 ];
-
 
 // =========================================================
 //  HELPERS
 // =========================================================
 const $ = id => document.getElementById(id);
+const on = (id, ev, fn) => { const e = $(id); if (e) e.addEventListener(ev, fn); };
 const val = id => { const e = $(id); return e ? e.value : ""; };
 const setVal = (id, v) => { const e = $(id); if (e) e.value = v; };
 const fmt = n => CURRENCY + " " + Math.round(n).toLocaleString("en-PK");
@@ -786,6 +197,20 @@ function sfx(kind) {
   } catch (e) { }
 }
 function paintSound() { const b = $("soundBtn"); if (b) b.textContent = soundOn ? "🔊" : "🔇"; }
+
+// Order hone par awaz
+function speak(text) {
+  if (!soundOn || !("speechSynthesis" in window)) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-IN";
+    u.rate = 0.95;
+    u.pitch = 1;
+    u.volume = 1;
+    speechSynthesis.speak(u);
+  } catch (e) { }
+}
 
 // =========================================================
 //  EFFECTS: toast, flying dot, confetti, sparks
@@ -932,11 +357,11 @@ function toggleFav(id, btn) {
   if (i >= 0) favs.splice(i, 1); else favs.push(id);
   lsSet("bsFavs", favs);
   if (view === "menu" && cat === "__fav") { renderMenu(); return; }
-  const on = i < 0;
-  btn.classList.toggle("on", on);
-  btn.textContent = on ? "♥" : "♡";
-  btn.setAttribute("aria-pressed", String(on));
-  if (on) sfx("fav");
+  const isOn = i < 0;
+  btn.classList.toggle("on", isOn);
+  btn.textContent = isOn ? "♥" : "♡";
+  btn.setAttribute("aria-pressed", String(isOn));
+  if (isOn) sfx("fav");
 }
 
 function onItemClick(e) {
@@ -1024,13 +449,12 @@ function renderChange() {
   const diff = paid - totals().total;
   if (diff >= 0) {
     box.className = "show ok";
-    box.textContent = "💵 To give back.: " + fmt(diff);
+    box.textContent = "💵 Wapis dein: " + fmt(diff);
   } else {
     box.className = "show short";
     box.textContent = "⚠️ Abhi " + fmt(-diff) + " kam hain";
   }
 }
-
 
 function renderCart() {
   const ids = Object.keys(cart);
@@ -1106,19 +530,19 @@ function customerSlipHTML(snap, t, meta) {
     <h2>${esc(RESTAURANT.name)}</h2>
     <div class="c">${esc(RESTAURANT.sub)}<br>${esc(RESTAURANT.address)}<br>Tel: ${esc(RESTAURANT.phone)}</div>
     <hr>
-       <div class="r"><span>Order #</span><span>${meta.no}</span></div>
+    <div class="r"><span>Order #</span><span>${meta.no}</span></div>
     <div class="r"><span>Date</span><span>${meta.dt}</span></div>
     <div class="r"><span>Time</span><span>${meta.tm}</span></div>
     <div class="r"><span>Type</span><span>${esc(meta.type)}</span></div>
     <hr>
     ${rows}
     <hr>
-    ${(t.disc > 0 || TAX_RATE > 0) ? `<div class="r"><span>Subtotal</span><span>${fmt(t.sub)}</span></div>` : ""}
+    ${(t.disc > 0 || TAX_RATE > 0 || t.del > 0) ? `<div class="r"><span>Subtotal</span><span>${fmt(t.sub)}</span></div>` : ""}
     ${t.disc > 0 ? `<div class="r"><span>Discount${t.isPct ? " (" + t.val + "%)" : ""}</span><span>- ${fmt(t.disc)}</span></div>` : ""}
     ${TAX_RATE > 0 ? `<div class="r"><span>Tax (${Math.round(TAX_RATE * 100)}%)</span><span>${fmt(t.tax)}</span></div>` : ""}
-        ${t.del > 0 ? `<div class="r"><span>Delivery charges</span><span>${fmt(t.del)}</span></div>` : ""}
+    ${t.del > 0 ? `<div class="r"><span>Delivery charges</span><span>${fmt(t.del)}</span></div>` : ""}
     <div class="r b"><span>TOTAL</span><span>${fmt(t.total)}</span></div>
-        ${meta.paid > 0 ? `<div class="r"><span>Cash</span><span>${fmt(meta.paid)}</span></div>
+    ${meta.paid > 0 ? `<div class="r"><span>Cash</span><span>${fmt(meta.paid)}</span></div>
     <div class="r"><span>Wapis (Change)</span><span>${fmt(Math.max(meta.paid - t.total, 0))}</span></div>` : ""}
     <hr>
     <div class="c">Good Food, Good Mood<br>Thank you! Please visit again.</div>
@@ -1159,12 +583,6 @@ function buildReceipt(snap, t, meta) {
   lastCustomer = customerSlipHTML(snap, t, meta);
   $("receipt").innerHTML = itemSlipsHTML();
 }
-
-// ====== PRINT SETTINGS ======
-const PRINT_WIDTH_MM = 48;   // 58mm roll = 48, 80mm roll = 72
-const PRINT_LEFT_MM = 0;    // slip left se kate to 2 ya 3 karein
-const PRINT_FONT_PX = 13;   // font ka size
-const PRINT_WEIGHT = 400;  // 400 normal, 700 bold
 
 function printReceipt() {
   if (!lastCustomer) { toast("No order to print"); return; }
@@ -1211,19 +629,7 @@ function printReceipt() {
   };
   Promise.race([ready, new Promise(res => setTimeout(res, 1500))]).then(go);
 }
-// Order hone par awaz
-function speak(text) {
-  if (!soundOn || !("speechSynthesis" in window)) return;
-  try {
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = "en-IN";
-    u.rate = 0.95;
-    u.pitch = 1;
-    u.volume = 1;
-    speechSynthesis.speak(u);
-  } catch (e) { }
-}
+
 function placeOrder() {
   if (!cartCount()) return;
   const snap = { ...cart }, t = totals(), no = nextOrderNo(), now = new Date();
@@ -1246,10 +652,8 @@ function placeOrder() {
   $("overlay").classList.add("show");
   confetti();
   sfx("order");
-  setTimeout(printReceipt, 400);
-  sfx("order");
-  setTimeout(() => speak("Nabeel Sir, order successfully"), 900);
-  setTimeout(printReceipt, 400);
+  speak("Nabeel Sir, order successfully");   // pehle awaz, phir print
+  setTimeout(printReceipt, 900);
 }
 
 // =========================================================
@@ -1608,18 +1012,18 @@ document.querySelectorAll("[data-panel]").forEach(b => b.onclick = () => openPan
 //  BUTTONS AND EVENTS
 // =========================================================
 function syncDelivery() {
-  const on = val("type") === "Delivery";
-  $("delRow").hidden = !on;
-  if (!on) setVal("delFee", "");
+  const isDel = val("type") === "Delivery";
+  const row = $("delRow");
+  if (row) row.hidden = !isDel;
+  if (!isDel) setVal("delFee", "");
   renderCart();
 }
-$("type").addEventListener("change", syncDelivery);
-$("delFee").addEventListener("input", renderCart);
-$("paid").oninput = renderChange;
-$("type").addEventListener("change", syncDelivery);
-$("delFee").addEventListener("input", renderCart);
-$("disc").oninput = renderCart;
-$("discType").onchange = renderCart;
+on("type", "change", syncDelivery);
+on("delFee", "input", () => renderCart());
+on("paid", "input", () => renderChange());
+
+$("disc").oninput = () => renderCart();
+$("discType").onchange = () => renderCart();
 $("search").oninput = () => { q = $("search").value.trim().toLowerCase(); renderMenu(); };
 $("go").onclick = placeOrder;
 $("print").onclick = printReceipt;
@@ -2010,8 +1414,6 @@ renderCart = function () {
   if (el && !reduceMotion) countTo(el, shownTotal, to);
   shownTotal = to;
 };
-$("disc").oninput = renderCart;
-$("discType").onchange = renderCart;
 
 // Card and order box flash when an item is added
 const _change = change;
@@ -2072,24 +1474,34 @@ change = function (id, d, btn) {
 //  REPORTS: print today's report and CSV download
 // =========================================================
 function printHTML(body) {
+  const old = document.getElementById("printFrame");
+  if (old) old.remove();
+
   const f = document.createElement("iframe");
-  f.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0";
+  f.id = "printFrame";
+  f.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden";
   document.body.appendChild(f);
+
   const d = f.contentWindow.document;
   d.open();
-  d.write(`<html><head><title>Report</title><style>
-    @page{margin:2mm}
-    body{margin:0;padding:0 3mm;box-sizing:border-box;width:72mm;font:bold 14px/1.5 'Courier New',monospace;color:#000}
-    h2{text-align:center;margin:4px 0}
-    .c{text-align:center}
-    hr{border:0;border-top:2px dashed #000;margin:8px 0}
-    .r{display:flex;justify-content:space-between;gap:8px}
+  d.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Report</title><style>
+    @page { size: ${PRINT_WIDTH_MM}mm auto; margin: 0; }
+    html, body { margin: 0; padding: 0; background: #fff; }
+    body { width: ${PRINT_WIDTH_MM}mm; padding-left: ${PRINT_LEFT_MM}mm; box-sizing: content-box;
+           font-family: Arial, Helvetica, sans-serif; font-size: ${PRINT_FONT_PX}px;
+           font-weight: ${PRINT_WEIGHT}; color: #000; padding-top: 2mm; padding-bottom: 4mm; }
+    h2 { text-align: center; margin: 2px 0; font-size: 1.3em; }
+    .c { text-align: center; }
+    hr { border: 0; border-top: 1px dashed #000; margin: 4px 0; }
+    .r { display: flex; justify-content: space-between; gap: 6px; }
+    .r span:first-child { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    .r span:last-child, .r b:last-child { white-space: nowrap; }
   </style></head><body>${body}</body></html>`);
   d.close();
+
   setTimeout(() => {
-    f.contentWindow.focus();
-    f.contentWindow.print();
-    setTimeout(() => f.remove(), 2000);
+    try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { }
+    setTimeout(() => f.remove(), 60000);
   }, 300);
 }
 
@@ -2102,7 +1514,7 @@ function printReport() {
   const cnt = {};
   to.forEach(o => o.items.forEach(i => { cnt[i.name] = (cnt[i.name] || 0) + i.q; }));
   const items = Object.entries(cnt).sort((a, b) => b[1] - a[1])
-    .map(([n, q]) => `<div class="r"><span>${esc(n)}</span><span>x ${q}</span></div>`).join("");
+    .map(([n, qty]) => `<div class="r"><span>${esc(n)}</span><span>x ${qty}</span></div>`).join("");
   printHTML(`
     <h2>${esc(RESTAURANT.name)}</h2>
     <div class="c">TODAY'S REPORT<br>${new Date().toLocaleDateString("en-GB")}</div>
