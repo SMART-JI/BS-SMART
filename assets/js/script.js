@@ -413,7 +413,191 @@ const DEFAULT_MENU = [
     desc: "Special signature pizza",
     price: 1000,
     img: ""
-  }
+  },
+  {
+  id: 49,
+  cat: "BBQ",
+  name: "Chicken Tikka (Chest)",
+  desc: "Chicken tikka chest piece",
+  price: 350,
+  img: ""
+},
+{
+  id: 50,
+  cat: "BBQ",
+  name: "Chicken Tikka (Leg)",
+  desc: "Chicken tikka leg piece",
+  price: 300,
+  img: ""
+},
+{
+  id: 51,
+  cat: "BBQ",
+  name: "Behari Tikka (Leg)",
+  desc: "Behari style tikka",
+  price: 350,
+  img: ""
+},
+{
+  id: 65,
+  cat: "BBQ",
+  name: "Behari Tikka (Chest)",
+  desc: "Behari style tikka",
+  price: 300,
+  img: ""
+},
+{
+  id: 52,
+  cat: "BBQ",
+  name: "Chicken Malai White Tikka (Plate)",
+  desc: "Creamy white malai chicken tikka",
+  price: 400,
+  img: ""
+},
+{
+  id: 53,
+  cat: "BBQ",
+  name: "Chicken Malai Boti (Plate)",
+  desc: "Tender malai chicken boti",
+  price: 400,
+  img: ""
+},
+{
+  id: 54,
+  cat: "BBQ",
+  name: "Behari Boti (Plate)",
+  desc: "Behari style boti plate",
+  price: 400,
+  img: ""
+},
+{
+  id: 55,
+  cat: "BBQ",
+  name: "Seekh Kabab (Plate)",
+  desc: "Seekh kabab plate",
+  price: 400,
+  img: ""
+},
+{
+  id: 56,
+  cat: "BBQ",
+  name: "Gola Kabab (Plate)",
+  desc: "Gola kabab plate",
+  price: 400,
+  img: ""
+},
+{
+  id: 57,
+  cat: "BBQ",
+  name: "Dhaga Kabab (Plate)",
+  desc: "Dhaga kabab plate",
+  price: 400,
+  img: ""
+},
+{
+  id: 58,
+  cat: "BBQ",
+  name: "Chicken Reshmi Kabab",
+  desc: "Soft and juicy reshmi kabab",
+  price: 400,
+  img: ""
+},
+{
+  id: 59,
+  cat: "BBQ",
+  name: "Turkish Kabab (Plate)",
+  desc: "Turkish kabab plate",
+  price: 400,
+  img: ""
+},
+{
+  id: 60,
+  cat: "BBQ",
+  name: "Chicken Boti (Plate)",
+  desc: "Classic chicken boti plate",
+  price: 400,
+  img: ""
+},
+{
+  id: 61,
+  cat: "BBQ",
+  name: "Chicken Balochi Boti (Plate)",
+  desc: "Balochi style chicken boti plate",
+  price: 400,
+  img: ""
+},
+{
+  id: 62,
+  cat: "BBQ",
+  name: "Chicken Malai Boti (Stick)",
+  desc: "Tender malai chicken boti stick",
+  price: 100,
+  img: ""
+},
+{
+  id: 63,
+  cat: "BBQ",
+  name: "Behari Boti (Stick)",
+  desc: "Behari style boti stick",
+  price: 100,
+  img: ""
+},
+{
+  id: 64,
+  cat: "BBQ",
+  name: "Seekh Kabab (Stick)",
+  desc: "Seekh kabab stick",
+  price: 100,
+  img: ""
+},
+{
+  id: 65,
+  cat: "BBQ",
+  name: "Chicken Boti (Stick)",
+  desc: "Classic chicken boti stick",
+  price: 100,
+  img: ""
+},
+{
+  id: 66,
+  cat: "BBQ",
+  name: "Chicken Balochi Boti (Stick)",
+  desc: "Balochi style chicken boti stick",
+  price: 100,
+  img: ""
+},
+{
+  id: 71,
+  cat: "Deals",
+  name: "Deal 1",
+  desc: "Rice, kabab platter, raita and Pepsi",
+  price: 1499,
+  img: ""
+},
+{
+  id: 68,
+  cat: "Deals",
+  name: "Deal 2",
+  desc: "Kabab platter, naan, raita and Pepsi",
+  price: 1299,
+  img: ""
+},
+{
+  id: 69,
+  cat: "Deals",
+  name: "Deal 3",
+  desc: "Kabab, naan, raita and Pepsi",
+  price: 850,
+  img: ""
+},
+{
+  id: 70,
+  cat: "Deals",
+  name: "Deal 4",
+  desc: "Chicken rice platter, raita and 2 drinks",
+  price: 799,
+  img: ""
+}
 ];
 
 
@@ -685,8 +869,8 @@ function totals() {
   const disc = isPct ? sub * Math.min(dv, 100) / 100 : Math.min(dv, sub);
   const after = sub - disc;
   const tax = after * TAX_RATE;
-   const del = val("type") === "Delivery" ? Math.max(parseFloat(val("delFee")) || 0, 0) : 0;
-  return {sub, disc, val: dv, isPct, tax, del, total: after + tax + del};
+  const del = val("type") === "Delivery" ? Math.max(parseFloat(val("delFee")) || 0, 0) : 0;
+  return { sub, disc, val: dv, isPct, tax, del, total: after + tax + del };
 }
 
 // "Add these too": suggest a drink or snack if the cart has none
@@ -752,7 +936,7 @@ function renderCart() {
     </div>`;
   }).join("") : `<div class="empty">No items yet. Tap "Add" on the menu.</div>`;
 
-   const t = totals();
+  const t = totals();
   const showSub = t.disc > 0 || TAX_RATE > 0 || t.del > 0;
   $("totals").innerHTML = ids.length ? `
     ${showSub ? `<div class="tot"><span>Subtotal</span><span>${fmt(t.sub)}</span></div>` : ""}
@@ -779,7 +963,7 @@ function resetOrder() {
   cart = {};
   prevIds = [];
   setVal("disc", "");
-    setVal("delFee", "");
+  setVal("delFee", "");
   setVal("paid", "");
   renderCart();
 }
