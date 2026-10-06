@@ -567,7 +567,7 @@ const DEFAULT_MENU = [
   img: ""
 },
 {
-  id: 71,
+  id: 90,
   cat: "Deals",
   name: "Deal 1",
   desc: "Rice, kabab platter, raita and Pepsi",
@@ -596,6 +596,118 @@ const DEFAULT_MENU = [
   name: "Deal 4",
   desc: "Chicken rice platter, raita and 2 drinks",
   price: 799,
+  img: ""
+},
+{
+  id: 71,
+  cat: "Biryani",
+  name: "Chicken Biryani (1 KG)",
+  desc: "Chicken biryani 1 kg",
+  price: 560,
+  img: ""
+},
+{
+  id: 72,
+  cat: "Biryani",
+  name: "Chicken Biryani (3 Pao)",
+  desc: "Chicken biryani 3 pao",
+  price: 420,
+  img: ""
+},
+{
+  id: 73,
+  cat: "Biryani",
+  name: "Chicken Biryani (Half KG)",
+  desc: "Chicken biryani half kg",
+  price: 280,
+  img: ""
+},
+{
+  id: 74,
+  cat: "Biryani",
+  name: "Chicken Biryani (1 Pao)",
+  desc: "Chicken biryani 1 pao",
+  price: 140,
+  img: ""
+},
+{
+  id: 75,
+  cat: "Biryani",
+  name: "Chicken Biryani (Plate)",
+  desc: "Chicken biryani single plate",
+  price: 210,
+  img: ""
+},
+{
+  id: 76,
+  cat: "Biryani",
+  name: "Sada Biryani / Sada Pulao (1 KG)",
+  desc: "Plain biryani / pulao 1 kg",
+  price: 400,
+  img: ""
+},
+{
+  id: 77,
+  cat: "Biryani",
+  name: "Sada Biryani / Sada Pulao (3 Pao)",
+  desc: "Plain biryani / pulao 3 pao",
+  price: 300,
+  img: ""
+},
+{
+  id: 78,
+  cat: "Biryani",
+  name: "Sada Biryani / Sada Pulao (Half KG)",
+  desc: "Plain biryani / pulao half kg",
+  price: 200,
+  img: ""
+},
+{
+  id: 79,
+  cat: "Biryani",
+  name: "Sada Biryani / Sada Pulao (1 Pao)",
+  desc: "Plain biryani / pulao 1 pao",
+  price: 100,
+  img: ""
+},
+{
+  id: 80,
+  cat: "Biryani",
+  name: "Beef Pulao (1 KG)",
+  desc: "Beef pulao 1 kg",
+  price: 760,
+  img: ""
+},
+{
+  id: 81,
+  cat: "Biryani",
+  name: "Beef Pulao (3 Pao)",
+  desc: "Beef pulao 3 pao",
+  price: 570,
+  img: ""
+},
+{
+  id: 82,
+  cat: "Biryani",
+  name: "Beef Pulao (Half KG)",
+  desc: "Beef pulao half kg",
+  price: 380,
+  img: ""
+},
+{
+  id: 83,
+  cat: "Biryani",
+  name: "Beef Pulao (1 Pao)",
+  desc: "Beef pulao 1 pao",
+  price: 190,
+  img: ""
+},
+{
+  id: 84,
+  cat: "Biryani",
+  name: "Beef Pulao (Plate)",
+  desc: "Beef pulao single plate",
+  price: 280,
   img: ""
 }
 ];
