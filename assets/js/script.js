@@ -119,7 +119,7 @@ const DEFAULT_MENU = [
     img: ""
   },
   {
-    id: 13,
+    id: 50,
     cat: "EXTRAS",
     name: "Chapati",
     desc: "Yammi",
