@@ -97,11 +97,12 @@ const DEFAULT_MENU = [
   { id: 60, cat: "BBQ", name: "Chicken Boti (Plate)", desc: "Classic chicken boti plate", price: 400, img: "" },
   { id: 61, cat: "BBQ", name: "Chicken Balochi Boti (Plate)", desc: "Balochi style chicken boti plate", price: 400, img: "" },
   { id: 62, cat: "BBQ", name: "Chicken Malai Boti (Stick)", desc: "Tender malai chicken boti stick", price: 100, img: "" },
-  { id: 63, cat: "BBQ", name: "Behari Boti (Stick)", desc: "Behari style boti stick", price: 100, img: "" },
-  { id: 64, cat: "BBQ", name: "Seekh Kabab (Stick)", desc: "Seekh kabab stick", price: 100, img: "" },
-  { id: 86, cat: "BBQ", name: "Chicken Boti (Stick)", desc: "Classic chicken boti stick", price: 100, img: "" },
-  { id: 66, cat: "BBQ", name: "Chicken Balochi Boti (Stick)", desc: "Balochi style chicken boti stick", price: 100, img: "" },
-
+    { id: 62, cat: "BBQ", name: "Chicken Malai Boti (Seekh)", desc: "Tender malai chicken boti seekh", price: 100, img: "" },
+  { id: 63, cat: "BBQ", name: "Behari Boti (Seekh)", desc: "Behari style boti seekh", price: 100, img: "" },
+  { id: 64, cat: "BBQ", name: "Seekh Kabab (Seekh)", desc: "Seekh kabab seekh", price: 100, img: "" },
+  { id: 86, cat: "BBQ", name: "Chicken Boti (Seekh)", desc: "Classic chicken boti seekh", price: 100, img: "" },
+  { id: 66, cat: "BBQ", name: "Chicken Balochi Boti (Seekh)", desc: "Balochi style chicken boti seekh", price: 100, img: "" },
+  
   { id: 90, cat: "Deals", name: "Deal 1", desc: "Half Kg Pulao (Sada), Leg Tikka, Bihari Boti (Half), Malai Boti (Half), Seekh Kabab (Half), Turkish Kabab (Half), 1 Ltr Drink, Raita", price: 1499, img: "" },
   { id: 68, cat: "Deals", name: "Deal 2", desc: "Bihari Boti (Half), Seekh Kabab (Half), Chicken Reshmi Kabab (Half), Chicken Tikka (Leg), 2 Paratha, 1 Ltr Drink, Raita", price: 1199, img: "" },
   { id: 69, cat: "Deals", name: "Deal 3", desc: "Afghani Boti (6 Seekh), Turkish Kabab (Half), 2 Paratha, 1 Ltr Drink, Raita", price: 850, img: "" },
