@@ -654,7 +654,7 @@ function placeOrder() {
     confetti();
     sfx("order");    
 
-const memeAudio = new Audio("assets/audio/chin_tapak_dum_dum.mp3");
+const memeAudio = new Audio("assets/chin_tapak_dum_dum.mp3");
 
 memeAudio.currentTime = 0;
 memeAudio.play().catch(error => {
