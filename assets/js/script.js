@@ -96,7 +96,6 @@ const DEFAULT_MENU = [
     { id: 59, cat: "BBQ", name: "Turkish Kabab (Plate)", desc: "Turkish kabab plate", price: 400, img: "" },
     { id: 60, cat: "BBQ", name: "Chicken Boti (Plate)", desc: "Classic chicken boti plate", price: 400, img: "" },
     { id: 61, cat: "BBQ", name: "Chicken Balochi Boti (Plate)", desc: "Balochi style chicken boti plate", price: 400, img: "" },
-    { id: 62, cat: "BBQ", name: "Chicken Malai Boti (Stick)", desc: "Tender malai chicken boti stick", price: 100, img: "" },
     { id: 62, cat: "BBQ", name: "Chicken Malai Boti (Seekh)", desc: "Tender malai chicken boti seekh", price: 100, img: "" },
     { id: 63, cat: "BBQ", name: "Behari Boti (Seekh)", desc: "Behari style boti seekh", price: 100, img: "" },
     { id: 64, cat: "BBQ", name: "Seekh Kabab (Seekh)", desc: "Seekh kabab seekh", price: 100, img: "" },
@@ -653,8 +652,8 @@ function placeOrder() {
 
     $("overlay").classList.add("show");
     confetti();
-    sfx("order");
-    speak("Nabeel Sir, order successfully");   // pehle awaz, phir print
+    sfx("order");    
+speak("Chin Tapak Dum Dum"); // Order complete hone par meme voice
     setTimeout(printReceipt, 900);
 }
 
@@ -1797,9 +1796,10 @@ $("lines").addEventListener("click", e => {
 (function () {
     const box = document.createElement("details");
     box.className = "custom";
-    box.innerHTML = `
-    <summary>✍️ Add a custom item/summary>
-          <p class="pnote">Add any special item to this order. Just type its name and price.</p>
+        box.innerHTML = `
+    <summary>✍️ Add a custom item</summary>
+    <p class="pnote">Add any special item to this order. Just type its name and price.</p>
+    <div class="cust-row">
       <input id="cName" placeholder="Item name (e.g. Biryani)" autocomplete="off">
       <input id="cPrice" type="number" min="0" step="any" inputmode="decimal" placeholder="Rs.">
     </div>
@@ -1818,3 +1818,18 @@ $("lines").addEventListener("click", e => {
         if (e.key === "Enter" && !e.ctrlKey && !e.metaKey) { e.preventDefault(); add(); }
     }));
 })();
+
+// =========================================================
+//  EK CLICK = EK ITEM (dobara judne se bachao)
+// =========================================================
+const GUARD_MS = 250;   // is waqt ke andar wahi item dobara add na ho
+let lastAdd = { id: null, t: 0 };
+const _changeGuard = change;
+change = function (id, d, btn) {
+  if (d > 0) {
+    const now = performance.now();
+    if (lastAdd.id == id && now - lastAdd.t < GUARD_MS) return;
+    lastAdd = { id, t: now };
+  }
+  _changeGuard(id, d, btn);
+};
