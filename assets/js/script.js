@@ -653,7 +653,13 @@ function placeOrder() {
     $("overlay").classList.add("show");
     confetti();
     sfx("order");    
-speak("Paisa Hi Paisa Hoga"); // Order complete hone par meme voice
+
+const memeAudio = new Audio("assets/audio/chin_tapak_dum_dum.mp3");
+
+memeAudio.currentTime = 0;
+memeAudio.play().catch(error => {
+    console.log("Audio play nahi hui:", error);
+});
     setTimeout(printReceipt, 900);
 }
 
