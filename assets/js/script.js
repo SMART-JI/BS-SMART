@@ -653,7 +653,7 @@ function placeOrder() {
     $("overlay").classList.add("show");
     confetti();
     sfx("order");    
-speak("Chin Tapak Dum Dum"); // Order complete hone par meme voice
+speak("Paisa Hi Paisa Hoga"); // Order complete hone par meme voice
     setTimeout(printReceipt, 900);
 }
 
