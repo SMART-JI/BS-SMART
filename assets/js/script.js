@@ -107,40 +107,44 @@ const DEFAULT_MENU = [
     { id: 67, cat: "BBQ", name: "Chicken Boti (Seekh)", desc: "Classic chicken boti seekh", price: 100, img: "" },
     { id: 68, cat: "BBQ", name: "Chicken Balochi Boti (Seekh)", desc: "Balochi style chicken boti seekh", price: 100, img: "" },
 
+    // ---------- BBQ Broast (NEW) ----------
+    { id: 69, cat: "BBQ", name: "Broast (CHEST)", desc: "Crispy broast chest piece", price: 500, img: "" },
+    { id: 70, cat: "BBQ", name: "Broast (LEG)", desc: "Crispy broast leg piece", price: 450, img: "" },
+
     // ---------- Deals ----------
-    { id: 69, cat: "Deals", name: "Deal 1", desc: "Half Kg Pulao (Sada), Leg Tikka, Bihari Boti (Half), Malai Boti (Half), Seekh Kabab (Half), Turkish Kabab (Half), 1 Ltr Drink, Raita", price: 1499, img: "" },
-    { id: 70, cat: "Deals", name: "Deal 2", desc: "Bihari Boti (Half), Seekh Kabab (Half), Chicken Reshmi Kabab (Half), Chicken Tikka (Leg), 2 Paratha, 1 Ltr Drink, Raita", price: 1199, img: "" },
-    { id: 71, cat: "Deals", name: "Deal 3", desc: "Afghani Boti (6 Seekh), Turkish Kabab (Half), 2 Paratha, 1 Ltr Drink, Raita", price: 850, img: "" },
-    { id: 72, cat: "Deals", name: "Deal 4", desc: "Pulao (Half Kg), Tikka (Chest), 2 Drinks (300ml), Raita", price: 799, img: "" },
+    { id: 71, cat: "Deals", name: "Deal 1", desc: "Half Kg Pulao (Sada), Leg Tikka, Bihari Boti (Half), Malai Boti (Half), Seekh Kabab (Half), Turkish Kabab (Half), 1 Ltr Drink, Raita", price: 1499, img: "" },
+    { id: 72, cat: "Deals", name: "Deal 2", desc: "Bihari Boti (Half), Seekh Kabab (Half), Chicken Reshmi Kabab (Half), Chicken Tikka (Leg), 2 Paratha, 1 Ltr Drink, Raita", price: 1199, img: "" },
+    { id: 73, cat: "Deals", name: "Deal 3", desc: "Afghani Boti (6 Seekh), Turkish Kabab (Half), 2 Paratha, 1 Ltr Drink, Raita", price: 850, img: "" },
+    { id: 74, cat: "Deals", name: "Deal 4", desc: "Pulao (Half Kg), Tikka (Chest), 2 Drinks (300ml), Raita", price: 799, img: "" },
 
     // ---------- Biryani ----------
-    { id: 73, cat: "Biryani", name: "Chicken Biryani (1 KG)", desc: "Chicken biryani 1 kg", price: 560, img: "" },
-    { id: 74, cat: "Biryani", name: "Chicken Biryani (3 Pao)", desc: "Chicken biryani 3 pao", price: 420, img: "" },
-    { id: 75, cat: "Biryani", name: "Chicken Biryani (Half KG)", desc: "Chicken biryani half kg", price: 280, img: "" },
-    { id: 76, cat: "Biryani", name: "Chicken Biryani (1 Pao)", desc: "Chicken biryani 1 pao", price: 140, img: "" },
-    { id: 77, cat: "Biryani", name: "Chicken Biryani (Plate)", desc: "Chicken biryani single plate", price: 210, img: "" },
-    { id: 78, cat: "Biryani", name: "Sada Biryani / Sada Pulao (1 KG)", desc: "Plain biryani / pulao 1 kg", price: 400, img: "" },
-    { id: 79, cat: "Biryani", name: "Sada Biryani / Sada Pulao (3 Pao)", desc: "Plain biryani / pulao 3 pao", price: 300, img: "" },
-    { id: 80, cat: "Biryani", name: "Sada Biryani / Sada Pulao (Half KG)", desc: "Plain biryani / pulao half kg", price: 200, img: "" },
-    { id: 81, cat: "Biryani", name: "Sada Biryani / Sada Pulao (1 Pao)", desc: "Plain biryani / pulao 1 pao", price: 100, img: "" },
-    { id: 82, cat: "Biryani", name: "Beef Pulao (1 KG)", desc: "Beef pulao 1 kg", price: 760, img: "" },
-    { id: 83, cat: "Biryani", name: "Beef Pulao (3 Pao)", desc: "Beef pulao 3 pao", price: 570, img: "" },
-    { id: 84, cat: "Biryani", name: "Beef Pulao (Half KG)", desc: "Beef pulao half kg", price: 380, img: "" },
-    { id: 85, cat: "Biryani", name: "Beef Pulao (1 Pao)", desc: "Beef pulao 1 pao", price: 190, img: "" },
-    { id: 86, cat: "Biryani", name: "Beef Pulao (Plate)", desc: "Beef pulao single plate", price: 280, img: "" },
+    { id: 75, cat: "Biryani", name: "Chicken Biryani (1 KG)", desc: "Chicken biryani 1 kg", price: 560, img: "" },
+    { id: 76, cat: "Biryani", name: "Chicken Biryani (3 Pao)", desc: "Chicken biryani 3 pao", price: 420, img: "" },
+    { id: 77, cat: "Biryani", name: "Chicken Biryani (Half KG)", desc: "Chicken biryani half kg", price: 280, img: "" },
+    { id: 78, cat: "Biryani", name: "Chicken Biryani (1 Pao)", desc: "Chicken biryani 1 pao", price: 140, img: "" },
+    { id: 79, cat: "Biryani", name: "Chicken Biryani (Plate)", desc: "Chicken biryani single plate", price: 210, img: "" },
+    { id: 80, cat: "Biryani", name: "Sada Biryani / Sada Pulao (1 KG)", desc: "Plain biryani / pulao 1 kg", price: 400, img: "" },
+    { id: 81, cat: "Biryani", name: "Sada Biryani / Sada Pulao (3 Pao)", desc: "Plain biryani / pulao 3 pao", price: 300, img: "" },
+    { id: 82, cat: "Biryani", name: "Sada Biryani / Sada Pulao (Half KG)", desc: "Plain biryani / pulao half kg", price: 200, img: "" },
+    { id: 83, cat: "Biryani", name: "Sada Biryani / Sada Pulao (1 Pao)", desc: "Plain biryani / pulao 1 pao", price: 100, img: "" },
+    { id: 84, cat: "Biryani", name: "Beef Pulao (1 KG)", desc: "Beef pulao 1 kg", price: 760, img: "" },
+    { id: 85, cat: "Biryani", name: "Beef Pulao (3 Pao)", desc: "Beef pulao 3 pao", price: 570, img: "" },
+    { id: 86, cat: "Biryani", name: "Beef Pulao (Half KG)", desc: "Beef pulao half kg", price: 380, img: "" },
+    { id: 87, cat: "Biryani", name: "Beef Pulao (1 Pao)", desc: "Beef pulao 1 pao", price: 190, img: "" },
+    { id: 88, cat: "Biryani", name: "Beef Pulao (Plate)", desc: "Beef pulao single plate", price: 280, img: "" },
 
-    // ---------- Drinks (NEW) ----------
-    { id: 87, cat: "Drinks", name: "REG Cold Drink", desc: "Regular cold drink", price: 70, img: "" },
-    { id: 88, cat: "Drinks", name: "REG Cold Drink Sting", desc: "Regular Sting", price: 80, img: "" },
-    { id: 89, cat: "Drinks", name: "300ml Coldrink", desc: "300ml cold drink", price: 90, img: "" },
-    { id: 90, cat: "Drinks", name: "300ml Coldrink Sting", desc: "300ml Sting", price: 100, img: "" },
-    { id: 91, cat: "Drinks", name: "500ml Coldrink", desc: "500ml cold drink", price: 120, img: "" },
-    { id: 92, cat: "Drinks", name: "500ml Coldrink Sting", desc: "500ml Sting", price: 140, img: "" },
-    { id: 93, cat: "Drinks", name: "1 ltr Coldrink", desc: "1 litre cold drink", price: 170, img: "" },
-    { id: 94, cat: "Drinks", name: "1.5 ltr Coldrink", desc: "1.5 litre cold drink", price: 220, img: "" },
-    { id: 95, cat: "Drinks", name: "Jumbo Coldrink", desc: "Jumbo size cold drink", price: 270, img: "" },
-    { id: 96, cat: "Drinks", name: "Water 500ml", desc: "500ml mineral water", price: 60, img: "" },
-    { id: 97, cat: "Drinks", name: "Water 1.5 Ltr", desc: "1.5 litre mineral water", price: 120, img: "" }
+    // ---------- Drinks ----------
+    { id: 89, cat: "Drinks", name: "REG Cold Drink", desc: "Regular cold drink", price: 70, img: "" },
+    { id: 90, cat: "Drinks", name: "REG Cold Drink Sting", desc: "Regular Sting", price: 80, img: "" },
+    { id: 91, cat: "Drinks", name: "300ml Coldrink", desc: "300ml cold drink", price: 90, img: "" },
+    { id: 92, cat: "Drinks", name: "300ml Coldrink Sting", desc: "300ml Sting", price: 100, img: "" },
+    { id: 93, cat: "Drinks", name: "500ml Coldrink", desc: "500ml cold drink", price: 120, img: "" },
+    { id: 94, cat: "Drinks", name: "500ml Coldrink Sting", desc: "500ml Sting", price: 140, img: "" },
+    { id: 95, cat: "Drinks", name: "1 ltr Coldrink", desc: "1 litre cold drink", price: 170, img: "" },
+    { id: 96, cat: "Drinks", name: "1.5 ltr Coldrink", desc: "1.5 litre cold drink", price: 220, img: "" },
+    { id: 97, cat: "Drinks", name: "Jumbo Coldrink", desc: "Jumbo size cold drink", price: 270, img: "" },
+    { id: 98, cat: "Drinks", name: "Water 500ml", desc: "500ml mineral water", price: 60, img: "" },
+    { id: 99, cat: "Drinks", name: "Water 1.5 Ltr", desc: "1.5 litre mineral water", price: 120, img: "" }
 ];
 
 // =========================================================
