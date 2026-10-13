@@ -1867,10 +1867,11 @@ change = function (id, d, btn) {
 //   file = assets folder mein mp3 ka naam
 // Naya meme: ek line copy karke naam aur file badal dein. Hatana ho to line mita dein.
 const MEMES = [
-    { name: "Chin Tapak Dum Dum", file: "assets/chin_tapak_dum_dum.mp3" },
-    { name: "Meme 2", file: "assets/meme2.mp3" },
-    { name: "Meme 3", file: "assets/meme3.mp3" },
-    { name: "Meme 4", file: "assets/meme4.mp3" }
+    { name: "Ya Marhaba", file: "assets/ya_marhaba.mp3" }
+        { name: "Chin Tapak Dum Dum", file: "assets/chin_tapak_dum_dum.mp3" },
+    { name: "Mujhay Anday Wala Burger", file: "assets/mujhay-anday-wala-burger.mp3" },
+    { name: "Paisa He Paisa", file: "assets/paisa_he_paisa.mp3" },
+    
 ];
 
 // Chuna hua meme: number (MEMES ka number), "random" ya "off"
