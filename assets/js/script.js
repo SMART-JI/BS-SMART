@@ -5,7 +5,7 @@ const RESTAURANT = {
     name: "BS Smart",
     sub: "Fast Food & Restaurant",
     address: "Sector 5-J, North Karachi, near Kala School",
-    phone: "0345-2183819 / 0312-2029588"
+    phone: " 03172526006"
 };
 const TAX_RATE = 0;          // use 0.13 for 13% tax
 const CURRENCY = "Rs.";
