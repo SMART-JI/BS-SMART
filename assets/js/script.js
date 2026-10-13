@@ -5,7 +5,7 @@ const RESTAURANT = {
     name: "BS Smart",
     sub: "Fast Food & Restaurant",
     address: "Sector 5-J, North Karachi, near Kala School",
-    phone: " 03172526006"
+    phone: "0345-2183819 / 0312-2029588"
 };
 const TAX_RATE = 0;          // use 0.13 for 13% tax
 const CURRENCY = "Rs.";
@@ -1867,11 +1867,10 @@ change = function (id, d, btn) {
 //   file = assets folder mein mp3 ka naam
 // Naya meme: ek line copy karke naam aur file badal dein. Hatana ho to line mita dein.
 const MEMES = [
-    { name: "Ya Marhaba", file: "assets/ya_marhaba.mp3" }
-        { name: "Chin Tapak Dum Dum", file: "assets/chin_tapak_dum_dum.mp3" },
+    { name: "Chin Tapak Dum Dum", file: "assets/chin_tapak_dum_dum.mp3" },
     { name: "Mujhay Anday Wala Burger", file: "assets/mujhay-anday-wala-burger.mp3" },
     { name: "Paisa He Paisa", file: "assets/paisa_he_paisa.mp3" },
-    
+    { name: "Ya Marhaba", file: "assets/ya_marhaba.mp3" }
 ];
 
 // Chuna hua meme: number (MEMES ka number), "random" ya "off"
