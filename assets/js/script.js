@@ -676,14 +676,8 @@ function placeOrder() {
 
     $("overlay").classList.add("show");
     confetti();
-    sfx("order");    
-
-const memeAudio = new Audio("assets/chin_tapak_dum_dum.mp3");
-
-memeAudio.currentTime = 0;
-memeAudio.play().catch(error => {
-    console.log("Audio play nahi hui:", error);
-});
+    sfx("order");
+    playMeme();
     setTimeout(printReceipt, 900);
 }
 
@@ -1863,3 +1857,83 @@ change = function (id, d, btn) {
   }
   _changeGuard(id, d, btn);
 };
+
+// =========================================================
+//  MEME AWAZ: speaker se band, aur apni marzi ka meme
+// =========================================================
+
+// Apne memes yahan likhein.
+//   name = jo naam toast mein dikhega (kuch bhi rakh sakte hain)
+//   file = assets folder mein mp3 ka naam
+// Naya meme: ek line copy karke naam aur file badal dein. Hatana ho to line mita dein.
+const MEMES = [
+    { name: "Chin Tapak Dum Dum", file: "assets/chin_tapak_dum_dum.mp3" },
+    { name: "Meme 2", file: "assets/meme2.mp3" },
+    { name: "Meme 3", file: "assets/meme3.mp3" },
+    { name: "Meme 4", file: "assets/meme4.mp3" }
+];
+
+// Chuna hua meme: number (MEMES ka number), "random" ya "off"
+let memeSel = lsGet("bsMeme", 0);
+if (typeof memeSel === "number" && !MEMES[memeSel]) memeSel = 0;
+let memeAudio = null;
+
+function pickMeme() {
+    if (memeSel === "off" || !MEMES.length) return null;
+    if (memeSel === "random") return MEMES[Math.floor(Math.random() * MEMES.length)];
+    return MEMES[memeSel] || MEMES[0];
+}
+
+// Chal rahi meme aur bolti awaz dono band
+function stopAllSound() {
+    if (memeAudio) { memeAudio.pause(); memeAudio.currentTime = 0; }
+    try { if ("speechSynthesis" in window) speechSynthesis.cancel(); } catch (e) { }
+}
+
+// Speaker band ho to kuch nahi bajta
+function playMeme() {
+    if (!soundOn) return;
+    const m = pickMeme();
+    if (!m) return;
+    stopAllSound();
+    memeAudio = new Audio(m.file);
+    memeAudio.play().catch(err => console.log("Meme play nahi hui:", err));
+}
+
+// Speaker button band karne par meme bhi band
+(function () {
+    const btn = $("soundBtn");
+    if (!btn) return;
+    const prev = btn.onclick;
+    btn.onclick = function (e) {
+        if (prev) prev.call(this, e);
+        if (!soundOn) stopAllSound();
+    };
+})();
+
+// Header mein 🎭 button: har click par agla meme (phir Random, phir Band)
+(function () {
+    const box = document.querySelector(".hb-in .social");
+    if (!box) return;
+    const b = document.createElement("button");
+    b.type = "button";
+    b.id = "memeBtn";
+    b.title = "Meme badlein";
+    b.setAttribute("aria-label", "Meme badlein");
+    b.textContent = "🎭";
+
+    const label = () =>
+        memeSel === "off" ? "Meme band 🚫"
+            : memeSel === "random" ? "Meme: Random 🎲"
+                : "Meme: " + (MEMES[memeSel] || MEMES[0]).name;
+
+    b.onclick = () => {
+        const order = [...MEMES.map((_, i) => i), "random", "off"];
+        const at = order.indexOf(memeSel);
+        memeSel = order[(at + 1) % order.length];
+        lsSet("bsMeme", memeSel);
+        toast(label() + (soundOn ? "" : " (speaker band hai)"));
+        playMeme();   // jhalak
+    };
+    box.insertBefore(b, box.firstChild);
+})();
