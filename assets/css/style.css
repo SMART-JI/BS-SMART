@@ -2018,6 +2018,784 @@
       transition: opacity .25s, transform .25s
   }
 
+  /* ===== Sun / Moon / Stars (background) ===== */
+  #sky {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      overflow: hidden;
+      background: rgba(30, 40, 110, 0);
+      transition: background 2.5s;
+  }
+
+  #sky.night {
+      background: rgba(30, 40, 110, .22);
+  }
+
+  #sky .orb {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      will-change: transform;
+  }
+
+  #sky .orb.sun {
+      background: radial-gradient(circle at 40% 40%, #fff6b0, #f5b800 65%);
+      box-shadow: 0 0 40px 14px rgba(245, 184, 0, .55), 0 0 110px 40px rgba(245, 184, 0, .25);
+      animation: sunPulse 3s ease-in-out infinite;
+  }
+
+  #sky .orb.moon {
+      width: 80px;
+      height: 80px;
+      background: transparent;
+      box-shadow: inset -24px 8px 0 0 #f7e08a, 0 0 30px 6px rgba(255, 240, 160, .45);
+  }
+
+  @keyframes sunPulse {
+      50% {
+          filter: brightness(1.12) saturate(1.1);
+      }
+  }
+
+  #sky .star {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #f5b800;
+      box-shadow: 0 0 8px 2px rgba(245, 184, 0, .8);
+      opacity: 0;
+      transition: opacity 2s;
+  }
+
+  /* ===== SPACE MODE (sirf Dark mode mein) ===== */
+  body.dark {
+      --bg: #03030a;
+  }
+
+  #space {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      overflow: hidden;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 1s, visibility 1s;
+      background:
+          radial-gradient(ellipse at 15% 10%, rgba(60, 40, 160, .45), transparent 55%),
+          radial-gradient(ellipse at 85% 85%, rgba(130, 30, 120, .35), transparent 50%),
+          radial-gradient(ellipse at 50% 50%, rgba(20, 60, 140, .2), transparent 60%),
+          #03030a;
+  }
+
+  body.dark #space {
+      opacity: 1;
+      visibility: visible;
+  }
+
+  #space canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+  }
+
+  @keyframes spaceFloat {
+      from {
+          transform: translate(0, 0);
+      }
+
+      to {
+          transform: translate(var(--fx, 18px), var(--fy, -22px));
+      }
+  }
+
+  .pl {
+      position: absolute;
+      border-radius: 50%;
+      aspect-ratio: 1;
+      animation: spaceFloat var(--d, 14s) ease-in-out infinite alternate;
+  }
+
+  /* Jupiter */
+  .pl.jupiter {
+      left: 2%;
+      top: 60%;
+      width: clamp(70px, 11vw, 170px);
+      --fx: 25px;
+      --fy: -18px;
+      --d: 18s;
+      background:
+          radial-gradient(circle at 32% 30%, rgba(255, 255, 255, .3), transparent 40%),
+          repeating-linear-gradient(180deg, #d9a066 0 8%, #b07a45 8% 15%, #ecd2a6 15% 22%, #9a5f33 22% 28%, #e6bd8a 28% 36%);
+      box-shadow: inset -22px -14px 40px rgba(0, 0, 0, .7), 0 0 40px rgba(220, 160, 100, .25);
+  }
+
+  .pl.jupiter::after {
+      content: "";
+      position: absolute;
+      left: 58%;
+      top: 56%;
+      width: 20%;
+      height: 11%;
+      border-radius: 50%;
+      background: #b3472f;
+      box-shadow: inset -2px -2px 5px rgba(0, 0, 0, .5);
+  }
+
+  /* Mars */
+  .pl.mars {
+      left: 14%;
+      top: 13%;
+      width: clamp(30px, 4vw, 62px);
+      --fx: -14px;
+      --fy: 20px;
+      --d: 12s;
+      background:
+          radial-gradient(circle at 35% 30%, rgba(255, 255, 255, .25), transparent 40%),
+          radial-gradient(circle at 60% 60%, #8a2f0c 0 14%, transparent 15%),
+          radial-gradient(circle at 30% 65%, #8a2f0c 0 9%, transparent 10%),
+          #c1440e;
+      box-shadow: inset -10px -8px 20px rgba(0, 0, 0, .65), 0 0 22px rgba(220, 80, 30, .35);
+  }
+
+  /* Venus */
+  .pl.venus {
+      left: 30%;
+      top: 88%;
+      width: clamp(28px, 3.6vw, 56px);
+      --fx: 22px;
+      --fy: -10px;
+      --d: 15s;
+      background: radial-gradient(circle at 32% 30%, #fff3c4, #e0b050 55%, #a8742a);
+      box-shadow: inset -9px -7px 18px rgba(0, 0, 0, .55), 0 0 22px rgba(240, 200, 100, .3);
+  }
+
+  /* Neptune */
+  .pl.neptune {
+      left: 55%;
+      top: 5%;
+      width: clamp(34px, 4.6vw, 72px);
+      --fx: -20px;
+      --fy: 14px;
+      --d: 17s;
+      background: radial-gradient(circle at 32% 30%, #9fd0ff, #3b6fe0 55%, #1b2f86);
+      box-shadow: inset -12px -9px 22px rgba(0, 0, 0, .6), 0 0 26px rgba(80, 130, 255, .4);
+  }
+
+  /* Saturn */
+  .pl.saturn {
+      right: 3%;
+      top: 64%;
+      width: clamp(55px, 7vw, 110px);
+      --fx: -16px;
+      --fy: -20px;
+      --d: 20s;
+      background:
+          radial-gradient(circle at 32% 30%, rgba(255, 255, 255, .3), transparent 40%),
+          repeating-linear-gradient(180deg, #e8d29a 0 12%, #c9ae6c 12% 22%, #f2e2b4 22% 32%);
+      box-shadow: inset -14px -10px 26px rgba(0, 0, 0, .6);
+  }
+
+  .pl.saturn::after {
+      content: "";
+      position: absolute;
+      left: -45%;
+      right: -45%;
+      top: 38%;
+      bottom: 38%;
+      border-radius: 50%;
+      border: 5px solid rgba(235, 215, 150, .8);
+      box-shadow: 0 0 0 4px rgba(200, 170, 100, .35);
+      transform: rotate(-18deg);
+  }
+
+  /* Earth + Moon (moon Earth ke gird ghoomta hai) */
+  .earthsys {
+      position: absolute;
+      right: 8%;
+      top: 15%;
+      width: clamp(50px, 7vw, 105px);
+      aspect-ratio: 1;
+      animation: spaceFloat 16s ease-in-out infinite alternate;
+      --fx: 12px;
+      --fy: 16px;
+  }
+
+  .earth {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background:
+          radial-gradient(circle at 30% 28%, rgba(255, 255, 255, .4), transparent 40%),
+          radial-gradient(circle at 34% 42%, #2f9a52 0 15%, transparent 16%),
+          radial-gradient(circle at 62% 66%, #2f9a52 0 13%, transparent 14%),
+          radial-gradient(circle at 70% 28%, #2f9a52 0 8%, transparent 9%),
+          #1f60d4;
+      box-shadow: inset -14px -10px 28px rgba(0, 0, 0, .7), 0 0 34px rgba(80, 150, 255, .45);
+  }
+
+  .moonorb {
+      position: absolute;
+      inset: -55%;
+      animation: spin 26s linear infinite;
+  }
+
+  .moonorb i {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 14%;
+      aspect-ratio: 1;
+      margin-left: -7%;
+      border-radius: 50%;
+      background:
+          radial-gradient(circle at 40% 40%, #8d8d8d 0 12%, transparent 13%),
+          radial-gradient(circle at 65% 62%, #8d8d8d 0 9%, transparent 10%),
+          radial-gradient(circle at 30% 30%, #f2f2f2, #b5b5b5 60%, #6e6e6e);
+      box-shadow: 0 0 14px rgba(255, 255, 255, .35);
+  }
+
+  /* Black hole */
+  .pl.blackhole {
+      left: 44%;
+      top: 76%;
+      width: clamp(56px, 7.5vw, 116px);
+      --fx: 10px;
+      --fy: -12px;
+      --d: 13s;
+      background: #000;
+      box-shadow: 0 0 22px 6px rgba(255, 140, 0, .45), 0 0 70px 20px rgba(140, 60, 255, .25);
+      z-index: 2;
+  }
+
+  .pl.blackhole::before {
+      content: "";
+      position: absolute;
+      inset: -55%;
+      border-radius: 50%;
+      background: conic-gradient(from var(--ang), #ff8a00, #ffe08a, #8a3cff, #ff3d00, #ff8a00);
+      -webkit-mask: radial-gradient(circle, transparent 30%, #000 33%, #000 60%, transparent 68%);
+      mask: radial-gradient(circle, transparent 30%, #000 33%, #000 60%, transparent 68%);
+      transform: rotate(-18deg) scaleY(.36);
+      animation: rot 2.5s linear infinite;
+      z-index: -1;
+  }
+
+  /* =========================================================
+   DAY MODE: asmaan, sun, badal, parinde, ghubbare
+   ========================================================= */
+  #daysky {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      overflow: hidden;
+      background: linear-gradient(180deg, #a9dcff 0%, #d9f0ff 30%, rgba(255, 253, 246, 0) 72%);
+      transition: opacity 1s, visibility 1s;
+  }
+
+  body.dark #daysky {
+      opacity: 0;
+      visibility: hidden;
+  }
+
+  /* Sun */
+  #daysky .sun {
+      position: absolute;
+      right: 7%;
+      top: 5%;
+      width: clamp(70px, 9vw, 120px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 38%, #fffbd0, #ffd83a 60%, #f5b800);
+      box-shadow: 0 0 40px 12px rgba(255, 200, 0, .5), 0 0 120px 40px rgba(255, 200, 0, .25);
+      animation: sunPulse2 4s ease-in-out infinite;
+  }
+
+  #daysky .sun::before {
+      content: "";
+      position: absolute;
+      inset: -70%;
+      border-radius: 50%;
+      background: repeating-conic-gradient(rgba(255, 210, 0, .38) 0 6deg, transparent 6deg 20deg);
+      -webkit-mask: radial-gradient(circle, transparent 28%, #000 30%, transparent 68%);
+      mask: radial-gradient(circle, transparent 28%, #000 30%, transparent 68%);
+      animation: spin 45s linear infinite;
+  }
+
+  @keyframes sunPulse2 {
+      50% {
+          transform: scale(1.07);
+          filter: brightness(1.1);
+      }
+  }
+
+  /* Clouds */
+  .cloud {
+      position: absolute;
+      left: 0;
+      width: 140px;
+      height: 44px;
+      background: #fff;
+      border-radius: 50px;
+      opacity: .92;
+      scale: var(--s, 1);
+      filter: drop-shadow(0 8px 10px rgba(70, 140, 210, .18));
+      animation: cloudMove var(--d, 70s) linear infinite;
+      animation-delay: var(--dl, 0s);
+  }
+
+  .cloud::before,
+  .cloud::after {
+      content: "";
+      position: absolute;
+      background: #fff;
+      border-radius: 50%;
+  }
+
+  .cloud::before {
+      width: 62px;
+      height: 62px;
+      top: -30px;
+      left: 22px;
+  }
+
+  .cloud::after {
+      width: 84px;
+      height: 84px;
+      top: -44px;
+      left: 60px;
+  }
+
+  @keyframes cloudMove {
+      from {
+          transform: translateX(-320px);
+      }
+
+      to {
+          transform: translateX(calc(100vw + 320px));
+      }
+  }
+
+  /* Birds */
+  .bird {
+      position: absolute;
+      left: 0;
+      width: 34px;
+      height: 16px;
+      animation: birdFly var(--d, 24s) linear infinite;
+      animation-delay: var(--dl, 0s);
+  }
+
+  .bird svg {
+      width: 100%;
+      height: 100%;
+      fill: none;
+      stroke: #33475b;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      transform-origin: 50% 80%;
+      animation: flap .5s ease-in-out infinite;
+  }
+
+  @keyframes flap {
+      50% {
+          transform: scaleY(.3);
+      }
+  }
+
+  @keyframes birdFly {
+      0% {
+          transform: translate(-80px, 0);
+      }
+
+      50% {
+          transform: translate(50vw, -45px);
+      }
+
+      100% {
+          transform: translate(calc(100vw + 80px), 10px);
+      }
+  }
+
+  /* Balloons */
+  .balloon {
+      position: absolute;
+      bottom: 0;
+      font-size: var(--fs, 40px);
+      animation: balloonUp var(--d, 40s) linear infinite;
+      animation-delay: var(--dl, 0s);
+      filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .15));
+  }
+
+  .balloon i {
+      display: block;
+      font-style: normal;
+      animation: sway 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes balloonUp {
+      from {
+          transform: translate(0, 120px);
+      }
+
+      to {
+          transform: translate(var(--sw, 60px), -112vh);
+      }
+  }
+
+  @keyframes sway {
+      from {
+          transform: rotate(-8deg);
+      }
+
+      to {
+          transform: rotate(8deg);
+      }
+  }
+
+  @media (max-width: 560px) {
+
+      .bird:nth-of-type(n+3),
+      .balloon:nth-of-type(n+3) {
+          display: none;
+      }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+
+      .cloud,
+      .bird,
+      .bird svg,
+      .balloon,
+      .balloon i,
+      #daysky .sun,
+      #daysky .sun::before {
+          animation: none !important;
+      }
+  }
+
+  /* =========================================================
+   NIGHT MODE EXTRAS: Milky Way, astronaut, rocket, UFO, comet
+   ========================================================= */
+  @keyframes milky {
+      from {
+          transform: translateX(-4%) rotate(0deg);
+      }
+
+      to {
+          transform: translateX(4%) rotate(2deg);
+      }
+  }
+
+  #space::before {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      background: linear-gradient(115deg, transparent 32%, rgba(150, 120, 255, .12) 42%,
+              rgba(255, 190, 240, .16) 50%, rgba(120, 170, 255, .12) 58%, transparent 68%);
+      filter: blur(28px);
+      animation: milky 20s ease-in-out infinite alternate;
+  }
+
+  .astro {
+      position: absolute;
+      left: 72%;
+      top: 46%;
+      font-size: clamp(34px, 5vw, 64px);
+      filter: drop-shadow(0 0 14px rgba(150, 200, 255, .5));
+      animation: astroDrift 24s ease-in-out infinite alternate;
+  }
+
+  @keyframes astroDrift {
+      0% {
+          transform: translate(0, 0) rotate(-20deg);
+      }
+
+      50% {
+          transform: translate(-60px, 40px) rotate(25deg);
+      }
+
+      100% {
+          transform: translate(40px, -30px) rotate(-10deg);
+      }
+  }
+
+  .fly {
+      position: absolute;
+      font-size: 34px;
+      z-index: 1;
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, .45));
+  }
+
+  .fly.rocket {
+      left: -60px;
+      bottom: -60px;
+      animation: rocketGo 9s ease-in forwards;
+  }
+
+  /* =========================================================
+   WEATHER: rain, storm, snow, fog, cloudy
+   ========================================================= */
+  #weather {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      overflow: hidden;
+  }
+
+  #weather canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+  }
+
+  /* Fog */
+  #weather .fogl {
+      position: absolute;
+      inset: -10%;
+      opacity: 0;
+      transition: opacity 1.5s;
+      background:
+          radial-gradient(ellipse at 20% 30%, rgba(235, 240, 245, .85), transparent 55%),
+          radial-gradient(ellipse at 80% 60%, rgba(225, 232, 240, .8), transparent 55%),
+          radial-gradient(ellipse at 40% 92%, rgba(235, 240, 245, .8), transparent 50%);
+      filter: blur(20px);
+      animation: fogMove 25s ease-in-out infinite alternate;
+  }
+
+  body[data-weather="fog"] #weather .fogl {
+      opacity: 1;
+  }
+
+  body.dark #weather .fogl {
+      filter: blur(20px) brightness(.3);
+  }
+
+  @keyframes fogMove {
+      from {
+          transform: translateX(-4%);
+      }
+
+      to {
+          transform: translateX(4%) scale(1.06);
+      }
+  }
+
+  /* Lightning */
+  #weather .flash {
+      position: absolute;
+      inset: 0;
+      background: #fff;
+      opacity: 0;
+  }
+
+  #weather .flash.go {
+      animation: lightning .8s;
+  }
+
+  @keyframes lightning {
+      0% {
+          opacity: 0;
+      }
+
+      8% {
+          opacity: .85;
+      }
+
+      16% {
+          opacity: .1;
+      }
+
+      26% {
+          opacity: .65;
+      }
+
+      100% {
+          opacity: 0;
+      }
+  }
+
+  /* Din ka asmaan weather ke hisaab se */
+  #daysky {
+      transition: opacity 1s, visibility 1s, filter 1.5s;
+  }
+
+  #daysky .sun {
+      transition: opacity 1.2s;
+  }
+
+  body[data-weather="cloudy"] #daysky {
+      filter: grayscale(.55) brightness(.92);
+  }
+
+  body[data-weather="rain"] #daysky {
+      filter: grayscale(.7) brightness(.78);
+  }
+
+  body[data-weather="storm"] #daysky {
+      filter: grayscale(.85) brightness(.55);
+  }
+
+  body[data-weather="snow"] #daysky {
+      filter: grayscale(.4) brightness(.97);
+  }
+
+  body[data-weather="fog"] #daysky {
+      filter: grayscale(.6) brightness(1.02);
+  }
+
+  body[data-weather="cloudy"] #daysky .sun {
+      opacity: .3;
+  }
+
+  body[data-weather="rain"] #daysky .sun,
+  body[data-weather="storm"] #daysky .sun,
+  body[data-weather="snow"] #daysky .sun,
+  body[data-weather="fog"] #daysky .sun {
+      opacity: 0;
+  }
+
+  body[data-weather="rain"] #daysky .bird,
+  body[data-weather="rain"] #daysky .balloon,
+  body[data-weather="storm"] #daysky .bird,
+  body[data-weather="storm"] #daysky .balloon {
+      opacity: 0;
+  }
+
+  /* Raat ka space weather ke hisaab se */
+  #space {
+      transition: opacity 1s, visibility 1s, filter 1.5s;
+  }
+
+  body.dark[data-weather="cloudy"] #space {
+      filter: brightness(.7);
+  }
+
+  body.dark[data-weather="rain"] #space,
+  body.dark[data-weather="snow"] #space,
+  body.dark[data-weather="fog"] #space {
+      filter: brightness(.5);
+  }
+
+  body.dark[data-weather="storm"] #space {
+      filter: brightness(.35);
+  }
+
+  @keyframes rocketGo {
+      to {
+          transform: translate(calc(100vw + 140px), calc(-100vh - 140px));
+      }
+  }
+
+  .fly.ufo {
+      left: -80px;
+      top: 22%;
+      font-size: 42px;
+      animation: ufoGo 14s linear forwards;
+  }
+
+  @keyframes ufoGo {
+      0% {
+          transform: translate(0, 0) rotate(-6deg);
+      }
+
+      25% {
+          transform: translate(28vw, -30px) rotate(6deg);
+      }
+
+      50% {
+          transform: translate(55vw, 25px) rotate(-6deg);
+      }
+
+      75% {
+          transform: translate(80vw, -20px) rotate(6deg);
+      }
+
+      100% {
+          transform: translate(calc(100vw + 160px), 10px) rotate(-6deg);
+      }
+  }
+
+  .fly.comet {
+      right: -60px;
+      top: -40px;
+      font-size: 38px;
+      animation: cometGo 4s ease-in forwards;
+  }
+
+  @keyframes cometGo {
+      to {
+          transform: translate(calc(-100vw - 200px), calc(70vh));
+      }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+
+      .astro,
+      .fly,
+      #space::before {
+          animation: none !important;
+      }
+
+      .fly {
+          display: none;
+      }
+  }
+
+  @media (max-width: 560px) {
+
+      .pl.neptune,
+      .pl.venus {
+          display: none;
+      }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+
+      .pl,
+      .earthsys,
+      .moonorb {
+          animation: none !important;
+      }
+  }
+
+  #sky.night .star {
+      opacity: 1;
+      animation: twinkle 2.4s ease-in-out infinite;
+  }
+
+  @keyframes twinkle {
+
+      0%,
+      100% {
+          transform: scale(1);
+          opacity: 1;
+      }
+
+      50% {
+          transform: scale(.4);
+          opacity: .35;
+      }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+
+      #sky .orb,
+      #sky .star {
+          animation: none !important;
+      }
+  }
+
   #toTop.show {
       opacity: 1;
       transform: none;
