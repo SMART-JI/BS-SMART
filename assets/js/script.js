@@ -5,7 +5,7 @@ const RESTAURANT = {
     name: "BS Smart",
     sub: "Fast Food & Restaurant",
     address: "Sector 5-J, North Karachi, near Kala School",
-    phone: "03172526006"
+    phone: "0345-2183819 / 0312-2029588"
 };
 const TAX_RATE = 0;          // use 0.13 for 13% tax
 const CURRENCY = "Rs.";
@@ -523,7 +523,7 @@ function resetOrder() {
     cart = {};
     prevIds = [];
     setVal("disc", "");
-      setVal("discType", "Rs");
+    setVal("discType", "Rs");
     setVal("delFee", "");
     setVal("paid", "");
     renderCart();
@@ -1820,7 +1820,7 @@ $("lines").addEventListener("click", e => {
 (function () {
     const box = document.createElement("details");
     box.className = "custom";
-        box.innerHTML = `
+    box.innerHTML = `
     <summary>✍️ Add a custom item</summary>
     <p class="pnote">Add any special item to this order. Just type its name and price.</p>
     <div class="cust-row">
@@ -1850,12 +1850,12 @@ const GUARD_MS = 250;   // is waqt ke andar wahi item dobara add na ho
 let lastAdd = { id: null, t: 0 };
 const _changeGuard = change;
 change = function (id, d, btn) {
-  if (d > 0) {
-    const now = performance.now();
-    if (lastAdd.id == id && now - lastAdd.t < GUARD_MS) return;
-    lastAdd = { id, t: now };
-  }
-  _changeGuard(id, d, btn);
+    if (d > 0) {
+        const now = performance.now();
+        if (lastAdd.id == id && now - lastAdd.t < GUARD_MS) return;
+        lastAdd = { id, t: now };
+    }
+    _changeGuard(id, d, btn);
 };
 
 // =========================================================
@@ -1872,6 +1872,11 @@ const MEMES = [
     { name: "Paisa He Paisa", file: "assets/paisa_he_paisa.mp3" },
     { name: "Ya Marhaba", file: "assets/ya_marhaba.mp3" }
 ];
+
+// Bada order: is raqam ya us se upar ke order par ye khaas meme bajega (0 likhein to band)
+const BIG_ORDER_AMOUNT = 3000;
+const BIG_ORDER_MEME = "Paisa He Paisa";   // MEMES mein jo name likha hai bilkul wahi
+let orderTotalNow = 0;                     // order ka total (khud set hota hai)
 
 // Chuna hua meme: number (MEMES ka number), "random" ya "off"
 let memeSel = lsGet("bsMeme", 0);
@@ -1893,8 +1898,13 @@ function stopAllSound() {
 // Speaker band ho to kuch nahi bajta
 function playMeme() {
     if (!soundOn) return;
-    const m = pickMeme();
+    let m = pickMeme();
     if (!m) return;
+    // Bada order ho to khaas meme (agar meme "Band" nahi hai)
+    if (BIG_ORDER_AMOUNT > 0 && orderTotalNow >= BIG_ORDER_AMOUNT) {
+        const big = MEMES.find(x => x.name === BIG_ORDER_MEME);
+        if (big) m = big;
+    }
     stopAllSound();
     memeAudio = new Audio(m.file);
     memeAudio.play().catch(err => console.log("Meme play nahi hui:", err));
@@ -1936,4 +1946,297 @@ function playMeme() {
         playMeme();   // jhalak
     };
     box.insertBefore(b, box.firstChild);
+})();
+// =========================================================
+//  SPACE MODE: Dark mode mein stars, planets, black hole
+// =========================================================
+(function () {
+    const sp = document.createElement("div");
+    sp.id = "space";
+    sp.innerHTML = `
+    <canvas></canvas>
+    <div class="pl jupiter"></div>
+    <div class="pl mars"></div>
+    <div class="pl venus"></div>
+    <div class="pl neptune"></div>
+    <div class="pl saturn"></div>
+    <div class="earthsys"><div class="earth"></div><div class="moonorb"><i></i></div></div>
+    <div class="pl blackhole"></div>`;
+    document.body.prepend(sp);
+
+    const cv = sp.querySelector("canvas"), c = cv.getContext("2d");
+    let W, H, stars = [], shoot = null;
+
+    function size() {
+        W = cv.width = innerWidth;
+        H = cv.height = innerHeight;
+        const n = Math.min(260, Math.round(W * H / 7000));
+        stars = Array.from({ length: n }, () => ({
+            x: Math.random() * W, y: Math.random() * H,
+            r: Math.random() * 1.4 + .2,
+            ph: Math.random() * 6.28, sp: .5 + Math.random() * 1.5
+        }));
+        if (reduceMotion) draw(0, true);
+    }
+
+    function draw(now, force) {
+        if (force || (document.body.classList.contains("dark") && !document.hidden)) {
+            c.clearRect(0, 0, W, H);
+            c.fillStyle = "#fff";
+            stars.forEach(s => {
+                c.globalAlpha = reduceMotion ? .8 : .35 + .65 * Math.abs(Math.sin(now / 1000 * s.sp + s.ph));
+                c.beginPath();
+                c.arc(s.x, s.y, s.r, 0, 7);
+                c.fill();
+            });
+
+            // Toota hua tara (shooting star)
+            if (!reduceMotion) {
+                if (!shoot && Math.random() < .004) {
+                    shoot = { x: Math.random() * W * .8, y: Math.random() * H * .4, vx: 9, vy: 4, l: 1 };
+                }
+                if (shoot) {
+                    c.globalAlpha = shoot.l;
+                    c.strokeStyle = "#fff";
+                    c.lineWidth = 2;
+                    c.beginPath();
+                    c.moveTo(shoot.x, shoot.y);
+                    c.lineTo(shoot.x - shoot.vx * 7, shoot.y - shoot.vy * 7);
+                    c.stroke();
+                    shoot.x += shoot.vx;
+                    shoot.y += shoot.vy;
+                    shoot.l -= .02;
+                    if (shoot.l <= 0) shoot = null;
+                }
+            }
+            c.globalAlpha = 1;
+        }
+        if (!reduceMotion) requestAnimationFrame(draw);
+    }
+
+    size();
+    addEventListener("resize", size);
+    if (!reduceMotion) requestAnimationFrame(draw);
+})();
+// =========================================================
+//  DAY SKY: badal, parinde, ghubbare
+// =========================================================
+(function () {
+    const d = document.createElement("div");
+    d.id = "daysky";
+
+    let html = `<div class="sun"></div>`;
+
+    // Clouds: top %, size, speed, start delay
+    [[8, 1.2, 80, -10], [20, .8, 55, -35], [34, 1.5, 100, -60], [13, .6, 45, -5], [48, 1, 70, -50]]
+        .forEach(([t, s, du, dl]) => {
+            html += `<div class="cloud" style="top:${t}%;--s:${s};--d:${du}s;--dl:${dl}s"></div>`;
+        });
+
+    // Birds
+    const bird = `<svg viewBox="0 0 40 20"><path d="M2 14 Q10 0 20 12 Q30 0 38 14"/></svg>`;
+    [[16, 26, -4], [22, 32, -14], [11, 38, -22], [28, 30, -9]].forEach(([t, du, dl]) => {
+        html += `<div class="bird" style="top:${t}%;--d:${du}s;--dl:${dl}s">${bird}</div>`;
+    });
+
+    // Balloons
+    [["🎈", 8, 44, -6, 70, 40], ["🎈", 55, 55, -28, -80, 34], ["🎈", 85, 48, -16, 40, 46]]
+        .forEach(([e, l, du, dl, sw, fs]) => {
+            html += `<div class="balloon" style="left:${l}%;--d:${du}s;--dl:${dl}s;--sw:${sw}px;--fs:${fs}px"><i>${e}</i></div>`;
+        });
+
+    d.innerHTML = html;
+    document.body.prepend(d);
+})();
+
+// =========================================================
+//  NIGHT EXTRAS: astronaut, rocket, UFO, comet
+// =========================================================
+(function () {
+    const sp = document.getElementById("space");
+    if (!sp) return;
+
+    const a = document.createElement("div");
+    a.className = "astro";
+    a.textContent = "🧑‍🚀";
+    sp.appendChild(a);
+
+    if (reduceMotion) return;
+
+    function fly(kind, emoji) {
+        const e = document.createElement("div");
+        e.className = "fly " + kind;
+        e.textContent = emoji;
+        if (kind === "comet") e.style.right = (Math.random() * 40 - 10) + "%";
+        if (kind === "rocket") e.style.left = (Math.random() * 40 - 5) + "%";
+        if (kind === "ufo") e.style.top = (10 + Math.random() * 40) + "%";
+        sp.appendChild(e);
+        e.addEventListener("animationend", () => e.remove());
+    }
+
+    const active = () => document.body.classList.contains("dark") && !document.hidden;
+
+    setInterval(() => { if (active()) fly("rocket", "🚀"); }, 17000);
+    setInterval(() => { if (active()) fly("ufo", "🛸"); }, 29000);
+    setInterval(() => { if (active() && Math.random() < .7) fly("comet", "☄️"); }, 9000);
+
+    // Dark mode on karte hi kuch dikhao
+    const obs = new MutationObserver(() => {
+        if (document.body.classList.contains("dark")) setTimeout(() => fly("comet", "☄️"), 800);
+    });
+    obs.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+})();
+// =========================================================
+//  WEATHER: Auto (asli mausam) ya apni marzi ka
+// =========================================================
+(function () {
+    // Karachi (North Karachi) ki location, Auto mode ke liye
+    const LAT = 24.98, LON = 67.06;
+
+    const MODES = ["auto", "clear", "cloudy", "rain", "storm", "snow", "fog"];
+    const ICON = { auto: "📡", clear: "☀️", cloudy: "☁️", rain: "🌧️", storm: "⛈️", snow: "❄️", fog: "🌫️" };
+    const NAME = { auto: "Auto (asli mausam)", clear: "Saaf mausam", cloudy: "Badal", rain: "Baarish", storm: "Toofan", snow: "Barf", fog: "Dhund" };
+
+    let mode = lsGet("bsWeather", "auto");
+    if (!MODES.includes(mode)) mode = "auto";
+    let live = "clear";
+
+    const box = document.createElement("div");
+    box.id = "weather";
+    box.innerHTML = `<canvas></canvas><div class="fogl"></div><div class="flash"></div>`;
+    document.body.appendChild(box);   // sab se aakhir mein, taake asmaan ke upar nazar aaye
+
+    const cv = box.querySelector("canvas"), c = cv.getContext("2d");
+    const flash = box.querySelector(".flash");
+    let W = 0, H = 0, parts = [], running = false, boltT = null;
+
+    const eff = () => mode === "auto" ? live : mode;
+
+    function size() {
+        W = cv.width = innerWidth;
+        H = cv.height = innerHeight;
+        spawn();
+    }
+
+    function spawn() {
+        const e = eff();
+        parts = [];
+        if (reduceMotion) return;
+        if (e === "rain" || e === "storm") {
+            const n = Math.min(e === "storm" ? 420 : 240, Math.round(W * H / (e === "storm" ? 4500 : 8000)));
+            for (let i = 0; i < n; i++) parts.push({
+                x: Math.random() * W, y: Math.random() * H,
+                l: 10 + Math.random() * 14, v: 12 + Math.random() * 10
+            });
+        }
+        if (e === "snow") {
+            const n = Math.min(180, Math.round(W * H / 11000));
+            for (let i = 0; i < n; i++) parts.push({
+                x: Math.random() * W, y: Math.random() * H,
+                r: 1.5 + Math.random() * 3, v: .6 + Math.random() * 1.4,
+                ph: Math.random() * 6.28, sw: .4 + Math.random() * .9
+            });
+        }
+    }
+
+    function draw(now) {
+        if (!running) return;
+        const e = eff(), dark = document.body.classList.contains("dark");
+        c.clearRect(0, 0, W, H);
+
+        if ((e === "rain" || e === "storm") && !document.hidden) {
+            c.strokeStyle = dark ? "rgba(170,195,255,.55)" : "rgba(50,90,150,.55)";
+            c.lineWidth = e === "storm" ? 1.6 : 1.2;
+            c.beginPath();
+            parts.forEach(p => {
+                c.moveTo(p.x, p.y);
+                c.lineTo(p.x - p.l * .2, p.y + p.l);
+                p.y += p.v;
+                p.x -= p.v * .2;
+                if (p.y > H) { p.y = -20; p.x = Math.random() * (W + 120); }
+                if (p.x < -20) p.x = W + 10;
+            });
+            c.stroke();
+        }
+
+        if (e === "snow" && !document.hidden) {
+            c.fillStyle = "#fff";
+            c.shadowColor = dark ? "rgba(255,255,255,.6)" : "rgba(60,100,160,.55)";
+            c.shadowBlur = 5;
+            parts.forEach(p => {
+                p.y += p.v;
+                p.x += Math.sin(now / 1000 * p.sw + p.ph) * .6;
+                if (p.y > H + 6) { p.y = -8; p.x = Math.random() * W; }
+                c.beginPath();
+                c.arc(p.x, p.y, p.r, 0, 7);
+                c.fill();
+            });
+            c.shadowBlur = 0;
+        }
+        requestAnimationFrame(draw);
+    }
+
+    function lightning() {
+        clearTimeout(boltT);
+        if (eff() !== "storm" || reduceMotion) return;
+        boltT = setTimeout(() => {
+            if (!document.hidden) {
+                flash.classList.remove("go");
+                void flash.offsetWidth;
+                flash.classList.add("go");
+            }
+            lightning();
+        }, 3500 + Math.random() * 6000);
+    }
+
+    function apply() {
+        const e = eff();
+        document.body.dataset.weather = e;
+        spawn();
+        const needs = (e === "rain" || e === "storm" || e === "snow") && !reduceMotion;
+        if (needs && !running) { running = true; requestAnimationFrame(draw); }
+        if (!needs) { running = false; c.clearRect(0, 0, W, H); }
+        lightning();
+        paint();
+    }
+
+    // Asli mausam (Open-Meteo, free)
+    function getLive() {
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=weather_code&timezone=auto`)
+            .then(r => r.json())
+            .then(j => {
+                const k = j.current.weather_code;
+                live = k <= 1 ? "clear"
+                    : k <= 3 ? "cloudy"
+                        : (k === 45 || k === 48) ? "fog"
+                            : (k >= 71 && k <= 77) || k === 85 || k === 86 ? "snow"
+                                : k >= 95 ? "storm"
+                                    : "rain";   // 51-67 aur 80-82 baarish
+                if (mode === "auto") apply();
+            })
+            .catch(() => { });
+    }
+
+    // Header ka button
+    const social = document.querySelector(".hb-in .social");
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.id = "weatherBtn";
+    btn.title = "Weather badlein";
+    btn.setAttribute("aria-label", "Weather badlein");
+    function paint() { btn.textContent = ICON[mode]; }
+    btn.onclick = () => {
+        mode = MODES[(MODES.indexOf(mode) + 1) % MODES.length];
+        lsSet("bsWeather", mode);
+        apply();
+        toast(ICON[mode] + " " + NAME[mode] + (mode === "auto" ? ": " + NAME[live] : ""));
+        sfx("fav");
+    };
+    if (social) social.insertBefore(btn, social.firstChild);
+
+    size();
+    addEventListener("resize", size);
+    apply();
+    getLive();
+    setInterval(getLive, 30 * 60 * 1000);
 })();
