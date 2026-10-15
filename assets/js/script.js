@@ -13,7 +13,7 @@ const DEFAULT_STOCK = 50;    // starting stock of every item
 
 // ====== SPEED SETTINGS (hang / slow print fix) ======
 const LITE_MODE = true;      // true = halka & tez (bhaari animations band). false = saari animations wapis
-const PRINT_LOGO = false;    // false = slip par logo nahi (thermal printer logo bohat der se print karta hai)
+const PRINT_LOGO = true;     // true = slip par logo aayega (customer slip). false = logo nahi
 const KITCHEN_ONE_SLIP = true; // true = kitchen ki saari items ek hi slip par (kam pages = tez print)
 
 // ====== PRINT SETTINGS ======
@@ -612,16 +612,28 @@ function buildReceipt(snap, t, meta) {
     $("receipt").innerHTML = itemSlipsHTML();
 }
 
-// Logo sirf tab tayyar karo jab PRINT_LOGO on ho
+// Logo sirf tab tayyar karo jab PRINT_LOGO on ho.
+// Logo pehle se chhota aur black & white bana liya jata hai, taake thermal printer par jaldi aur saaf print ho.
+const LOGO_THRESHOLD = 190;   // logo bahut kala aaye to barhao (200), bahut halka aaye to ghatao (150)
 let logoData = "";
 if (PRINT_LOGO) (function () {
     const im = new Image();
     im.onload = () => {
         try {
-            const w = 140, h = Math.round(im.naturalHeight * w / im.naturalWidth);
+            const w = 160, h = Math.round(im.naturalHeight * w / im.naturalWidth);
             const c = document.createElement("canvas");
             c.width = w; c.height = h;
-            c.getContext("2d").drawImage(im, 0, 0, w, h);
+            const x = c.getContext("2d");
+            x.fillStyle = "#fff";
+            x.fillRect(0, 0, w, h);
+            x.drawImage(im, 0, 0, w, h);
+            const img = x.getImageData(0, 0, w, h), p = img.data;
+            for (let i = 0; i < p.length; i += 4) {
+                const g = p[i] * .3 + p[i + 1] * .59 + p[i + 2] * .11;
+                const v = g > LOGO_THRESHOLD ? 255 : 0;
+                p[i] = p[i + 1] = p[i + 2] = v;
+            }
+            x.putImageData(img, 0, 0);
             logoData = c.toDataURL("image/png");
         } catch (e) { }
     };
@@ -647,7 +659,7 @@ function printCSS() {
     .b { font-weight: 700; font-size: 1.15em; }
     .big { font-size: 1.4em; font-weight: 700; }
     .tag { font-size: .85em; margin-top: 4px; }
-    .logo { display: block; margin: 0 auto 2px; width: 22mm; max-width: 100%; }
+    .logo { display: block; margin: 0 auto 3px; width: 24mm; max-width: 100%; border-radius: 50%; }
     .k-item { font-size: 1.2em; font-weight: 700; margin: 2px 0; }
     .k-desc { font-size: .85em; margin: 0 0 4px 8px; }`;
 }
@@ -686,6 +698,7 @@ function printHTMLDoc(body) {
 function printReceipt() {
     if (!lastCustomer) { toast("No order to print"); return; }
     let html = itemSlipsHTML();
+    // B&W logo tayyar ho gaya ho to wo, warna original logo hi print hoga
     if (PRINT_LOGO && logoData) html = html.split('src="assets/img/logo.jpeg"').join('src="' + logoData + '"');
     printHTMLDoc(html);
 }
