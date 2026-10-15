@@ -575,6 +575,10 @@ function customerSlipHTML(snap, t, meta) {
 }
 
 // Kitchen slips: one per category, no logo and no prices
+// Kitchen: true karein to saari items ek hi slip par (kam pages = tez print)
+const KITCHEN_ONE_SLIP = false;
+
+// Kitchen slips: no logo, normal items ki price nahi. Custom item ki price aati hai.
 function kitchenSlipsHTML() {
     if (!lastMeta) return "";
     const groups = {};
@@ -583,20 +587,29 @@ function kitchenSlipsHTML() {
         if (!m) return;
         (groups[m.cat] = groups[m.cat] || []).push({ m, n });
     });
-    return Object.keys(groups).map(c => {
-        const rows = groups[c].map(({ m, n }) =>
-            `<div class="k-item">${n} x ${esc(m.name)}</div>` +
-            (isDeal(m) ? `<div class="k-desc">${esc(m.desc || "")}</div>` : "")
-        ).join("");
-        return `<div class="slip pg">
+
+    const line = ({ m, n }) => m.custom
+        ? `<div class="r k-item"><span>${n} x ${esc(m.name)}</span><span>${fmt(m.price * n)}</span></div>`
+        : `<div class="k-item">${n} x ${esc(m.name)}</div>` +
+          (isDeal(m) ? `<div class="k-desc">${esc(m.desc || "")}</div>` : "");
+
+    const head = `
       <div class="c big">Order # ${lastMeta.no}</div>
       <div class="c">${lastMeta.dt} · ${esc(lastMeta.type)}</div>
-      <hr>
+      <hr>`;
+
+    if (KITCHEN_ONE_SLIP) {
+        return `<div class="slip pg">${head}` +
+            Object.keys(groups).map(c =>
+                `<div class="c k-item">${esc(c.toUpperCase())}</div>${groups[c].map(line).join("")}<hr>`).join("") +
+            `</div>`;
+    }
+
+    return Object.keys(groups).map(c => `<div class="slip pg">${head}
       <div class="c k-item">${esc(c.toUpperCase())}</div>
       <hr>
-      ${rows}
-    </div>`;
-    }).join("");
+      ${groups[c].map(line).join("")}
+    </div>`).join("");
 }
 
 // Customer slip first, then the kitchen slips
@@ -609,8 +622,70 @@ function buildReceipt(snap, t, meta) {
     $("receipt").innerHTML = itemSlipsHTML();
 }
 
+// Logo ek baar chhota bana kar yaad rakho (print mein dobara load na ho)
+let logoData = "";
+(function () {
+    const im = new Image();
+    im.onload = () => {
+        try {
+            const w = 140, h = Math.round(im.naturalHeight * w / im.naturalWidth);
+            const c = document.createElement("canvas");
+            c.width = w; c.height = h;
+            c.getContext("2d").drawImage(im, 0, 0, w, h);
+            logoData = c.toDataURL("image/png");
+        } catch (e) { }
+    };
+    im.src = "assets/img/logo.jpeg";
+})();
+
 function printReceipt() {
     if (!lastCustomer) { toast("No order to print"); return; }
+
+    const old = document.getElementById("printFrame");
+    if (old) old.remove();
+
+    let html = itemSlipsHTML();
+    if (logoData) html = html.split('src="assets/img/logo.jpeg"').join('src="' + logoData + '"');
+
+    const f = document.createElement("iframe");
+    f.id = "printFrame";
+    f.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden";
+    document.body.appendChild(f);
+
+    const d = f.contentWindow.document;
+    d.open();
+    d.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><base href="${document.baseURI}"><title>Receipt</title><style>
+    @page { size: ${PRINT_WIDTH_MM}mm auto; margin: 0; }
+    html, body { margin: 0; padding: 0; background: #fff; }
+    body { width: ${PRINT_WIDTH_MM}mm; padding-left: ${PRINT_LEFT_MM}mm; box-sizing: content-box;
+           font-family: Arial, Helvetica, sans-serif; font-size: ${PRINT_FONT_PX}px;
+           font-weight: ${PRINT_WEIGHT}; color: #000; }
+    .slip { width: 100%; padding: 2mm 0; }
+    .pg { page-break-before: always; break-before: page; }
+    h2 { text-align: center; margin: 2px 0; font-size: 1.3em; }
+    hr { border: 0; border-top: 1px dashed #000; margin: 4px 0; }
+    .r { display: flex; justify-content: space-between; gap: 6px; }
+    .r span:first-child { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    .r span:last-child { white-space: nowrap; }
+    .c { text-align: center; }
+    .b { font-weight: 700; font-size: 1.15em; }
+    .big { font-size: 1.4em; font-weight: 700; }
+    .tag { font-size: .85em; margin-top: 4px; }
+    .logo { display: block; margin: 0 auto 2px; width: 22mm; max-width: 100%; }
+    .k-item { font-size: 1.2em; font-weight: 700; margin: 2px 0; }
+    .k-desc { font-size: .85em; margin: 0 0 4px 8px; }
+  </style></head><body>${html}</body></html>`);
+    d.close();
+
+    const imgs = [...d.images];
+    const ready = Promise.all(imgs.map(im => im.complete ? 1 :
+        new Promise(res => { im.onload = im.onerror = res; })));
+    const go = () => {
+        try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { }
+        setTimeout(() => f.remove(), 60000);
+    };
+    Promise.race([ready, new Promise(res => setTimeout(res, 400))]).then(go);
+}
 
     const old = document.getElementById("printFrame");
     if (old) old.remove();
