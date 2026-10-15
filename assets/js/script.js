@@ -736,6 +736,7 @@ function placeOrder() {
     const dt = now.toLocaleDateString("en-GB");
     const tm = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
     const type = val("type") || "Dine-in";
+    
 
     lastMeta = { no, dt, tm, type, items: snap, paid: parseFloat(val("paid")) || 0 };
     buildReceipt(snap, t, lastMeta);
@@ -749,11 +750,12 @@ function placeOrder() {
     lsSet("bsStock", stock);
     updateStats();
 
-    $("overlay").classList.add("show");
-    confetti();
+       $("overlay").classList.add("show");
+    orderTotalNow = t.total;         // bade order wali meme ke liye
     sfx("order");
     playMeme();
-    setTimeout(printReceipt, 900);
+    setTimeout(printReceipt, 80);    // print pehle
+    setTimeout(confetti, 600);       // animation baad mein, taake print na ruke
 }
 
 // =========================================================
