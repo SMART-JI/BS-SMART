@@ -687,56 +687,103 @@ function printReceipt() {
     Promise.race([ready, new Promise(res => setTimeout(res, 400))]).then(go);
 }
 
-    const old = document.getElementById("printFrame");
-    if (old) old.remove();
+// =========================================================
+//  ORDER SOUND (meme) - speaker se band ho, aur apni marzi ki awaz
+// =========================================================
+const MEME_DEFAULT = "assets/chin_tapak_dum_dum.mp3";   // shuru ki awaz
+const MEME_MAX = 2 * 1024 * 1024;                       // website se chunne wali file ki hadd (2 MB)
+let memeAudio = null;
 
-    const f = document.createElement("iframe");
-    f.id = "printFrame";
-    f.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden";
-    document.body.appendChild(f);
+const memeData = () => lsGet("bsMeme", null);           // {name, data} ya null
+const memeSrc = () => (memeData() && memeData().data) || MEME_DEFAULT;
 
-    const d = f.contentWindow.document;
-    d.open();
-    d.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><base href="${document.baseURI}"><title>Receipt</title><style>
-    @page { size: ${PRINT_WIDTH_MM}mm auto; margin: 0; }
-    html, body { margin: 0; padding: 0; background: #fff; }
-    body { width: ${PRINT_WIDTH_MM}mm; padding-left: ${PRINT_LEFT_MM}mm; box-sizing: content-box;
-           font-family: Arial, Helvetica, sans-serif; font-size: ${PRINT_FONT_PX}px;
-           font-weight: ${PRINT_WEIGHT}; color: #000; }
-    .slip { width: 100%; padding: 2mm 0; }
-    .pg { page-break-before: always; break-before: page; }
-    h2 { text-align: center; margin: 2px 0; font-size: 1.3em; }
-    hr { border: 0; border-top: 1px dashed #000; margin: 4px 0; }
-    .r { display: flex; justify-content: space-between; gap: 6px; }
-    .r span:first-child { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-    .r span:last-child { white-space: nowrap; }
-    .c { text-align: center; }
-    .b { font-weight: 700; font-size: 1.15em; }
-    .big { font-size: 1.4em; font-weight: 700; }
-    .tag { font-size: .85em; margin-top: 4px; }
-    .logo { display: block; margin: 0 auto 2px; width: 26mm; max-width: 100%; filter: grayscale(1); }
-    .k-item { font-size: 1.2em; font-weight: 700; margin: 2px 0; }
-    .k-desc { font-size: .85em; margin: 0 0 4px 8px; }
-  </style></head><body>${itemSlipsHTML()}</body></html>`);
-    d.close();
-
-    const imgs = [...d.images];
-    const ready = Promise.all(imgs.map(im => im.complete ? 1 :
-        new Promise(res => { im.onload = im.onerror = res; })));
-    const go = () => {
-        try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { }
-        setTimeout(() => f.remove(), 60000);
-    };
-    Promise.race([ready, new Promise(res => setTimeout(res, 1500))]).then(go);
+function stopMeme() {
+    try { if (memeAudio) { memeAudio.pause(); memeAudio.currentTime = 0; } } catch (e) { }
+    try { if ("speechSynthesis" in window) speechSynthesis.cancel(); } catch (e) { }
 }
 
+function playMeme(force) {
+    if (!soundOn && !force) return;       // speaker band hai to kuch nahi
+    stopMeme();
+    try {
+        memeAudio = new Audio(memeSrc());
+        memeAudio.play().catch(err => console.log("Audio play nahi hui:", err));
+    } catch (e) { }
+}
+
+// ----- "Order Sound" ka panel -----
+function renderMemePanel(msg) {
+    const cur = memeData();
+    $("panelTitle").textContent = "Order Sound";
+    $("panelBody").innerHTML = `
+    ${msg ? `<p class="mmsg">${esc(msg)}</p>` : ""}
+    <div class="mform">
+      <h3>Meme / order sound</h3>
+      <p class="pnote">Abhi: <strong>${cur ? esc(cur.name) : "Default (chin_tapak_dum_dum.mp3)"}</strong></p>
+      <p class="pnote">Speaker button band ho to order par ye awaz nahi bajti.</p>
+      <label class="mfile">🎵 Awaz chunein<input id="sndFile" type="file" accept="audio/*" hidden></label>
+      <div class="mbtns">
+        <button type="button" class="cbtn-warn" data-snd="test">▶️ Test</button>
+        <button type="button" class="btn-lite" data-snd="stop">⏹️ Stop</button>
+        <button type="button" class="btn-lite" data-snd="reset">Default par wapas</button>
+      </div>
+    </div>`;
+    $("panel").classList.add("show");
+}
+
+$("panelBody").addEventListener("click", e => {
+    const b = e.target.closest("[data-snd]");
+    if (!b) return;
+    const a = b.dataset.snd;
+    if (a === "test") playMeme(true);
+    if (a === "stop") stopMeme();
+    if (a === "reset") {
+        stopMeme();
+        try { localStorage.removeItem("bsMeme"); } catch (err) { }
+        renderMemePanel("Default awaz wapas lag gayi.");
+    }
+});
+
+$("panelBody").addEventListener("change", e => {
+    if (e.target.id !== "sndFile") return;
+    const f = e.target.files[0];
+    if (!f) return;
+    if (f.size > MEME_MAX) { renderMemePanel("File bohat badi hai (max 2 MB). Chhoti clip chunein."); return; }
+    const fr = new FileReader();
+    fr.onload = () => {
+        const ok = lsSet("bsMeme", { name: f.name, data: fr.result });
+        renderMemePanel(ok ? "Nayi awaz save ho gayi." : "Save nahi hui (jagah bhar gayi). Chhoti file chunein.");
+        if (ok) playMeme(true);
+    };
+    fr.readAsDataURL(f);
+});
+
+// Speaker band karte hi chalti hui awaz bhi ruk jaye
+$("soundBtn").addEventListener("click", () => { if (!soundOn) stopMeme(); });
+
+// ----- Header mein 🎵 button (speaker ke saath) -----
+(function () {
+    const sb = $("soundBtn");
+    if (!sb) return;
+    const b = document.createElement("button");
+    b.type = "button";
+    b.id = "memeBtn";
+    b.title = "Order sound badlein";
+    b.setAttribute("aria-label", "Change order sound");
+    b.textContent = "🎵";
+    b.onclick = () => renderMemePanel();
+    sb.after(b);
+})();
+
+// =========================================================
+//  ORDER PLACE
+// =========================================================
 function placeOrder() {
     if (!cartCount()) return;
     const snap = { ...cart }, t = totals(), no = nextOrderNo(), now = new Date();
     const dt = now.toLocaleDateString("en-GB");
     const tm = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
     const type = val("type") || "Dine-in";
-    
 
     lastMeta = { no, dt, tm, type, items: snap, paid: parseFloat(val("paid")) || 0 };
     buildReceipt(snap, t, lastMeta);
@@ -750,7 +797,7 @@ function placeOrder() {
     lsSet("bsStock", stock);
     updateStats();
 
-       $("overlay").classList.add("show");
+    $("overlay").classList.add("show");
     orderTotalNow = t.total;         // bade order wali meme ke liye
     sfx("order");
     playMeme();
@@ -1127,7 +1174,7 @@ on("paid", "input", () => renderChange());
 $("disc").oninput = () => renderCart();
 $("discType").onchange = () => renderCart();
 $("search").oninput = () => { q = $("search").value.trim().toLowerCase(); renderMenu(); };
-$("go").onclick = placeOrder;
+$("go").onclick = () => placeOrder();
 $("print").onclick = printReceipt;
 $("close").onclick = () => {
     $("overlay").classList.remove("show");
@@ -1809,6 +1856,7 @@ if (yr) yr.textContent = new Date().getFullYear();
         }
     };
 })();
+
 // =========================================================
 //  APNI MARZI KI ITEM + POORI ITEM HATANE KA BUTTON
 // =========================================================
@@ -1862,7 +1910,6 @@ placeOrder = function () {
     Object.keys(CUSTOM).forEach(k => { delete stock[k]; });
     lsSet("bsStock", stock);
 };
-$("go").onclick = () => placeOrder();
 
 // Har line ke saath 🗑️ button
 const _renderCartRm = renderCart;
