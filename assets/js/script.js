@@ -11,6 +11,11 @@ const TAX_RATE = 0;          // use 0.13 for 13% tax
 const CURRENCY = "Rs.";
 const DEFAULT_STOCK = 50;    // starting stock of every item
 
+// ====== SPEED SETTINGS (hang / slow print fix) ======
+const LITE_MODE = true;      // true = halka & tez (bhaari animations band). false = saari animations wapis
+const PRINT_LOGO = false;    // false = slip par logo nahi (thermal printer logo bohat der se print karta hai)
+const KITCHEN_ONE_SLIP = true; // true = kitchen ki saari items ek hi slip par (kam pages = tez print)
+
 // ====== PRINT SETTINGS ======
 const PRINT_WIDTH_MM = 48;   // 58mm roll = 48, 80mm roll = 72
 const PRINT_LEFT_MM = 0;     // slip left se kate to 2 ya 3 karein
@@ -163,6 +168,8 @@ const sumTotal = list => list.reduce((s, o) => s + o.total, 0);
 const isDeal = m => m.cat === "Deals";
 const reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
 const canHover = window.matchMedia && matchMedia("(hover:hover)").matches;
+// Fancy mouse effects sirf tab chalein jab LITE_MODE band ho
+const FANCY = !LITE_MODE && !reduceMotion;
 
 // =========================================================
 //  STATE
@@ -254,7 +261,8 @@ function flyFrom(a) {
 function confetti() {
     if (reduceMotion) return;
     const cols = ["#f5b800", "#0d0d0d", "#ffffff", "#1b7a2f", "#e5483b"];
-    for (let i = 0; i < 46; i++) {
+    const n = LITE_MODE ? 22 : 46;
+    for (let i = 0; i < n; i++) {
         const c = document.createElement("i");
         c.className = "confetti";
         c.style.left = Math.random() * 100 + "vw";
@@ -529,7 +537,7 @@ function nextOrderNo() {
     return String(n).padStart(4, "0");
 }
 
-// Customer slip: logo, every item, prices, total (proof of purchase)
+// Customer slip: (logo optional), every item, prices, total (proof of purchase)
 function customerSlipHTML(snap, t, meta) {
     const rows = Object.entries(snap).map(([id, n]) => {
         const m = MENU.find(x => x.id == id);
@@ -537,7 +545,7 @@ function customerSlipHTML(snap, t, meta) {
     }).join("");
 
     return `
-    <img class="logo" src="assets/img/logo.jpeg" alt="">
+    ${PRINT_LOGO ? `<img class="logo" src="assets/img/logo.jpeg" alt="">` : ""}
     <h2>${esc(RESTAURANT.name)}</h2>
     <div class="c">${esc(RESTAURANT.sub)}<br>${esc(RESTAURANT.address)}<br>Tel: ${esc(RESTAURANT.phone)}</div>
     <hr>
@@ -559,9 +567,6 @@ function customerSlipHTML(snap, t, meta) {
     <div class="c">Good Food, Good Mood<br>Thank you! Please visit again.</div>
     <div class="c tag">--- Customer Copy ---</div>`;
 }
-
-// Kitchen: true karein to saari items ek hi slip par (kam pages = tez print)
-const KITCHEN_ONE_SLIP = false;
 
 // Kitchen slips: no logo, normal items ki price nahi. Custom item ki price aati hai.
 function kitchenSlipsHTML() {
@@ -607,9 +612,9 @@ function buildReceipt(snap, t, meta) {
     $("receipt").innerHTML = itemSlipsHTML();
 }
 
-// Logo ek baar chhota bana kar yaad rakho (print mein dobara load na ho)
+// Logo sirf tab tayyar karo jab PRINT_LOGO on ho
 let logoData = "";
-(function () {
+if (PRINT_LOGO) (function () {
     const im = new Image();
     im.onload = () => {
         try {
@@ -623,23 +628,9 @@ let logoData = "";
     im.src = "assets/img/logo.jpeg";
 })();
 
-function printReceipt() {
-    if (!lastCustomer) { toast("No order to print"); return; }
-
-    const old = document.getElementById("printFrame");
-    if (old) old.remove();
-
-    let html = itemSlipsHTML();
-    if (logoData) html = html.split('src="assets/img/logo.jpeg"').join('src="' + logoData + '"');
-
-    const f = document.createElement("iframe");
-    f.id = "printFrame";
-    f.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden";
-    document.body.appendChild(f);
-
-    const d = f.contentWindow.document;
-    d.open();
-    d.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><base href="${document.baseURI}"><title>Receipt</title><style>
+// ----- Print engine: ek hi iframe baar baar use hota hai (tez) -----
+function printCSS() {
+    return `
     @page { size: ${PRINT_WIDTH_MM}mm auto; margin: 0; }
     html, body { margin: 0; padding: 0; background: #fff; }
     body { width: ${PRINT_WIDTH_MM}mm; padding-left: ${PRINT_LEFT_MM}mm; box-sizing: content-box;
@@ -650,26 +641,53 @@ function printReceipt() {
     h2 { text-align: center; margin: 2px 0; font-size: 1.3em; }
     hr { border: 0; border-top: 1px dashed #000; margin: 4px 0; }
     .r { display: flex; justify-content: space-between; gap: 6px; }
-    .r span:first-child { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-    .r span:last-child { white-space: nowrap; }
+    .r span:first-child, .r b:first-child { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    .r span:last-child, .r b:last-child { white-space: nowrap; }
     .c { text-align: center; }
     .b { font-weight: 700; font-size: 1.15em; }
     .big { font-size: 1.4em; font-weight: 700; }
     .tag { font-size: .85em; margin-top: 4px; }
     .logo { display: block; margin: 0 auto 2px; width: 22mm; max-width: 100%; }
     .k-item { font-size: 1.2em; font-weight: 700; margin: 2px 0; }
-    .k-desc { font-size: .85em; margin: 0 0 4px 8px; }
-  </style></head><body>${html}</body></html>`);
+    .k-desc { font-size: .85em; margin: 0 0 4px 8px; }`;
+}
+
+function getPrintFrame() {
+    let f = document.getElementById("printFrame");
+    if (!f) {
+        f = document.createElement("iframe");
+        f.id = "printFrame";
+        f.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden";
+        document.body.appendChild(f);
+    }
+    return f;
+}
+
+function printHTMLDoc(body) {
+    const f = getPrintFrame();
+    const d = f.contentWindow.document;
+    d.open();
+    d.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><base href="${document.baseURI}"><title>Receipt</title><style>${printCSS()}</style></head><body>${body}</body></html>`);
     d.close();
 
-    const imgs = [...d.images];
-    const ready = Promise.all(imgs.map(im => im.complete ? 1 :
-        new Promise(res => { im.onload = im.onerror = res; })));
+    let fired = false;
     const go = () => {
+        if (fired) return;
+        fired = true;
         try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { }
-        setTimeout(() => f.remove(), 60000);
     };
-    Promise.race([ready, new Promise(res => setTimeout(res, 400))]).then(go);
+    // Sirf tab intezar karo jab koi image abhi load ho rahi ho (logo)
+    const pending = [...d.images].filter(im => !im.complete);
+    if (!pending.length) { go(); return; }
+    Promise.all(pending.map(im => new Promise(res => { im.onload = im.onerror = res; }))).then(go);
+    setTimeout(go, 250);
+}
+
+function printReceipt() {
+    if (!lastCustomer) { toast("No order to print"); return; }
+    let html = itemSlipsHTML();
+    if (PRINT_LOGO && logoData) html = html.split('src="assets/img/logo.jpeg"').join('src="' + logoData + '"');
+    printHTMLDoc(html);
 }
 
 // =========================================================
@@ -697,6 +715,19 @@ let memeSel = lsGet("bsMemeSel", 0);
 if (typeof memeSel === "number" && !MEMES[memeSel]) memeSel = 0;
 let memeAudio = null;
 
+// Memes pehle se load rehte hain taake order par der na lage
+const memeCache = {};
+function getMemeAudio(file) {
+    if (!memeCache[file]) {
+        const a = new Audio();
+        a.preload = "auto";
+        a.src = file;
+        memeCache[file] = a;
+    }
+    return memeCache[file];
+}
+setTimeout(() => MEMES.forEach(m => getMemeAudio(m.file)), 2000);
+
 function pickMeme() {
     if (memeSel === "off" || !MEMES.length) return null;
     if (memeSel === "random") return MEMES[Math.floor(Math.random() * MEMES.length)];
@@ -705,8 +736,10 @@ function pickMeme() {
 
 // Chal rahi meme aur bolti awaz dono band
 function stopAllSound() {
-    if (memeAudio) { memeAudio.pause(); memeAudio.currentTime = 0; }
-    try { if ("speechSynthesis" in window) speechSynthesis.cancel(); } catch (e) { }
+    if (memeAudio) { try { memeAudio.pause(); memeAudio.currentTime = 0; } catch (e) { } }
+    try {
+        if ("speechSynthesis" in window && (speechSynthesis.speaking || speechSynthesis.pending)) speechSynthesis.cancel();
+    } catch (e) { }
 }
 
 // Speaker band ho to kuch nahi bajta
@@ -720,7 +753,8 @@ function playMeme() {
         if (big) m = big;
     }
     stopAllSound();
-    memeAudio = new Audio(m.file);
+    memeAudio = getMemeAudio(m.file);
+    try { memeAudio.currentTime = 0; } catch (e) { }
     memeAudio.play().catch(err => console.log("Meme play nahi hui:", err));
 }
 
@@ -782,14 +816,16 @@ function placeOrder() {
     Object.entries(snap).forEach(([id, n]) => { stock[id] = Math.max(0, (stock[id] || 0) - n); });
     lsSet("bsOrders", orders);
     lsSet("bsStock", stock);
-    updateStats();
 
     $("overlay").classList.add("show");
     orderTotalNow = t.total;         // bade order wali meme ke liye
-    sfx("order");
-    playMeme();
-    setTimeout(printReceipt, 80);    // print pehle
-    setTimeout(confetti, 600);       // animation baad mein, taake print na ruke
+
+    // 1) PRINT sab se pehle (agle tick par, bina kisi intezar ke)
+    setTimeout(printReceipt, 0);
+    // 2) Baaki sab kuch print ke baad
+    setTimeout(() => { sfx("order"); playMeme(); }, 30);
+    setTimeout(updateStats, 60);
+    setTimeout(confetti, 700);
 }
 
 // =========================================================
@@ -1160,7 +1196,14 @@ on("paid", "input", () => renderChange());
 
 $("disc").oninput = () => renderCart();
 $("discType").onchange = () => renderCart();
-$("search").oninput = () => { q = $("search").value.trim().toLowerCase(); renderMenu(); };
+
+// Search: har key par nahi, thora ruk kar (hang se bachao)
+let searchT;
+$("search").oninput = () => {
+    clearTimeout(searchT);
+    searchT = setTimeout(() => { q = $("search").value.trim().toLowerCase(); renderMenu(); }, 130);
+};
+
 $("go").onclick = () => placeOrder();
 $("print").onclick = printReceipt;
 $("close").onclick = () => {
@@ -1234,9 +1277,9 @@ document.addEventListener("pointerdown", e => {
     setTimeout(() => s.remove(), 600);
 });
 
-// 3D tilt on menu cards
+// 3D tilt on menu cards (sirf FANCY mode mein)
 (function () {
-    if (reduceMotion || !canHover) return;
+    if (!FANCY || !canHover) return;
     const grid = $("menu");
     let cur = null;
     const reset = c => { c.style.removeProperty("--rx"); c.style.removeProperty("--ry"); };
@@ -1267,7 +1310,7 @@ document.addEventListener("pointerdown", e => {
     }
 
     const fl = $("floaters");
-    if (fl && !reduceMotion) {
+    if (fl && FANCY) {
         const em = ["🍔", "🍕", "🍟", "🌭", "🥤", "🍗", "🌮", "🍩"];
         for (let i = 0; i < 14; i++) {
             const s = document.createElement("span");
@@ -1290,7 +1333,7 @@ document.addEventListener("pointerdown", e => {
         if (taps >= 5) { taps = 0; confetti(); sfx("order"); toast("Good Food, Good Mood 😄"); }
     });
 
-    if (reduceMotion || !canHover) return;
+    if (!FANCY || !canHover) return;
 
     let last = 0;
     hero.addEventListener("pointermove", e => {
@@ -1335,7 +1378,7 @@ document.addEventListener("pointerdown", e => {
     let seen = false;
     try { seen = sessionStorage.getItem("bsSplash") === "1"; sessionStorage.setItem("bsSplash", "1"); } catch (e) { }
     if (seen) { s.remove(); return; }
-    setTimeout(() => { s.classList.add("hide"); setTimeout(() => s.remove(), 600); }, 1200);
+    setTimeout(() => { s.classList.add("hide"); setTimeout(() => s.remove(), 600); }, LITE_MODE ? 600 : 1200);
 })();
 
 const navEl = document.querySelector(".nav");
@@ -1348,13 +1391,19 @@ toTop.textContent = "↑";
 toTop.onclick = () => window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
 document.body.appendChild(toTop);
 
+// Scroll handler: ek frame mein sirf ek baar chalta hai
+let scrollTick = false;
 function onScroll() {
     const y = window.scrollY, h = document.documentElement.scrollHeight - window.innerHeight;
     if (navEl) navEl.classList.toggle("scrolled", y > 10);
     toTop.classList.toggle("show", y > 500);
     if (prog) prog.style.width = (h > 0 ? y / h * 100 : 0) + "%";
 }
-window.addEventListener("scroll", onScroll, { passive: true });
+window.addEventListener("scroll", () => {
+    if (scrollTick) return;
+    scrollTick = true;
+    requestAnimationFrame(() => { scrollTick = false; onScroll(); });
+}, { passive: true });
 
 (function () {
     const rev = document.querySelectorAll(".sec-title,.vswitch,.search,.tabs,.foot-info,.foot-bottom");
@@ -1380,6 +1429,7 @@ if ("IntersectionObserver" in window) {
 //  CLOCK
 // =========================================================
 function tickClock() {
+    if (document.hidden) return;
     const n = new Date();
     const t = $("clockTime"), d = $("clockDate");
     if (t) t.textContent = n.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
@@ -1400,9 +1450,9 @@ onScroll();
 //  EXTRA ANIMATIONS: cursor trail, add burst, fireworks
 // =========================================================
 
-// Food emoji trail behind the mouse
+// Food emoji trail behind the mouse (sirf FANCY mode)
 (function () {
-    if (reduceMotion || !canHover) return;
+    if (!FANCY || !canHover) return;
     const em = ["✨", "🍔", "🍕", "🍟", "⭐"];
     let last = 0;
     document.addEventListener("pointermove", e => {
@@ -1421,9 +1471,9 @@ onScroll();
     });
 })();
 
-// Emoji burst when Add / chip is pressed
+// Emoji burst when Add / chip is pressed (sirf FANCY mode)
 document.addEventListener("pointerdown", e => {
-    if (reduceMotion || !e.target.closest(".add:not(:disabled),.chip")) return;
+    if (!FANCY || !e.target.closest(".add:not(:disabled),.chip")) return;
     const em = ["🍔", "🍟", "🍕", "⭐", "✨", "🔥"];
     for (let i = 0; i < 10; i++) {
         const s = document.createElement("i");
@@ -1439,9 +1489,9 @@ document.addEventListener("pointerdown", e => {
     }
 });
 
-// Fireworks when an order is placed
+// Fireworks when an order is placed (sirf FANCY mode)
 function fireworks() {
-    if (reduceMotion) return;
+    if (!FANCY) return;
     const c = document.createElement("canvas");
     c.className = "fw";
     c.width = innerWidth;
@@ -1547,7 +1597,7 @@ renderCart = function () {
     paintBags();
     const to = totals().total;
     const el = document.querySelector("#totals .tot.big span:last-child");
-    if (el && !reduceMotion) countTo(el, shownTotal, to);
+    if (el && !reduceMotion && !LITE_MODE) countTo(el, shownTotal, to);
     shownTotal = to;
 };
 
@@ -1609,38 +1659,6 @@ change = function (id, d, btn) {
 // =========================================================
 //  REPORTS: print today's report and CSV download
 // =========================================================
-function printHTML(body) {
-    const old = document.getElementById("printFrame");
-    if (old) old.remove();
-
-    const f = document.createElement("iframe");
-    f.id = "printFrame";
-    f.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden";
-    document.body.appendChild(f);
-
-    const d = f.contentWindow.document;
-    d.open();
-    d.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Report</title><style>
-    @page { size: ${PRINT_WIDTH_MM}mm auto; margin: 0; }
-    html, body { margin: 0; padding: 0; background: #fff; }
-    body { width: ${PRINT_WIDTH_MM}mm; padding-left: ${PRINT_LEFT_MM}mm; box-sizing: content-box;
-           font-family: Arial, Helvetica, sans-serif; font-size: ${PRINT_FONT_PX}px;
-           font-weight: ${PRINT_WEIGHT}; color: #000; padding-top: 2mm; padding-bottom: 4mm; }
-    h2 { text-align: center; margin: 2px 0; font-size: 1.3em; }
-    .c { text-align: center; }
-    hr { border: 0; border-top: 1px dashed #000; margin: 4px 0; }
-    .r { display: flex; justify-content: space-between; gap: 6px; }
-    .r span:first-child { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-    .r span:last-child, .r b:last-child { white-space: nowrap; }
-  </style></head><body>${body}</body></html>`);
-    d.close();
-
-    setTimeout(() => {
-        try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { }
-        setTimeout(() => f.remove(), 60000);
-    }, 300);
-}
-
 function printReport() {
     const to = todayOrders();
     const types = ["Dine-in", "Takeaway", "Delivery"].map(tp => {
@@ -1651,7 +1669,7 @@ function printReport() {
     to.forEach(o => o.items.forEach(i => { cnt[i.name] = (cnt[i.name] || 0) + i.q; }));
     const items = Object.entries(cnt).sort((a, b) => b[1] - a[1])
         .map(([n, qty]) => `<div class="r"><span>${esc(n)}</span><span>x ${qty}</span></div>`).join("");
-    printHTML(`
+    printHTMLDoc(`<div class="slip">
     <h2>${esc(RESTAURANT.name)}</h2>
     <div class="c">TODAY'S REPORT<br>${new Date().toLocaleDateString("en-GB")}</div>
     <hr>
@@ -1660,7 +1678,7 @@ function printReport() {
     <div class="r"><b>TOTAL SALE</b><b>${fmt(sumTotal(to))}</b></div>
     <hr>${types}<hr>
     <div class="c">Items sold</div>
-    ${items || '<div class="c">No orders yet</div>'}`);
+    ${items || '<div class="c">No orders yet</div>'}</div>`);
 }
 
 function downloadCSV() {
@@ -1708,13 +1726,13 @@ const yr = $("yr");
 if (yr) yr.textContent = new Date().getFullYear();
 
 // =========================================================
-//  ANIMATIONS EXTRA
+//  ANIMATIONS EXTRA (sirf FANCY mode)
 // =========================================================
 
 // 1) Logo ke gird ghoomte food emojis
 (function () {
     const w = $("logoWrap");
-    if (!w || reduceMotion) return;
+    if (!w || !FANCY) return;
     const o = document.createElement("div");
     o.className = "orbit";
     const list = ["🍔", "🍕", "🍟", "🍗", "🥤", "🌮"];
@@ -1731,7 +1749,7 @@ if (yr) yr.textContent = new Date().getFullYear();
 // 2) Delivery scooter hero mein
 (function () {
     const hero = document.querySelector(".hero");
-    if (!hero || reduceMotion) return;
+    if (!hero || !FANCY) return;
     const s = document.createElement("div");
     s.className = "scooter";
     s.innerHTML = "<i>🛵</i>";
@@ -1740,30 +1758,35 @@ if (yr) yr.textContent = new Date().getFullYear();
 
 // 3) Mouse ke peeche sunehri roshni
 (function () {
-    if (reduceMotion || !canHover) return;
+    if (!FANCY || !canHover) return;
     const g = document.createElement("div");
     g.className = "cglow";
     document.body.appendChild(g);
-    let x = innerWidth / 2, y = innerHeight / 2, tx = x, ty = y;
-    addEventListener("pointermove", e => { tx = e.clientX; ty = e.clientY; g.style.opacity = 1; });
+    let x = innerWidth / 2, y = innerHeight / 2, tx = x, ty = y, running = false;
+    addEventListener("pointermove", e => {
+        tx = e.clientX; ty = e.clientY; g.style.opacity = 1;
+        if (!running) { running = true; requestAnimationFrame(f); }
+    });
     document.addEventListener("mouseleave", () => { g.style.opacity = 0; });
-    (function f() {
+    // Loop sirf tab chalta hai jab roshni ko hilna ho
+    function f() {
         x += (tx - x) * .12;
         y += (ty - y) * .12;
         g.style.transform = `translate(${x}px,${y}px)`;
-        requestAnimationFrame(f);
-    })();
+        if (Math.abs(tx - x) > .5 || Math.abs(ty - y) > .5) requestAnimationFrame(f);
+        else running = false;
+    }
 })();
 
 // 4) Search box mein khud type hota hua placeholder
 (function () {
     const inp = $("search");
-    if (!inp || reduceMotion) return;
+    if (!inp || !FANCY) return;
     const words = ["burger", "pizza", "biryani", "zinger", "chai", "fries"];
     let w = 0, c = 0, del = false;
     (function loop() {
         let d = 110;
-        if (view === "menu" && document.activeElement !== inp && !inp.value) {
+        if (!document.hidden && view === "menu" && document.activeElement !== inp && !inp.value) {
             const word = words[w];
             c += del ? -1 : 1;
             inp.placeholder = "Search food: " + word.slice(0, c) + "|";
@@ -1776,6 +1799,7 @@ if (yr) yr.textContent = new Date().getFullYear();
 
 // 5) Header ke numbers ginti ki tarah chalte hain (Orders / Payment)
 (function () {
+    if (LITE_MODE) return;
     const _set = setStat;
     setStat = function (id, text) {
         const e = $(id);
@@ -1792,11 +1816,12 @@ if (yr) yr.textContent = new Date().getFullYear();
     };
 })();
 
-// 6) Panels: stat numbers count-up + rows ek ek karke
+// 6) Panels: rows ek ek karke (+ stat numbers count-up sirf FANCY mode mein)
 (function () {
     const _op = openPanel;
     openPanel = function (type) {
         _op(type);
+        if (LITE_MODE) return;
         document.querySelectorAll("#panelBody .ptable tbody tr").forEach((r, i) => {
             r.style.animationDelay = Math.min(i, 12) * 40 + "ms";
         });
@@ -1816,7 +1841,7 @@ if (yr) yr.textContent = new Date().getFullYear();
 
 // 7) "Kyun BS Smart" cards mouse par 3D tilt
 (function () {
-    if (reduceMotion || !canHover) return;
+    if (!FANCY || !canHover) return;
     document.querySelectorAll(".feat").forEach(c => {
         c.addEventListener("pointermove", e => {
             const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
@@ -1971,6 +1996,7 @@ change = function (id, d, btn) {
 
 // =========================================================
 //  SPACE MODE: Dark mode mein stars, planets, black hole
+//  (animation loop sirf dark mode mein chalta hai)
 // =========================================================
 (function () {
     const sp = document.createElement("div");
@@ -1987,64 +2013,73 @@ change = function (id, d, btn) {
     document.body.prepend(sp);
 
     const cv = sp.querySelector("canvas"), c = cv.getContext("2d");
-    let W, H, stars = [], shoot = null;
+    const isDark = () => document.body.classList.contains("dark");
+    let W, H, stars = [], shoot = null, raf = 0;
 
     function size() {
         W = cv.width = innerWidth;
         H = cv.height = innerHeight;
-        const n = Math.min(260, Math.round(W * H / 7000));
+        const n = Math.min(LITE_MODE ? 120 : 260, Math.round(W * H / 7000));
         stars = Array.from({ length: n }, () => ({
             x: Math.random() * W, y: Math.random() * H,
             r: Math.random() * 1.4 + .2,
             ph: Math.random() * 6.28, sp: .5 + Math.random() * 1.5
         }));
-        if (reduceMotion) draw(0, true);
+        if (reduceMotion) paint(0);
     }
 
-    function draw(now, force) {
-        if (force || (document.body.classList.contains("dark") && !document.hidden)) {
-            c.clearRect(0, 0, W, H);
-            c.fillStyle = "#fff";
-            stars.forEach(s => {
-                c.globalAlpha = reduceMotion ? .8 : .35 + .65 * Math.abs(Math.sin(now / 1000 * s.sp + s.ph));
-                c.beginPath();
-                c.arc(s.x, s.y, s.r, 0, 7);
-                c.fill();
-            });
+    function paint(now) {
+        c.clearRect(0, 0, W, H);
+        c.fillStyle = "#fff";
+        stars.forEach(s => {
+            c.globalAlpha = reduceMotion ? .8 : .35 + .65 * Math.abs(Math.sin(now / 1000 * s.sp + s.ph));
+            c.beginPath();
+            c.arc(s.x, s.y, s.r, 0, 7);
+            c.fill();
+        });
 
-            // Toota hua tara (shooting star)
-            if (!reduceMotion) {
-                if (!shoot && Math.random() < .004) {
-                    shoot = { x: Math.random() * W * .8, y: Math.random() * H * .4, vx: 9, vy: 4, l: 1 };
-                }
-                if (shoot) {
-                    c.globalAlpha = shoot.l;
-                    c.strokeStyle = "#fff";
-                    c.lineWidth = 2;
-                    c.beginPath();
-                    c.moveTo(shoot.x, shoot.y);
-                    c.lineTo(shoot.x - shoot.vx * 7, shoot.y - shoot.vy * 7);
-                    c.stroke();
-                    shoot.x += shoot.vx;
-                    shoot.y += shoot.vy;
-                    shoot.l -= .02;
-                    if (shoot.l <= 0) shoot = null;
-                }
+        // Toota hua tara (shooting star)
+        if (!reduceMotion) {
+            if (!shoot && Math.random() < .004) {
+                shoot = { x: Math.random() * W * .8, y: Math.random() * H * .4, vx: 9, vy: 4, l: 1 };
             }
-            c.globalAlpha = 1;
+            if (shoot) {
+                c.globalAlpha = shoot.l;
+                c.strokeStyle = "#fff";
+                c.lineWidth = 2;
+                c.beginPath();
+                c.moveTo(shoot.x, shoot.y);
+                c.lineTo(shoot.x - shoot.vx * 7, shoot.y - shoot.vy * 7);
+                c.stroke();
+                shoot.x += shoot.vx;
+                shoot.y += shoot.vy;
+                shoot.l -= .02;
+                if (shoot.l <= 0) shoot = null;
+            }
         }
-        if (!reduceMotion) requestAnimationFrame(draw);
+        c.globalAlpha = 1;
     }
+
+    function frame(now) {
+        raf = 0;
+        if (!isDark()) return;                       // light mode: loop band
+        if (!document.hidden) paint(now);
+        if (!reduceMotion) raf = requestAnimationFrame(frame);
+    }
+
+    function sync() { if (isDark() && !raf) raf = requestAnimationFrame(frame); }
 
     size();
     addEventListener("resize", size);
-    if (!reduceMotion) requestAnimationFrame(draw);
+    new MutationObserver(sync).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+    sync();
 })();
 
 // =========================================================
-//  DAY SKY: badal, parinde, ghubbare
+//  DAY SKY: badal, parinde, ghubbare (sirf FANCY mode)
 // =========================================================
 (function () {
+    if (!FANCY) return;
     const d = document.createElement("div");
     d.id = "daysky";
 
@@ -2073,7 +2108,7 @@ change = function (id, d, btn) {
 })();
 
 // =========================================================
-//  NIGHT EXTRAS: astronaut, rocket, UFO, comet
+//  NIGHT EXTRAS: astronaut, rocket, UFO, comet (sirf FANCY mode)
 // =========================================================
 (function () {
     const sp = document.getElementById("space");
@@ -2084,7 +2119,7 @@ change = function (id, d, btn) {
     a.textContent = "🧑‍🚀";
     sp.appendChild(a);
 
-    if (reduceMotion) return;
+    if (!FANCY) return;
 
     function fly(kind, emoji) {
         const e = document.createElement("div");
@@ -2132,7 +2167,8 @@ change = function (id, d, btn) {
 
     const cv = box.querySelector("canvas"), c = cv.getContext("2d");
     const flash = box.querySelector(".flash");
-    let W = 0, H = 0, parts = [], running = false, boltT = null;
+    let W = 0, H = 0, parts = [], running = false, boltT = null, raf = 0;
+    const K = LITE_MODE ? .5 : 1;   // lite mode mein kam boondein / barf
 
     const eff = () => mode === "auto" ? live : mode;
 
@@ -2147,14 +2183,14 @@ change = function (id, d, btn) {
         parts = [];
         if (reduceMotion) return;
         if (e === "rain" || e === "storm") {
-            const n = Math.min(e === "storm" ? 420 : 240, Math.round(W * H / (e === "storm" ? 4500 : 8000)));
+            const n = Math.round(Math.min(e === "storm" ? 420 : 240, Math.round(W * H / (e === "storm" ? 4500 : 8000))) * K);
             for (let i = 0; i < n; i++) parts.push({
                 x: Math.random() * W, y: Math.random() * H,
                 l: 10 + Math.random() * 14, v: 12 + Math.random() * 10
             });
         }
         if (e === "snow") {
-            const n = Math.min(180, Math.round(W * H / 11000));
+            const n = Math.round(Math.min(180, Math.round(W * H / 11000)) * K);
             for (let i = 0; i < n; i++) parts.push({
                 x: Math.random() * W, y: Math.random() * H,
                 r: 1.5 + Math.random() * 3, v: .6 + Math.random() * 1.4,
@@ -2185,8 +2221,6 @@ change = function (id, d, btn) {
 
         if (e === "snow" && !document.hidden) {
             c.fillStyle = "#fff";
-            c.shadowColor = dark ? "rgba(255,255,255,.6)" : "rgba(60,100,160,.55)";
-            c.shadowBlur = 5;
             parts.forEach(p => {
                 p.y += p.v;
                 p.x += Math.sin(now / 1000 * p.sw + p.ph) * .6;
@@ -2195,9 +2229,8 @@ change = function (id, d, btn) {
                 c.arc(p.x, p.y, p.r, 0, 7);
                 c.fill();
             });
-            c.shadowBlur = 0;
         }
-        requestAnimationFrame(draw);
+        raf = requestAnimationFrame(draw);
     }
 
     function lightning() {
@@ -2218,14 +2251,15 @@ change = function (id, d, btn) {
         document.body.dataset.weather = e;
         spawn();
         const needs = (e === "rain" || e === "storm" || e === "snow") && !reduceMotion;
-        if (needs && !running) { running = true; requestAnimationFrame(draw); }
-        if (!needs) { running = false; c.clearRect(0, 0, W, H); }
+        if (needs && !running) { running = true; raf = requestAnimationFrame(draw); }
+        if (!needs) { running = false; cancelAnimationFrame(raf); c.clearRect(0, 0, W, H); }
         lightning();
         paint();
     }
 
     // Asli mausam (Open-Meteo, free)
     function getLive() {
+        if (document.hidden) return;
         fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=weather_code&timezone=auto`)
             .then(r => r.json())
             .then(j => {
@@ -2264,4 +2298,3 @@ change = function (id, d, btn) {
     getLive();
     setInterval(getLive, 30 * 60 * 1000);
 })();
-        
