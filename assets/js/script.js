@@ -222,20 +222,6 @@ function sfx(kind) {
 }
 function paintSound() { const b = $("soundBtn"); if (b) b.textContent = soundOn ? "🔊" : "🔇"; }
 
-// Order hone par awaz
-function speak(text) {
-    if (!soundOn || !("speechSynthesis" in window)) return;
-    try {
-        speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = "en-IN";
-        u.rate = 0.95;
-        u.pitch = 1;
-        u.volume = 1;
-        speechSynthesis.speak(u);
-    } catch (e) { }
-}
-
 // =========================================================
 //  EFFECTS: toast, flying dot, confetti, sparks
 // =========================================================
@@ -574,7 +560,6 @@ function customerSlipHTML(snap, t, meta) {
     <div class="c tag">--- Customer Copy ---</div>`;
 }
 
-// Kitchen slips: one per category, no logo and no prices
 // Kitchen: true karein to saari items ek hi slip par (kam pages = tez print)
 const KITCHEN_ONE_SLIP = false;
 
@@ -688,91 +673,93 @@ function printReceipt() {
 }
 
 // =========================================================
-//  ORDER SOUND (meme) - speaker se band ho, aur apni marzi ki awaz
+//  MEME AWAZ: speaker se band, aur apni marzi ka meme
 // =========================================================
-const MEME_DEFAULT = "assets/chin_tapak_dum_dum.mp3";   // shuru ki awaz
-const MEME_MAX = 2 * 1024 * 1024;                       // website se chunne wali file ki hadd (2 MB)
+
+// Apne memes yahan likhein.
+//   name = jo naam toast mein dikhega (kuch bhi rakh sakte hain)
+//   file = assets folder mein mp3 ka naam
+// Naya meme: ek line copy karke naam aur file badal dein. Hatana ho to line mita dein.
+const MEMES = [
+    { name: "Chin Tapak Dum Dum", file: "assets/chin_tapak_dum_dum.mp3" },
+    { name: "Mujhay Anday Wala Burger", file: "assets/mujhay-anday-wala-burger.mp3" },
+    { name: "Paisa He Paisa", file: "assets/paisa_he_paisa.mp3" },
+    { name: "Ya Marhaba", file: "assets/ya_marhaba.mp3" }
+];
+
+// Bada order: is raqam ya us se upar ke order par ye khaas meme bajega (0 likhein to band)
+const BIG_ORDER_AMOUNT = 3000;
+const BIG_ORDER_MEME = "Paisa He Paisa";   // MEMES mein jo name likha hai bilkul wahi
+let orderTotalNow = 0;                     // order ka total (khud set hota hai)
+
+// Chuna hua meme: number (MEMES ka number), "random" ya "off"
+let memeSel = lsGet("bsMemeSel", 0);
+if (typeof memeSel === "number" && !MEMES[memeSel]) memeSel = 0;
 let memeAudio = null;
 
-const memeData = () => lsGet("bsMeme", null);           // {name, data} ya null
-const memeSrc = () => (memeData() && memeData().data) || MEME_DEFAULT;
+function pickMeme() {
+    if (memeSel === "off" || !MEMES.length) return null;
+    if (memeSel === "random") return MEMES[Math.floor(Math.random() * MEMES.length)];
+    return MEMES[memeSel] || MEMES[0];
+}
 
-function stopMeme() {
-    try { if (memeAudio) { memeAudio.pause(); memeAudio.currentTime = 0; } } catch (e) { }
+// Chal rahi meme aur bolti awaz dono band
+function stopAllSound() {
+    if (memeAudio) { memeAudio.pause(); memeAudio.currentTime = 0; }
     try { if ("speechSynthesis" in window) speechSynthesis.cancel(); } catch (e) { }
 }
 
-function playMeme(force) {
-    if (!soundOn && !force) return;       // speaker band hai to kuch nahi
-    stopMeme();
-    try {
-        memeAudio = new Audio(memeSrc());
-        memeAudio.play().catch(err => console.log("Audio play nahi hui:", err));
-    } catch (e) { }
-}
-
-// ----- "Order Sound" ka panel -----
-function renderMemePanel(msg) {
-    const cur = memeData();
-    $("panelTitle").textContent = "Order Sound";
-    $("panelBody").innerHTML = `
-    ${msg ? `<p class="mmsg">${esc(msg)}</p>` : ""}
-    <div class="mform">
-      <h3>Meme / order sound</h3>
-      <p class="pnote">Abhi: <strong>${cur ? esc(cur.name) : "Default (chin_tapak_dum_dum.mp3)"}</strong></p>
-      <p class="pnote">Speaker button band ho to order par ye awaz nahi bajti.</p>
-      <label class="mfile">🎵 Awaz chunein<input id="sndFile" type="file" accept="audio/*" hidden></label>
-      <div class="mbtns">
-        <button type="button" class="cbtn-warn" data-snd="test">▶️ Test</button>
-        <button type="button" class="btn-lite" data-snd="stop">⏹️ Stop</button>
-        <button type="button" class="btn-lite" data-snd="reset">Default par wapas</button>
-      </div>
-    </div>`;
-    $("panel").classList.add("show");
-}
-
-$("panelBody").addEventListener("click", e => {
-    const b = e.target.closest("[data-snd]");
-    if (!b) return;
-    const a = b.dataset.snd;
-    if (a === "test") playMeme(true);
-    if (a === "stop") stopMeme();
-    if (a === "reset") {
-        stopMeme();
-        try { localStorage.removeItem("bsMeme"); } catch (err) { }
-        renderMemePanel("Default awaz wapas lag gayi.");
+// Speaker band ho to kuch nahi bajta
+function playMeme() {
+    if (!soundOn) return;
+    let m = pickMeme();
+    if (!m) return;
+    // Bada order ho to khaas meme
+    if (BIG_ORDER_AMOUNT > 0 && orderTotalNow >= BIG_ORDER_AMOUNT) {
+        const big = MEMES.find(x => x.name === BIG_ORDER_MEME);
+        if (big) m = big;
     }
-});
+    stopAllSound();
+    memeAudio = new Audio(m.file);
+    memeAudio.play().catch(err => console.log("Meme play nahi hui:", err));
+}
 
-$("panelBody").addEventListener("change", e => {
-    if (e.target.id !== "sndFile") return;
-    const f = e.target.files[0];
-    if (!f) return;
-    if (f.size > MEME_MAX) { renderMemePanel("File bohat badi hai (max 2 MB). Chhoti clip chunein."); return; }
-    const fr = new FileReader();
-    fr.onload = () => {
-        const ok = lsSet("bsMeme", { name: f.name, data: fr.result });
-        renderMemePanel(ok ? "Nayi awaz save ho gayi." : "Save nahi hui (jagah bhar gayi). Chhoti file chunein.");
-        if (ok) playMeme(true);
-    };
-    fr.readAsDataURL(f);
-});
-
-// Speaker band karte hi chalti hui awaz bhi ruk jaye
-$("soundBtn").addEventListener("click", () => { if (!soundOn) stopMeme(); });
-
-// ----- Header mein 🎵 button (speaker ke saath) -----
+// Speaker button band karne par meme bhi band
 (function () {
-    const sb = $("soundBtn");
-    if (!sb) return;
+    const btn = $("soundBtn");
+    if (!btn) return;
+    const prev = btn.onclick;
+    btn.onclick = function (e) {
+        if (prev) prev.call(this, e);
+        if (!soundOn) stopAllSound();
+    };
+})();
+
+// Header mein 🎭 button: har click par agla meme (phir Random, phir Band)
+(function () {
+    const box = document.querySelector(".hb-in .social");
+    if (!box) return;
     const b = document.createElement("button");
     b.type = "button";
     b.id = "memeBtn";
-    b.title = "Order sound badlein";
-    b.setAttribute("aria-label", "Change order sound");
-    b.textContent = "🎵";
-    b.onclick = () => renderMemePanel();
-    sb.after(b);
+    b.title = "Meme badlein";
+    b.setAttribute("aria-label", "Meme badlein");
+    b.textContent = "🎭";
+
+    const label = () =>
+        memeSel === "off" ? "Meme band 🚫"
+            : memeSel === "random" ? "Meme: Random 🎲"
+                : "Meme: " + (MEMES[memeSel] || MEMES[0]).name;
+
+    b.onclick = () => {
+        const order = [...MEMES.map((_, i) => i), "random", "off"];
+        const at = order.indexOf(memeSel);
+        memeSel = order[(at + 1) % order.length];
+        lsSet("bsMemeSel", memeSel);
+        toast(label() + (soundOn ? "" : " (speaker band hai)"));
+        playMeme();   // jhalak
+    };
+    box.insertBefore(b, box.firstChild);
 })();
 
 // =========================================================
@@ -1866,7 +1853,7 @@ const CUSTOM = {};
 let customSeq = Date.now();
 const isCustomId = id => Object.prototype.hasOwnProperty.call(CUSTOM, id);
 
-// MENU.find ab custom items ko bhi dhoondh leta hai (baaqi code mein kuch badalna nahi)
+// MENU.find ab custom items ko bhi dhoondh leta hai
 const _findBase = Array.prototype.find;
 MENU.find = function (fn, thisArg) {
     const r = _findBase.call(this, fn, thisArg);
@@ -1983,95 +1970,6 @@ change = function (id, d, btn) {
 };
 
 // =========================================================
-//  MEME AWAZ: speaker se band, aur apni marzi ka meme
-// =========================================================
-
-// Apne memes yahan likhein.
-//   name = jo naam toast mein dikhega (kuch bhi rakh sakte hain)
-//   file = assets folder mein mp3 ka naam
-// Naya meme: ek line copy karke naam aur file badal dein. Hatana ho to line mita dein.
-const MEMES = [
-    { name: "Chin Tapak Dum Dum", file: "assets/chin_tapak_dum_dum.mp3" },
-    { name: "Mujhay Anday Wala Burger", file: "assets/mujhay-anday-wala-burger.mp3" },
-    { name: "Paisa He Paisa", file: "assets/paisa_he_paisa.mp3" },
-    { name: "Ya Marhaba", file: "assets/ya_marhaba.mp3" }
-];
-
-// Bada order: is raqam ya us se upar ke order par ye khaas meme bajega (0 likhein to band)
-const BIG_ORDER_AMOUNT = 3000;
-const BIG_ORDER_MEME = "Paisa He Paisa";   // MEMES mein jo name likha hai bilkul wahi
-let orderTotalNow = 0;                     // order ka total (khud set hota hai)
-
-// Chuna hua meme: number (MEMES ka number), "random" ya "off"
-let memeSel = lsGet("bsMeme", 0);
-if (typeof memeSel === "number" && !MEMES[memeSel]) memeSel = 0;
-let memeAudio = null;
-
-function pickMeme() {
-    if (memeSel === "off" || !MEMES.length) return null;
-    if (memeSel === "random") return MEMES[Math.floor(Math.random() * MEMES.length)];
-    return MEMES[memeSel] || MEMES[0];
-}
-
-// Chal rahi meme aur bolti awaz dono band
-function stopAllSound() {
-    if (memeAudio) { memeAudio.pause(); memeAudio.currentTime = 0; }
-    try { if ("speechSynthesis" in window) speechSynthesis.cancel(); } catch (e) { }
-}
-
-// Speaker band ho to kuch nahi bajta
-function playMeme() {
-    if (!soundOn) return;
-    let m = pickMeme();
-    if (!m) return;
-    // Bada order ho to khaas meme (agar meme "Band" nahi hai)
-    if (BIG_ORDER_AMOUNT > 0 && orderTotalNow >= BIG_ORDER_AMOUNT) {
-        const big = MEMES.find(x => x.name === BIG_ORDER_MEME);
-        if (big) m = big;
-    }
-    stopAllSound();
-    memeAudio = new Audio(m.file);
-    memeAudio.play().catch(err => console.log("Meme play nahi hui:", err));
-}
-
-// Speaker button band karne par meme bhi band
-(function () {
-    const btn = $("soundBtn");
-    if (!btn) return;
-    const prev = btn.onclick;
-    btn.onclick = function (e) {
-        if (prev) prev.call(this, e);
-        if (!soundOn) stopAllSound();
-    };
-})();
-
-// Header mein 🎭 button: har click par agla meme (phir Random, phir Band)
-(function () {
-    const box = document.querySelector(".hb-in .social");
-    if (!box) return;
-    const b = document.createElement("button");
-    b.type = "button";
-    b.id = "memeBtn";
-    b.title = "Meme badlein";
-    b.setAttribute("aria-label", "Meme badlein");
-    b.textContent = "🎭";
-
-    const label = () =>
-        memeSel === "off" ? "Meme band 🚫"
-            : memeSel === "random" ? "Meme: Random 🎲"
-                : "Meme: " + (MEMES[memeSel] || MEMES[0]).name;
-
-    b.onclick = () => {
-        const order = [...MEMES.map((_, i) => i), "random", "off"];
-        const at = order.indexOf(memeSel);
-        memeSel = order[(at + 1) % order.length];
-        lsSet("bsMeme", memeSel);
-        toast(label() + (soundOn ? "" : " (speaker band hai)"));
-        playMeme();   // jhalak
-    };
-    box.insertBefore(b, box.firstChild);
-})();
-// =========================================================
 //  SPACE MODE: Dark mode mein stars, planets, black hole
 // =========================================================
 (function () {
@@ -2142,6 +2040,7 @@ function playMeme() {
     addEventListener("resize", size);
     if (!reduceMotion) requestAnimationFrame(draw);
 })();
+
 // =========================================================
 //  DAY SKY: badal, parinde, ghubbare
 // =========================================================
@@ -2210,6 +2109,7 @@ function playMeme() {
     });
     obs.observe(document.body, { attributes: true, attributeFilter: ["class"] });
 })();
+
 // =========================================================
 //  WEATHER: Auto (asli mausam) ya apni marzi ka
 // =========================================================
@@ -2364,3 +2264,4 @@ function playMeme() {
     getLive();
     setInterval(getLive, 30 * 60 * 1000);
 })();
+        
