@@ -3764,3 +3764,33 @@
           display: none
       }
   }
+
+  /* Print ke dauran animations ruk jayen */
+  body.printing *,
+  body.printing *::before,
+  body.printing *::after {
+      animation: none !important;
+      transition: none !important
+  }
+
+  body.printing #space,
+  body.printing #weather,
+  body.printing #daysky {
+      display: none !important
+  }
+
+  /* Fast / Smooth: hamesha chalti rehne wali animations ek baar chal kar ruk jayen (lag khatam) */
+  html[data-anim="fast"] *,
+  html[data-anim="fast"] *::before,
+  html[data-anim="fast"] *::after {
+      animation-iteration-count: 1 !important
+  }
+
+  html[data-anim="smooth"] .item,
+  html[data-anim="smooth"] .item *,
+  html[data-anim="smooth"] .item::before,
+  html[data-anim="smooth"] .item::after,
+  html[data-anim="smooth"] .add,
+  html[data-anim="smooth"] .add::after {
+      animation-iteration-count: 1 !important
+  }
