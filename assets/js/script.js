@@ -25,7 +25,7 @@ document.documentElement.dataset.anim = ANIM;
 const LITE_MODE = ANIM !== "full";
 
 // ====== PRINT / SLIP SETTINGS ======
-const PRINT_LOGO = true;                               // true = customer slip par logo
+const PRINT_LOGO = false;                              // true = customer slip par logo (print dheema karta hai)
 const LOGO_PRINT_FILE = "assets/img/logo-print.png";   // chhota black-white logo (200px). Na ho to khud bana liya jata hai
 const KITCHEN_ONE_SLIP = false;                        // false = har category ki alag slip, true = saari items ek slip par
 
@@ -649,14 +649,10 @@ function buildReceipt(snap, t, meta) {
     $("receipt").innerHTML = itemSlipsHTML();
 }
 
-// ----- Logo for print -----
-// 1) assets/img/logo-print.png (chhota) mile to wahi use hota hai
-// 2) warna original logo ko chhota black-white bana liya jata hai
-// 3) dono na ho saken to logo print hi nahi hota (taake slip tez nikle)
 const LOGO_THRESHOLD = 190;   // logo bahut kala aaye to barhao (200), bahut halka aaye to ghatao (150)
 let logoData = "";            // "" = abhi tayyar nahi, "none" = logo nahi
 if (PRINT_LOGO) (function () {
-    function fallback() {
+    function load(src, next) {
         const im = new Image();
         im.onload = () => {
             try {
@@ -674,19 +670,17 @@ if (PRINT_LOGO) (function () {
                     p[i] = p[i + 1] = p[i + 2] = v;
                 }
                 x.putImageData(img, 0, 0);
-                logoData = c.toDataURL("image/png");
-            } catch (e) { logoData = "none"; }   // file:// par browser rok deta hai
+                logoData = c.toDataURL("image/png");   // data URL: print ke waqt load ka intezar nahi
+            } catch (e) { logoData = src; }            // file:// par canvas rok de to seedha file use hogi
         };
-        im.onerror = () => { logoData = "none"; };
-        im.src = "assets/img/logo.jpeg";
+        im.onerror = next;
+        im.src = src;
     }
-    const small = new Image();
-    small.onload = () => { logoData = LOGO_PRINT_FILE; };
-    small.onerror = fallback;
-    small.src = LOGO_PRINT_FILE;
+    // Pehle chhota logo-print.png, na mile to bada logo.jpeg, dono na hon to logo nahi
+    load(LOGO_PRINT_FILE, () => load("assets/img/logo.jpeg", () => { logoData = "none"; }));
 })();
 
-// ----- Print engine: ek hi iframe baar baar use hota hai (tez) -----
+// ----- Print engine: ek hi iframe pehle se tayyar rehta hai (tez) -----
 function printCSS() {
     return `
     @page { size: ${PRINT_WIDTH_MM}mm auto; margin: 0; }
@@ -734,14 +728,15 @@ function printHTMLDoc(body) {
     const go = () => {
         if (fired) return;
         fired = true;
-        document.body.classList.add("printing");
+        document.body.classList.add("printing");            // print ke dauran animations ruk jayen
         try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { }
         setTimeout(() => document.body.classList.remove("printing"), 1500);
     };
+    // Sirf tab intezar karo jab koi image abhi load ho rahi ho (logo)
     const pending = [...d.images].filter(im => !im.complete);
     if (!pending.length) { go(); return; }
     Promise.all(pending.map(im => new Promise(res => { im.onload = im.onerror = res; }))).then(go);
-    setTimeout(go, 250);
+    setTimeout(go, 100);
 }
 
 // Page khulte hi iframe tayyar kar lo, taake pehli print bhi tez ho
@@ -888,12 +883,12 @@ function placeOrder() {
     lsSet("bsOrders", orders);
     lsSet("bsStock", stock);
 
-    $("overlay").classList.add("show");
     orderTotalNow = t.total;         // bade order wali meme ke liye
 
-    // 1) PRINT sab se pehle
-    setTimeout(printReceipt, 0);
+    // 1) PRINT sab se pehle, seedha (bina setTimeout)
+    printReceipt();
     // 2) Baaki sab kuch print ke baad
+    setTimeout(() => $("overlay").classList.add("show"), 0);
     setTimeout(() => { sfx("order"); playMeme(); }, 60);
     setTimeout(updateStats, 100);
     setTimeout(confetti, 900);
