@@ -1,5 +1,5 @@
 // =========================================================
-//  SETTINGS (yahan se settings badlein)
+//  SETTINGS (change your settings here)
 // =========================================================
 const RESTAURANT = {
     name: "BS Smart",
@@ -7,36 +7,38 @@ const RESTAURANT = {
     address: "Sector 5-J, North Karachi, near Kala School",
     phone: "0345-2183819 / 0312-2029588"
 };
-const TAX_RATE = 0;              // 13% tax ke liye 0.13
+const TAX_RATE = 0;          // use 0.13 for 13% tax
 const CURRENCY = "Rs.";
-const DEFAULT_STOCK = 50;
+const DEFAULT_STOCK = 50;    // starting stock of every item
 
-const LITE_MODE = true;          // true = halka aur tez, false = saari animations
-const PRINT_LOGO = true;         // slip par logo
-const KITCHEN_ONE_SLIP = false;  // false = har category ki alag slip | true = sab ek slip par
+// ====== ANIMATION LEVEL (header ke 🐇 / ✨ / 🎆 button se bhi badal sakte hain) ======
+// "fast"   = sab se tez, bhaari animations band
+// "smooth" = halki animations, lag nahi (pasandida)
+// "full"   = saari animations (kamzor computer par lag karti hain)
+const ANIM_DEFAULT = "smooth";
+let ANIM = ANIM_DEFAULT;
+try {
+    const v = JSON.parse(localStorage.getItem("bsAnim"));
+    if (v === "fast" || v === "smooth" || v === "full") ANIM = v;
+} catch (e) { }
+document.documentElement.dataset.anim = ANIM;
+const LITE_MODE = ANIM !== "full";
 
-// ====== PRINT SETTINGS ======
-const PRINT_WIDTH_MM = 48;       // 58mm roll = 48, 80mm roll = 72
-const PRINT_LEFT_MM = 0;
-const PRINT_FONT_PX = 13;
-const PRINT_WEIGHT = 400;        // 400 normal, 700 bold
-const LOGO_THRESHOLD = 190;      // logo kala aaye to barhao, halka aaye to ghatao
+// ====== PRINT / SLIP SETTINGS ======
+const PRINT_LOGO = true;                               // true = customer slip par logo
+const LOGO_PRINT_FILE = "assets/img/logo-print.png";   // chhota black-white logo (200px). Na ho to khud bana liya jata hai
+const KITCHEN_ONE_SLIP = false;                        // false = har category ki alag slip, true = saari items ek slip par
 
-// ====== BADA ORDER MEME ======
-const BIG_ORDER_AMOUNT = 3000;   // is se zyada ke order par khaas meme (0 = band)
-const BIG_ORDER_MEME = "Paisa He Paisa";
+const PRINT_WIDTH_MM = 48;   // 58mm roll = 48, 80mm roll = 72
+const PRINT_LEFT_MM = 0;     // slip left se kate to 2 ya 3 karein
+const PRINT_FONT_PX = 13;    // font ka size
+const PRINT_WEIGHT = 400;    // 400 normal, 700 bold
 
-// Memes: name = jo toast mein dikhega, file = assets folder ki mp3
-const MEMES = [
-    { name: "Chin Tapak Dum Dum", file: "assets/chin_tapak_dum_dum.mp3" },
-    { name: "Mujhay Anday Wala Burger", file: "assets/mujhay-anday-wala-burger.mp3" },
-    { name: "Paisa He Paisa", file: "assets/paisa_he_paisa.mp3" },
-    { name: "Ya Marhaba", file: "assets/ya_marhaba.mp3" }
-];
-
-// Starting menu (baad mein Manage Menu se badal sakte hain)
-// Category "Deals" wale items sirf Deals view mein dikhte hain.
+// Starting menu (can be changed later from Manage Menu).
+// Items with category "Deals" only show in the Deals view.
+// Har item ka id alag hona chahiye.
 const DEFAULT_MENU = [
+    // ---------- FastFood ----------
     { id: 1, cat: "FastFood", name: "Zinger Burger", desc: "Crispy chicken zinger burger", price: 300, img: "" },
     { id: 2, cat: "FastFood", name: "Zinger Burger Cheese", desc: "Zinger burger with cheese", price: 350, img: "" },
     { id: 3, cat: "FastFood", name: "Zinger Burger Jumbo", desc: "Jumbo crispy chicken zinger burger", price: 450, img: "" },
@@ -49,10 +51,12 @@ const DEFAULT_MENU = [
     { id: 10, cat: "FastFood", name: "Mayo Fries", desc: "Mayo Yammi Fries", price: 200, img: "" },
     { id: 11, cat: "FastFood", name: "Cheese Fries", desc: "Cheese Yammi Fries", price: 200, img: "" },
 
+    // ---------- EXTRAS ----------
     { id: 12, cat: "EXTRAS", name: "Paratha (SMALL)", desc: "Yammi", price: 50, img: "" },
     { id: 13, cat: "EXTRAS", name: "Paratha (LARGE)", desc: "Yammi", price: 100, img: "" },
     { id: 14, cat: "EXTRAS", name: "Chapati", desc: "Yammi", price: 20, img: "" },
 
+    // ---------- BBQ Rolls ----------
     { id: 15, cat: "BBQ", name: "Zinger Roll", desc: "Crispy chicken zinger roll", price: 150, img: "" },
     { id: 16, cat: "BBQ", name: "Zinger Jumbo Roll", desc: "Jumbo crispy chicken zinger roll", price: 250, img: "" },
     { id: 17, cat: "BBQ", name: "Boti Roll", desc: "Chicken boti roll", price: 150, img: "" },
@@ -62,34 +66,44 @@ const DEFAULT_MENU = [
     { id: 21, cat: "BBQ", name: "Chicken Malai Boti Roll", desc: "Creamy chicken malai boti roll", price: 150, img: "" },
     { id: 22, cat: "BBQ", name: "Chicken Crispy Roll", desc: "Crispy chicken roll", price: 150, img: "" },
 
+    // ---------- Pizza ----------
     { id: 23, cat: "Pizza", name: "Chicken Fajita (SMALL)", desc: "Chicken fajita pizza", price: 300, img: "" },
     { id: 24, cat: "Pizza", name: "Chicken Fajita (MEDIUM)", desc: "Chicken fajita pizza", price: 500, img: "" },
     { id: 25, cat: "Pizza", name: "Chicken Fajita (LARGE)", desc: "Chicken fajita pizza", price: 700, img: "" },
+
     { id: 26, cat: "Pizza", name: "Chicken Tikka (SMALL)", desc: "Chicken tikka pizza", price: 300, img: "" },
     { id: 27, cat: "Pizza", name: "Chicken Tikka (MEDIUM)", desc: "Chicken tikka pizza", price: 500, img: "" },
     { id: 28, cat: "Pizza", name: "Chicken Tikka (LARGE)", desc: "Chicken tikka pizza", price: 700, img: "" },
+
     { id: 29, cat: "Pizza", name: "Chicken Malai (SMALL)", desc: "Chicken malai pizza", price: 300, img: "" },
     { id: 30, cat: "Pizza", name: "Chicken Malai (MEDIUM)", desc: "Chicken malai pizza", price: 500, img: "" },
     { id: 31, cat: "Pizza", name: "Chicken Malai (LARGE)", desc: "Chicken malai pizza", price: 700, img: "" },
+
     { id: 32, cat: "Pizza", name: "BBQ Chicken (SMALL)", desc: "BBQ chicken pizza", price: 300, img: "" },
     { id: 33, cat: "Pizza", name: "BBQ Chicken (MEDIUM)", desc: "BBQ chicken pizza", price: 500, img: "" },
     { id: 34, cat: "Pizza", name: "BBQ Chicken (LARGE)", desc: "BBQ chicken pizza", price: 700, img: "" },
+
     { id: 35, cat: "Pizza", name: "Chicken Supreme (SMALL)", desc: "Chicken supreme pizza", price: 300, img: "" },
     { id: 36, cat: "Pizza", name: "Chicken Supreme (MEDIUM)", desc: "Chicken supreme pizza", price: 500, img: "" },
     { id: 37, cat: "Pizza", name: "Chicken Supreme (LARGE)", desc: "Chicken supreme pizza", price: 700, img: "" },
+
     { id: 38, cat: "Pizza", name: "Chicken Shish (SMALL)", desc: "Chicken shish pizza", price: 300, img: "" },
     { id: 39, cat: "Pizza", name: "Chicken Shish (MEDIUM)", desc: "Chicken shish pizza", price: 500, img: "" },
     { id: 40, cat: "Pizza", name: "Chicken Shish (LARGE)", desc: "Chicken shish pizza", price: 700, img: "" },
+
     { id: 41, cat: "Pizza", name: "Chicken Cheese (SMALL)", desc: "Chicken cheese pizza", price: 300, img: "" },
     { id: 42, cat: "Pizza", name: "Chicken Cheese (MEDIUM)", desc: "Chicken cheese pizza", price: 500, img: "" },
     { id: 43, cat: "Pizza", name: "Chicken Cheese (LARGE)", desc: "Chicken cheese pizza", price: 700, img: "" },
+
     { id: 44, cat: "Pizza", name: "Vegetable (SMALL)", desc: "Fresh vegetable pizza", price: 300, img: "" },
     { id: 45, cat: "Pizza", name: "Vegetable (MEDIUM)", desc: "Fresh vegetable pizza", price: 500, img: "" },
     { id: 46, cat: "Pizza", name: "Vegetable (LARGE)", desc: "Fresh vegetable pizza", price: 700, img: "" },
+
     { id: 47, cat: "Pizza", name: "Special (BS Smart) (SMALL)", desc: "Special signature pizza", price: 400, img: "" },
     { id: 48, cat: "Pizza", name: "Special (BS Smart) (MEDIUM)", desc: "Special signature pizza", price: 700, img: "" },
     { id: 49, cat: "Pizza", name: "Special (BS Smart) (LARGE)", desc: "Special signature pizza", price: 1000, img: "" },
 
+    // ---------- BBQ Plates & Seekh ----------
     { id: 50, cat: "BBQ", name: "Chicken Tikka (Chest)", desc: "Chicken tikka chest piece", price: 350, img: "" },
     { id: 51, cat: "BBQ", name: "Chicken Tikka (Leg)", desc: "Chicken tikka leg piece", price: 300, img: "" },
     { id: 52, cat: "BBQ", name: "Behari Tikka (Leg)", desc: "Behari style tikka", price: 350, img: "" },
@@ -110,14 +124,17 @@ const DEFAULT_MENU = [
     { id: 67, cat: "BBQ", name: "Chicken Boti (Seekh)", desc: "Classic chicken boti seekh", price: 100, img: "" },
     { id: 68, cat: "BBQ", name: "Chicken Balochi Boti (Seekh)", desc: "Balochi style chicken boti seekh", price: 100, img: "" },
 
+    // ---------- BBQ Broast (NEW) ----------
     { id: 69, cat: "BBQ", name: "Broast (CHEST)", desc: "Crispy broast chest piece", price: 500, img: "" },
     { id: 70, cat: "BBQ", name: "Broast (LEG)", desc: "Crispy broast leg piece", price: 450, img: "" },
 
+    // ---------- Deals ----------
     { id: 71, cat: "Deals", name: "Deal 1", desc: "Half Kg Pulao (Sada), Leg Tikka, Bihari Boti (Half), Malai Boti (Half), Seekh Kabab (Half), Turkish Kabab (Half), 1 Ltr Drink, Raita", price: 1499, img: "" },
     { id: 72, cat: "Deals", name: "Deal 2", desc: "Bihari Boti (Half), Seekh Kabab (Half), Chicken Reshmi Kabab (Half), Chicken Tikka (Leg), 2 Paratha, 1 Ltr Drink, Raita", price: 1199, img: "" },
     { id: 73, cat: "Deals", name: "Deal 3", desc: "Afghani Boti (6 Seekh), Turkish Kabab (Half), 2 Paratha, 1 Ltr Drink, Raita", price: 850, img: "" },
     { id: 74, cat: "Deals", name: "Deal 4", desc: "Pulao (Half Kg), Tikka (Chest), 2 Drinks (300ml), Raita", price: 799, img: "" },
 
+    // ---------- Biryani ----------
     { id: 75, cat: "Biryani", name: "Chicken Biryani (1 KG)", desc: "Chicken biryani 1 kg", price: 560, img: "" },
     { id: 76, cat: "Biryani", name: "Chicken Biryani (3 Pao)", desc: "Chicken biryani 3 pao", price: 420, img: "" },
     { id: 77, cat: "Biryani", name: "Chicken Biryani (Half KG)", desc: "Chicken biryani half kg", price: 280, img: "" },
@@ -133,6 +150,7 @@ const DEFAULT_MENU = [
     { id: 87, cat: "Biryani", name: "Beef Pulao (1 Pao)", desc: "Beef pulao 1 pao", price: 190, img: "" },
     { id: 88, cat: "Biryani", name: "Beef Pulao (Plate)", desc: "Beef pulao single plate", price: 280, img: "" },
 
+    // ---------- Drinks ----------
     { id: 89, cat: "Drinks", name: "REG Cold Drink", desc: "Regular cold drink", price: 70, img: "" },
     { id: 90, cat: "Drinks", name: "REG Cold Drink Sting", desc: "Regular Sting", price: 80, img: "" },
     { id: 91, cat: "Drinks", name: "300ml Coldrink", desc: "300ml cold drink", price: 90, img: "" },
@@ -158,11 +176,13 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;"
 const lsGet = (k, fb) => { try { return JSON.parse(localStorage.getItem(k)) ?? fb; } catch (e) { return fb; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } };
 const dayKey = d => new Date(d).toDateString();
-const isDeal = m => !!m && m.cat === "Deals";
+const sumTotal = list => list.reduce((s, o) => s + o.total, 0);
+const isDeal = m => m.cat === "Deals";
 const reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
 const canHover = window.matchMedia && matchMedia("(hover:hover)").matches;
-const FANCY = !LITE_MODE && !reduceMotion;   // sirf is mode mein bhari effects
-document.body.classList.toggle("lite", LITE_MODE);
+// SMOOTH = halki animations (smooth + full). FANCY = bhaari mouse effects (sirf full)
+const SMOOTH = ANIM !== "fast" && !reduceMotion;
+const FANCY = ANIM === "full" && !reduceMotion;
 
 // =========================================================
 //  STATE
@@ -171,33 +191,29 @@ const MENU = JSON.parse(JSON.stringify(DEFAULT_MENU));
 const savedMenu = lsGet("bsMenu", null);
 if (Array.isArray(savedMenu) && savedMenu.length) MENU.splice(0, MENU.length, ...savedMenu);
 
-const CUSTOM = {};               // sirf is order ki apni marzi ki items
-let customSeq = Date.now();
-
 let orders = lsGet("bsOrders", []);
 let stock = lsGet("bsStock", {});
 let favs = lsGet("bsFavs", []);
 let soundOn = lsGet("bsSound", true);
-let memeSel = lsGet("bsMemeSel", 0);      // number, "random" ya "off"
 let cart = {};
-let lastMeta = null;                       // last order (slips ke liye)
-let view = "menu", cat = "All", q = "";
-let prevIds = [];
-let editId = null, formImg = "", curPanel = "", mq = "";
-let orderTotalNow = 0, orderVisible = false;
-let lastAdd = { id: null, t: 0 };
-
-const itemById = id => CUSTOM[id] || MENU.find(m => m.id == id);
-const stockOf = id => stock[id] ?? DEFAULT_STOCK;
-const todayOrders = () => orders.filter(o => dayKey(o.t) === dayKey(Date.now()));
-const cartCount = () => Object.values(cart).reduce((a, b) => a + b, 0);
-const sumTotal = list => list.reduce((s, o) => s + o.total, 0);
+let lastMeta = null;       // details of the last order (for slips)
+let lastCustomer = "";     // customer slip HTML
+let view = "menu";         // "menu" or "deals"
+let cat = "All";
+let q = "";
+let prevIds = [], prevCount = 0, orderVisible = false;
+let editId = null, formImg = "", curPanel = "";
 
 function ensureStock() {
     MENU.forEach(m => { if (stock[m.id] === undefined) stock[m.id] = DEFAULT_STOCK; });
     lsSet("bsStock", stock);
 }
 ensureStock();
+
+const catList = () => ["All", "__fav", ...new Set(MENU.filter(m => !isDeal(m)).map(m => m.cat))];
+const catLabel = c => c === "__fav" ? "❤️ Favourites" : c;
+const todayOrders = () => orders.filter(o => dayKey(o.t) === dayKey(Date.now()));
+const cartCount = () => Object.values(cart).reduce((a, b) => a + b, 0);
 
 // =========================================================
 //  SOUND
@@ -227,47 +243,7 @@ function sfx(kind) {
 function paintSound() { const b = $("soundBtn"); if (b) b.textContent = soundOn ? "🔊" : "🔇"; }
 
 // =========================================================
-//  MEMES
-// =========================================================
-if (typeof memeSel === "number" && !MEMES[memeSel]) memeSel = 0;
-let memeAudio = null;
-const memeCache = {};
-function getMemeAudio(file) {
-    if (!memeCache[file]) {
-        const a = new Audio();
-        a.preload = "auto";
-        a.src = file;
-        memeCache[file] = a;
-    }
-    return memeCache[file];
-}
-setTimeout(() => MEMES.forEach(m => getMemeAudio(m.file)), 2000);
-
-function pickMeme() {
-    if (memeSel === "off" || !MEMES.length) return null;
-    if (memeSel === "random") return MEMES[Math.floor(Math.random() * MEMES.length)];
-    return MEMES[memeSel] || MEMES[0];
-}
-function stopAllSound() {
-    if (memeAudio) { try { memeAudio.pause(); memeAudio.currentTime = 0; } catch (e) { } }
-    try { if ("speechSynthesis" in window) speechSynthesis.cancel(); } catch (e) { }
-}
-function playMeme() {
-    if (!soundOn) return;
-    let m = pickMeme();
-    if (!m) return;
-    if (BIG_ORDER_AMOUNT > 0 && orderTotalNow >= BIG_ORDER_AMOUNT) {
-        const big = MEMES.find(x => x.name === BIG_ORDER_MEME);
-        if (big) m = big;
-    }
-    stopAllSound();
-    memeAudio = getMemeAudio(m.file);
-    try { memeAudio.currentTime = 0; } catch (e) { }
-    memeAudio.play().catch(err => console.log("Meme play nahi hui:", err));
-}
-
-// =========================================================
-//  EFFECTS
+//  EFFECTS: toast, flying dot, confetti, sparks
 // =========================================================
 let toastTimer;
 function toast(msg) {
@@ -276,29 +252,29 @@ function toast(msg) {
     t.textContent = msg;
     t.classList.add("show");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove("show"), 1500);
+    toastTimer = setTimeout(() => t.classList.remove("show"), 1700);
 }
 
-// Add button se cart icon tak chhota dot
-function flyFrom(rect) {
+function flyFrom(a) {
     const target = $("navCount");
-    if (reduceMotion || !rect || !target) return;
+    if (reduceMotion || !a || !target) return;
     const b = target.getBoundingClientRect();
     const dot = document.createElement("div");
-    dot.className = "flydot";
-    dot.style.cssText = `position:fixed;width:16px;height:16px;border-radius:50%;background:#f5b800;z-index:70;pointer-events:none;transition:transform .5s ease-in,opacity .5s;left:${rect.left + rect.width / 2 - 8}px;top:${rect.top + rect.height / 2 - 8}px`;
+    dot.className = "fly";
+    dot.style.left = (a.left + a.width / 2 - 9) + "px";
+    dot.style.top = (a.top + a.height / 2 - 9) + "px";
     document.body.appendChild(dot);
     requestAnimationFrame(() => requestAnimationFrame(() => {
-        dot.style.transform = `translate(${b.left - rect.left}px, ${b.top - rect.top}px) scale(.3)`;
-        dot.style.opacity = "0";
+        dot.style.transform = `translate(${b.left + b.width / 2 - (a.left + a.width / 2)}px, ${b.top + b.height / 2 - (a.top + a.height / 2)}px) scale(.3)`;
+        dot.style.opacity = ".2";
     }));
-    setTimeout(() => dot.remove(), 600);
+    setTimeout(() => dot.remove(), 700);
 }
 
 function confetti() {
     if (reduceMotion) return;
     const cols = ["#f5b800", "#0d0d0d", "#ffffff", "#1b7a2f", "#e5483b"];
-    const n = LITE_MODE ? 16 : 40;
+    const n = ANIM === "full" ? 46 : ANIM === "smooth" ? 22 : 12;
     for (let i = 0; i < n; i++) {
         const c = document.createElement("i");
         c.className = "confetti";
@@ -310,35 +286,17 @@ function confetti() {
         document.body.appendChild(c);
         setTimeout(() => c.remove(), 2800);
     }
-    if (FANCY) fireworks();
 }
 
-function fireworks() {
-    const c = document.createElement("canvas");
-    c.className = "fw";
-    c.width = innerWidth;
-    c.height = innerHeight;
-    document.body.appendChild(c);
-    const x = c.getContext("2d"), P = [];
-    const boom = (bx, by) => {
-        const col = `hsl(${Math.random() * 360},100%,60%)`;
-        for (let i = 0; i < 60; i++) {
-            const a = Math.PI * 2 * i / 60, v = 2 + Math.random() * 4;
-            P.push({ x: bx, y: by, vx: Math.cos(a) * v, vy: Math.sin(a) * v, l: 1, col });
-        }
-    };
-    [0, 350, 700].forEach(t => setTimeout(() => boom(c.width * (.2 + Math.random() * .6), c.height * (.15 + Math.random() * .35)), t));
-    const end = performance.now() + 2400;
-    (function f() {
-        x.clearRect(0, 0, c.width, c.height);
-        P.forEach(p => {
-            p.x += p.vx; p.y += p.vy; p.vy += .05; p.vx *= .985; p.l -= .012;
-            x.globalAlpha = Math.max(p.l, 0);
-            x.fillStyle = p.col;
-            x.beginPath(); x.arc(p.x, p.y, 2.5, 0, 7); x.fill();
-        });
-        if (performance.now() < end) requestAnimationFrame(f); else c.remove();
-    })();
+function spark(host, x, y) {
+    const s = document.createElement("i");
+    s.className = "spark";
+    s.style.left = x + "px";
+    s.style.top = y + "px";
+    s.style.setProperty("--sx", (Math.random() * 40 - 20) + "px");
+    s.style.setProperty("--sy", (Math.random() * 40 + 10) + "px");
+    host.appendChild(s);
+    setTimeout(() => s.remove(), 700);
 }
 
 function setStat(id, text) {
@@ -351,31 +309,8 @@ function setStat(id, text) {
 }
 
 // =========================================================
-//  MENU / DEALS
+//  MENU / DEALS: switch, tabs, cards
 // =========================================================
-const catList = () => ["All", "__fav", ...new Set(MENU.filter(m => !isDeal(m)).map(m => m.cat))];
-const catLabel = c => c === "__fav" ? "❤️ Favourites" : c;
-const matchQ = m => (m.name + " " + (m.desc || "") + " " + m.cat).toLowerCase().includes(q);
-
-function visibleItems() {
-    return MENU.filter(m => {
-        if (!matchQ(m)) return false;
-        if (view === "deals") return isDeal(m);
-        if (isDeal(m)) return false;
-        if (cat === "__fav") return favs.includes(m.id);
-        return cat === "All" || m.cat === cat;
-    });
-}
-
-function renderTabs() {
-    const box = $("tabs");
-    box.style.display = view === "deals" ? "none" : "";
-    const cats = catList();
-    if (!cats.includes(cat)) cat = "All";
-    box.innerHTML = cats.map(c =>
-        `<button class="tab" aria-pressed="${c === cat}" data-c="${esc(c)}">${esc(catLabel(c))}</button>`).join("");
-}
-
 function setView(v, scroll) {
     view = v;
     const vs = $("vswitch");
@@ -388,46 +323,36 @@ function setView(v, scroll) {
     if (scroll) $("menuSec").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
 }
 
-function cardHTML(m, i) {
-    const s = stockOf(m.id), sold = s <= 0, fav = favs.includes(m.id), n = cart[m.id] || 0;
-    return `<article class="item${isDeal(m) ? " deal" : ""}${sold ? " sold" : ""}" style="animation-delay:${Math.min(i, 14) * 40}ms">
-      ${isDeal(m) ? "" : `<button class="fav${fav ? " on" : ""}" data-id="${m.id}" aria-pressed="${fav}" aria-label="Favourite">${fav ? "♥" : "♡"}</button>`}
-      ${m.img ? `<img class="em" src="${esc(m.img)}" alt="" loading="lazy" onerror="this.style.display='none'">` : ""}
-      <h3>${esc(m.name)}</h3>
-      <p>${esc(m.desc || "")}</p>
-      ${!sold && s <= 5 ? `<span class="lowtag">Only ${s} left</span>` : ""}
-      <div class="row">
-        <span class="price">${fmt(m.price)}</span>
-        <button class="add" data-id="${m.id}"${sold ? " disabled" : ""}>${sold ? "Sold out" : "Add"}</button>
-      </div>
-      ${n ? `<span class="inbag">×${n}</span>` : ""}
-    </article>`;
+function renderTabs() {
+    const box = $("tabs");
+    box.style.display = view === "deals" ? "none" : "";
+    const cats = catList();
+    if (!cats.includes(cat)) cat = "All";
+    box.innerHTML = cats.map(c =>
+        `<button class="tab" aria-pressed="${c === cat}" data-c="${esc(c)}">${esc(catLabel(c))}</button>`).join("");
+}
+
+const matchQ = m => (m.name + " " + (m.desc || "") + " " + m.cat).toLowerCase().includes(q);
+
+function visibleItems() {
+    return MENU.filter(m => {
+        if (!matchQ(m)) return false;
+        if (view === "deals") return isDeal(m);
+        if (isDeal(m)) return false;
+        if (cat === "__fav") return favs.includes(m.id);
+        return cat === "All" || m.cat === cat;
+    });
 }
 
 function renderSpecial() {
     const box = $("special");
-    const deals = MENU.filter(m => isDeal(m) && stockOf(m.id) > 0);
+    const deals = MENU.filter(m => isDeal(m) && (stock[m.id] ?? DEFAULT_STOCK) > 0);
     if (view !== "deals" || !deals.length || q) { box.className = "special"; box.innerHTML = ""; return; }
-    const m = deals[Math.floor(Date.now() / 864e5) % deals.length];   // roz ek alag deal
+    const m = deals[Math.floor(Date.now() / 864e5) % deals.length];   // a different deal every day
     box.className = "special show";
     box.innerHTML = `
     <div class="sp-l"><small>⭐ TODAY'S SPECIAL DEAL</small><h3>${esc(m.name)}</h3><p>${esc(m.desc || "")}</p></div>
     <div class="sp-r"><span class="price">${fmt(m.price)}</span><button class="add" data-id="${m.id}">Add</button></div>`;
-}
-
-function renderBest() {
-    const box = $("best");
-    if (!box) return;
-    const cnt = {};
-    orders.forEach(o => o.items.forEach(i => { cnt[i.id] = (cnt[i.id] || 0) + i.q; }));
-    const top = Object.entries(cnt).sort((a, b) => b[1] - a[1])
-        .map(([id, n]) => ({ m: MENU.find(x => x.id == id), n }))
-        .filter(x => x.m && !isDeal(x.m) && stockOf(x.m.id) > 0)
-        .slice(0, 3);
-    box.innerHTML = view === "menu" && !q && top.length
-        ? `<p class="up-t">🏆 Best sellers</p><div class="chips">${top.map(({ m, n }) =>
-            `<button type="button" class="chip" data-id="${m.id}">${esc(m.name)} <b>${n} sold</b></button>`).join("")}</div>`
-        : "";
 }
 
 function renderMenu() {
@@ -440,23 +365,22 @@ function renderMenu() {
         : view === "menu" && cat === "__fav" && !q ? "No favourites yet. Tap ❤️ on any item."
             : "No items found. Try another name.";
 
-    $("menu").innerHTML = list.length
-        ? list.map((m, i) => cardHTML(m, i)).join("")
-        : `<div class="no-result">${empty}</div>`;
-    renderSpecial();
-    renderBest();
-}
+    $("menu").innerHTML = list.length ? list.map((m, i) => {
+        const s = stock[m.id] ?? DEFAULT_STOCK, sold = s <= 0, on = favs.includes(m.id);
+        return `<article class="item${isDeal(m) ? " deal" : ""}${sold ? " sold" : ""}" style="animation-delay:${Math.min(i, 14) * 45}ms">
+      ${isDeal(m) ? "" : `<button class="fav${on ? " on" : ""}" data-id="${m.id}" aria-pressed="${on}" aria-label="Favourite">${on ? "♥" : "♡"}</button>`}
+      ${m.img ? `<img class="em" src="${esc(m.img)}" alt="" loading="lazy" onerror="this.style.display='none'">` : ""}
+      <h3>${esc(m.name)}</h3>
+      <p>${esc(m.desc || "")}</p>
+      ${!sold && s <= 5 ? `<span class="lowtag">Only ${s} left</span>` : ""}
+      <div class="row">
+        <span class="price">${fmt(m.price)}</span>
+        <button class="add" data-id="${m.id}"${sold ? " disabled" : ""}>${sold ? "Sold out" : "Add"}</button>
+      </div>
+    </article>`;
+    }).join("") : `<div class="no-result">${empty}</div>`;
 
-// Cart ke hisaab se cards par ×2 wale badge (poora grid dobara nahi banta)
-function paintBags() {
-    document.querySelectorAll("#menu .item .add[data-id]").forEach(b => {
-        const it = b.closest(".item");
-        const n = cart[b.dataset.id] || 0;
-        let tag = it.querySelector(".inbag");
-        if (!n) { if (tag) tag.remove(); return; }
-        if (!tag) { tag = document.createElement("span"); tag.className = "inbag"; it.appendChild(tag); }
-        tag.textContent = "×" + n;
-    });
+    renderSpecial();
 }
 
 function toggleFav(id, btn) {
@@ -471,46 +395,43 @@ function toggleFav(id, btn) {
     if (isOn) sfx("fav");
 }
 
+function onItemClick(e) {
+    const f = e.target.closest(".fav");
+    if (f) { toggleFav(+f.dataset.id, f); return; }
+    const a = e.target.closest(".add");
+    if (a && !a.disabled) change(+a.dataset.id, 1, a);
+}
+
 // =========================================================
 //  CART
 // =========================================================
 function change(id, d, btn) {
-    const m = itemById(id);
+    const m = MENU.find(x => x.id == id);
     if (!m) return;
-    const custom = !!CUSTOM[id];
     const have = cart[id] || 0;
-
-    if (d > 0) {
-        // ek click = ek item (double click se bachao)
-        const now = performance.now();
-        if (lastAdd.id == id && now - lastAdd.t < 250) return;
-        lastAdd = { id, t: now };
-        if (!custom && have >= stockOf(id)) { toast(m.name + " sirf " + stockOf(id) + " bacha hai"); return; }
+    if (d > 0 && have >= (stock[id] ?? DEFAULT_STOCK)) {
+        toast(m.name + " has only " + (stock[id] || 0) + " left in stock");
+        return;
     }
-
     const rect = btn ? btn.getBoundingClientRect() : null;
     cart[id] = have + d;
-    if (cart[id] <= 0) { delete cart[id]; if (custom) delete CUSTOM[id]; }
+    if (cart[id] <= 0) delete cart[id];
     renderCart();
 
-    if (d > 0) {
+    if (d > 0 && btn) {
+        flyFrom(rect);
         sfx("add");
         toast(m.name + " added");
-        if (btn) {
-            flyFrom(rect);
-            btn.classList.add("added");
-            const old = btn.textContent;
-            btn.textContent = "✓";
-            setTimeout(() => { btn.textContent = old; btn.classList.remove("added"); }, 600);
-        }
-        const o = $("order");
-        o.classList.add("glow");
-        setTimeout(() => o.classList.remove("glow"), 400);
+        const old = btn.textContent;
+        btn.textContent = "✓ Added";
+        btn.classList.add("added");
+        setTimeout(() => { btn.textContent = old; btn.classList.remove("added"); }, 700);
     }
 }
 
 function totals() {
-    const sub = Object.entries(cart).reduce((s, [id, n]) => s + ((itemById(id) || { price: 0 }).price * n), 0);
+    const sub = Object.entries(cart).reduce(
+        (s, [id, n]) => s + ((MENU.find(m => m.id == id) || { price: 0 }).price) * n, 0);
     const dv = Math.max(parseFloat(val("disc")) || 0, 0);
     const isPct = (val("discType") || "%") === "%";
     const disc = isPct ? sub * Math.min(dv, 100) / 100 : Math.min(dv, sub);
@@ -520,14 +441,15 @@ function totals() {
     return { sub, disc, val: dv, isPct, tax, del, total: after + tax + del };
 }
 
+// "Add these too": suggest a drink or snack if the cart has none
 function renderUpsell() {
     const box = $("upsell");
     if (!box) return;
     if (!cartCount()) { box.innerHTML = ""; return; }
-    const hasCat = c => Object.keys(cart).some(id => (itemById(id) || {}).cat === c);
+    const hasCat = c => Object.keys(cart).some(id => (MENU.find(m => m.id == id) || {}).cat === c);
     const pool = [];
-    ["Drinks", "EXTRAS"].filter(c => !hasCat(c)).forEach(c => {
-        MENU.filter(m => m.cat === c && !cart[m.id] && stockOf(m.id) > 0)
+    ["Drinks", "Snacks"].filter(c => !hasCat(c)).forEach(c => {
+        MENU.filter(m => m.cat === c && !cart[m.id] && (stock[m.id] ?? DEFAULT_STOCK) > 0)
             .slice(0, 2).forEach(m => pool.push(m));
     });
     const list = pool.slice(0, 3);
@@ -535,6 +457,19 @@ function renderUpsell() {
         ? `<p class="up-t">😋 Add these too</p><div class="chips">${list.map(m =>
             `<button type="button" class="chip" data-id="${m.id}">+ ${esc(m.name)} <b>${fmt(m.price)}</b></button>`).join("")}</div>`
         : "";
+}
+
+function updateCartbar(count) {
+    let bar = $("cartbar");
+    if (!bar) {
+        bar = document.createElement("a");
+        bar.id = "cartbar";
+        bar.className = "cartbar";
+        bar.href = "#order";
+        document.body.appendChild(bar);
+    }
+    bar.innerHTML = `<span>🛒 ${count} item${count === 1 ? "" : "s"}</span><span>${fmt(totals().total)}</span><span>View order →</span>`;
+    bar.classList.toggle("show", count > 0 && !orderVisible);
 }
 
 function renderChange() {
@@ -552,24 +487,11 @@ function renderChange() {
     }
 }
 
-function updateCartbar(count) {
-    let bar = $("cartbar");
-    if (!bar) {
-        bar = document.createElement("a");
-        bar.id = "cartbar";
-        bar.className = "cartbar";
-        bar.href = "#order";
-        document.body.appendChild(bar);
-    }
-    bar.innerHTML = `<span>🛒 ${count} item${count === 1 ? "" : "s"}</span><span>${fmt(totals().total)}</span><span>View order →</span>`;
-    bar.classList.toggle("show", count > 0 && !orderVisible);
-}
-
 function renderCart() {
     const ids = Object.keys(cart);
 
     $("lines").innerHTML = ids.length ? ids.map(id => {
-        const m = itemById(id), n = cart[id];
+        const m = MENU.find(x => x.id == id), n = cart[id];
         if (!m) return "";
         return `<div class="line${prevIds.includes(id) ? "" : " new"}">
       <span>${esc(m.name)}</span>
@@ -578,7 +500,6 @@ function renderCart() {
         <button data-id="${id}" data-d="1" aria-label="Increase">+</button>
       </span>
       <span>${fmt(m.price * n)}</span>
-      <button class="rm" data-id="${id}" title="Poori item hata dein" aria-label="Remove item">🗑️</button>
     </div>`;
     }).join("") : `<div class="empty">No items yet. Tap "Add" on the menu.</div>`;
 
@@ -595,22 +516,19 @@ function renderCart() {
 
     const count = cartCount(), nc = $("navCount");
     if (nc) {
-        if (nc.textContent !== String(count)) {
-            nc.textContent = count;
-            nc.classList.remove("bump"); void nc.offsetWidth; nc.classList.add("bump");
-        }
+        nc.textContent = count;
+        if (count !== prevCount) { nc.classList.remove("bump"); void nc.offsetWidth; nc.classList.add("bump"); }
     }
+    prevCount = count;
     prevIds = ids;
     renderUpsell();
     renderChange();
     updateCartbar(count);
-    paintBags();
 }
 
 function resetOrder() {
     cart = {};
     prevIds = [];
-    Object.keys(CUSTOM).forEach(k => delete CUSTOM[k]);
     setVal("disc", "");
     setVal("discType", "Rs");
     setVal("delFee", "");
@@ -619,10 +537,10 @@ function resetOrder() {
 }
 
 // =========================================================
-//  RECEIPT / SLIPS
+//  ORDER, RECEIPT, PRINT
 // =========================================================
 function nextOrderNo() {
-    let n;
+    let n = 1;
     try {
         n = (parseInt(localStorage.getItem("bsOrderNo")) || 0) + 1;
         localStorage.setItem("bsOrderNo", n);
@@ -632,12 +550,15 @@ function nextOrderNo() {
     return String(n).padStart(4, "0");
 }
 
-// Customer slip: sab items, total (rasid)
-function customerSlip(meta, logo) {
-    const t = meta.t;
-    const rows = meta.lines.map(l =>
-        `<div class="r"><span>${l.n} x ${esc(l.m.name)}</span><span>${fmt(l.m.price * l.n)}</span></div>`).join("");
-    return `${logo ? `<img class="logo" src="${logo}" alt="">` : ""}
+// Customer slip: (logo optional), every item, prices, total (proof of purchase)
+function customerSlipHTML(snap, t, meta) {
+    const rows = Object.entries(snap).map(([id, n]) => {
+        const m = MENU.find(x => x.id == id);
+        return `<div class="r"><span>${n} x ${esc(m.name)}</span><span>${fmt(m.price * n)}</span></div>`;
+    }).join("");
+
+    return `
+    ${PRINT_LOGO ? `<img class="logo" src="assets/img/logo.jpeg" alt="">` : ""}
     <h2>${esc(RESTAURANT.name)}</h2>
     <div class="c">${esc(RESTAURANT.sub)}<br>${esc(RESTAURANT.address)}<br>Tel: ${esc(RESTAURANT.phone)}</div>
     <hr>
@@ -660,83 +581,132 @@ function customerSlip(meta, logo) {
     <div class="c tag">--- Customer Copy ---</div>`;
 }
 
-// Kitchen slips: har category ki alag slip (ya KITCHEN_ONE_SLIP true ho to ek hi)
-function kitchenSlips(meta) {
-    const groups = {}, order = [];
-    meta.lines.forEach(l => {
-        const c = l.m.cat;
-        if (!groups[c]) { groups[c] = []; order.push(c); }
-        groups[c].push(l);
+// Deal ke har hisse ki category pehchano (description se)
+function dealParts(m) {
+    return String(m.desc || "").split(",").map(s => s.trim()).filter(Boolean).map(text => {
+        const t = text.toLowerCase();
+        let cat = "Deals";
+        if (/pulao|biryani/.test(t)) cat = "Biryani";
+        else if (/drink|ltr|\bml\b|cola|sting|water/.test(t)) cat = "Drinks";
+        else if (/paratha|chapati|naan|raita|salad|chutney/.test(t)) cat = "EXTRAS";
+        else if (/pizza/.test(t)) cat = "Pizza";
+        else if (/burger|sandwich|fries/.test(t)) cat = "FastFood";
+        else if (/tikka|boti|kabab|seekh|broast|roll/.test(t)) cat = "BBQ";
+        return { cat, text };
+    });
+}
+
+// Kitchen slips: no logo, normal items ki price nahi. Custom item ki price aati hai.
+// Deal ke hisse bhi apni category ki slip par jate hain.
+function kitchenSlipsHTML() {
+    if (!lastMeta) return "";
+    const groups = {};
+    Object.entries(lastMeta.items).forEach(([id, n]) => {
+        const m = MENU.find(x => x.id == id);
+        if (!m) return;
+        if (isDeal(m)) {
+            dealParts(m).forEach(p => {
+                (groups[p.cat] = groups[p.cat] || []).push({ m, n, part: p.text });
+            });
+            return;
+        }
+        (groups[m.cat] = groups[m.cat] || []).push({ m, n });
     });
 
-    const head = `<div class="c big">Order # ${meta.no}</div>
-      <div class="c">${meta.dt} · ${meta.tm}</div>
-      <div class="c">${esc(meta.type)}</div>
+    const line = ({ m, n, part }) => part
+        ? `<div class="k-item">${esc(part)}${n > 1 ? " x " + n : ""}</div>` +
+          `<div class="k-desc">(${esc(m.name)})</div>`
+        : m.custom
+            ? `<div class="r k-item"><span>${n} x ${esc(m.name)}</span><span>${fmt(m.price * n)}</span></div>`
+            : `<div class="k-item">${n} x ${esc(m.name)}</div>`;
+
+    const head = `
+      <div class="c big">Order # ${lastMeta.no}</div>
+      <div class="c">${lastMeta.dt} · ${esc(lastMeta.type)}</div>
       <hr>`;
 
-    const lineHTML = l => l.m.custom
-        ? `<div class="r k-item"><span>${l.n} x ${esc(l.m.name)}</span><span>${fmt(l.m.price * l.n)}</span></div>`
-        : `<div class="k-item">${l.n} x ${esc(l.m.name)}</div>${isDeal(l.m) && l.m.desc ? `<div class="k-desc">${esc(l.m.desc)}</div>` : ""}`;
-
     if (KITCHEN_ONE_SLIP) {
-        return [head + order.map(c =>
-            `<div class="c k-cat">${esc(c.toUpperCase())}</div>${groups[c].map(lineHTML).join("")}<hr>`).join("")];
+        return `<div class="slip pg">${head}` +
+            Object.keys(groups).map(c =>
+                `<div class="c k-item">${esc(c.toUpperCase())}</div>${groups[c].map(line).join("")}<hr>`).join("") +
+            `</div>`;
     }
-    return order.map(c =>
-        head + `<div class="c k-cat">${esc(c.toUpperCase())}</div><hr>${groups[c].map(lineHTML).join("")}`);
+
+    return Object.keys(groups).map(c => `<div class="slip pg">${head}
+      <div class="c k-item">${esc(c.toUpperCase())}</div>
+      <hr>
+      ${groups[c].map(line).join("")}
+    </div>`).join("");
 }
 
-function buildSlips(meta, logo) {
-    return [customerSlip(meta, logo), ...kitchenSlips(meta)];
+// Customer slip first, then the kitchen slips
+function itemSlipsHTML() {
+    return `<div class="slip">${lastCustomer}</div>` + kitchenSlipsHTML();
 }
 
-// Logo ko chhota aur black & white bana kar rakh lete hain (ek hi baar)
-let logoData = "";
-function prepareLogo() {
-    const im = new Image();
-    im.onload = () => {
-        try {
-            const w = 160, h = Math.round(im.naturalHeight * w / im.naturalWidth);
-            const c = document.createElement("canvas");
-            c.width = w; c.height = h;
-            const x = c.getContext("2d");
-            x.fillStyle = "#fff";
-            x.fillRect(0, 0, w, h);
-            x.drawImage(im, 0, 0, w, h);
-            const img = x.getImageData(0, 0, w, h), p = img.data;
-            for (let i = 0; i < p.length; i += 4) {
-                const g = p[i] * .3 + p[i + 1] * .59 + p[i + 2] * .11;
-                const v = g > LOGO_THRESHOLD ? 255 : 0;
-                p[i] = p[i + 1] = p[i + 2] = v;
-            }
-            x.putImageData(img, 0, 0);
-            logoData = c.toDataURL("image/png");
-        } catch (e) { }
-    };
-    im.src = "assets/img/logo.jpeg";
+function buildReceipt(snap, t, meta) {
+    lastCustomer = customerSlipHTML(snap, t, meta);
+    $("receipt").innerHTML = itemSlipsHTML();
 }
-if (PRINT_LOGO) prepareLogo();
 
+// ----- Logo for print -----
+// 1) assets/img/logo-print.png (chhota) mile to wahi use hota hai
+// 2) warna original logo ko chhota black-white bana liya jata hai
+// 3) dono na ho saken to logo print hi nahi hota (taake slip tez nikle)
+const LOGO_THRESHOLD = 190;   // logo bahut kala aaye to barhao (200), bahut halka aaye to ghatao (150)
+let logoData = "";            // "" = abhi tayyar nahi, "none" = logo nahi
+if (PRINT_LOGO) (function () {
+    function fallback() {
+        const im = new Image();
+        im.onload = () => {
+            try {
+                const w = 160, h = Math.round(im.naturalHeight * w / im.naturalWidth);
+                const c = document.createElement("canvas");
+                c.width = w; c.height = h;
+                const x = c.getContext("2d");
+                x.fillStyle = "#fff";
+                x.fillRect(0, 0, w, h);
+                x.drawImage(im, 0, 0, w, h);
+                const img = x.getImageData(0, 0, w, h), p = img.data;
+                for (let i = 0; i < p.length; i += 4) {
+                    const g = p[i] * .3 + p[i + 1] * .59 + p[i + 2] * .11;
+                    const v = g > LOGO_THRESHOLD ? 255 : 0;
+                    p[i] = p[i + 1] = p[i + 2] = v;
+                }
+                x.putImageData(img, 0, 0);
+                logoData = c.toDataURL("image/png");
+            } catch (e) { logoData = "none"; }   // file:// par browser rok deta hai
+        };
+        im.onerror = () => { logoData = "none"; };
+        im.src = "assets/img/logo.jpeg";
+    }
+    const small = new Image();
+    small.onload = () => { logoData = LOGO_PRINT_FILE; };
+    small.onerror = fallback;
+    small.src = LOGO_PRINT_FILE;
+})();
+
+// ----- Print engine: ek hi iframe baar baar use hota hai (tez) -----
 function printCSS() {
     return `
     @page { size: ${PRINT_WIDTH_MM}mm auto; margin: 0; }
     html, body { margin: 0; padding: 0; background: #fff; }
-    body { width: ${PRINT_WIDTH_MM}mm; padding-left: ${PRINT_LEFT_MM}mm; font-family: Arial, Helvetica, sans-serif;
-           font-size: ${PRINT_FONT_PX}px; font-weight: ${PRINT_WEIGHT}; color: #000; }
-    .slip { width: 100%; padding: 2mm 0; page-break-after: always; break-after: page; }
-    .slip:last-child { page-break-after: auto; break-after: auto; }
+    body { width: ${PRINT_WIDTH_MM}mm; padding-left: ${PRINT_LEFT_MM}mm; box-sizing: content-box;
+           font-family: Arial, Helvetica, sans-serif; font-size: ${PRINT_FONT_PX}px;
+           font-weight: ${PRINT_WEIGHT}; color: #000; }
+    .slip { width: 100%; padding: 2mm 0; }
+    .pg { page-break-before: always; break-before: page; }
     h2 { text-align: center; margin: 2px 0; font-size: 1.3em; }
     hr { border: 0; border-top: 1px dashed #000; margin: 4px 0; }
     .r { display: flex; justify-content: space-between; gap: 6px; }
-    .r span:first-child { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-    .r span:last-child { white-space: nowrap; }
+    .r span:first-child, .r b:first-child { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    .r span:last-child, .r b:last-child { white-space: nowrap; }
     .c { text-align: center; }
     .b { font-weight: 700; font-size: 1.15em; }
     .big { font-size: 1.4em; font-weight: 700; }
     .tag { font-size: .85em; margin-top: 4px; }
-    .logo { display: block; margin: 0 auto 3px; width: 24mm; max-width: 100%; border-radius: 50%; }
-    .k-cat { font-size: 1.1em; font-weight: 800; margin: 4px 0; }
-    .k-item { font-size: 1.2em; font-weight: 700; margin: 3px 0; }
+    .logo { display: block; margin: 0 auto 3px; width: 24mm; max-width: 100%; }
+    .k-item { font-size: 1.2em; font-weight: 700; margin: 2px 0; }
     .k-desc { font-size: .85em; margin: 0 0 4px 8px; }`;
 }
 
@@ -745,29 +715,157 @@ function getPrintFrame() {
     if (!f) {
         f = document.createElement("iframe");
         f.id = "printFrame";
-        f.style.cssText = "position:fixed;left:0;top:0;width:1px;height:1px;border:0;opacity:0;pointer-events:none";
+        f.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden";
         document.body.appendChild(f);
+        const d = f.contentWindow.document;
+        d.open();
+        d.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><base href="${document.baseURI}"><title>Receipt</title><style>${printCSS()}</style></head><body></body></html>`);
+        d.close();
     }
     return f;
 }
 
-// Har slip alag page par print hoti hai (thermal printer par alag tukda)
-function printSlips(slips) {
+function printHTMLDoc(body) {
     const f = getPrintFrame();
     const d = f.contentWindow.document;
-    d.open();
-    d.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Receipt</title><style>${printCSS()}</style></head><body>${slips.map(s => `<div class="slip">${s}</div>`).join("")}</body></html>`);
-    d.close();
-    setTimeout(() => {
-        try { f.contentWindow.focus(); f.contentWindow.print(); }
-        catch (e) { toast("Print nahi hua, dobara try karein"); }
-    }, 120);
+    d.body.innerHTML = body;
+
+    let fired = false;
+    const go = () => {
+        if (fired) return;
+        fired = true;
+        document.body.classList.add("printing");
+        try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { }
+        setTimeout(() => document.body.classList.remove("printing"), 1500);
+    };
+    const pending = [...d.images].filter(im => !im.complete);
+    if (!pending.length) { go(); return; }
+    Promise.all(pending.map(im => new Promise(res => { im.onload = im.onerror = res; }))).then(go);
+    setTimeout(go, 250);
 }
 
+// Page khulte hi iframe tayyar kar lo, taake pehli print bhi tez ho
+getPrintFrame();
+
 function printReceipt() {
-    if (!lastMeta) { toast("No order to print"); return; }
-    printSlips(buildSlips(lastMeta, PRINT_LOGO ? logoData : ""));
+    if (!lastCustomer) { toast("No order to print"); return; }
+    let html = itemSlipsHTML();
+    if (PRINT_LOGO) {
+        if (logoData && logoData !== "none") {
+            html = html.split('src="assets/img/logo.jpeg"').join('src="' + logoData + '"');
+        } else {
+            // chhota logo tayyar nahi: bada logo print mein dene se behtar hai ke logo na ho
+            html = html.replace(/<img class="logo"[^>]*>/g, "");
+        }
+    }
+    printHTMLDoc(html);
 }
+
+// =========================================================
+//  MEME AWAZ: speaker se band, aur apni marzi ka meme
+// =========================================================
+
+// Apne memes yahan likhein.
+//   name = jo naam toast mein dikhega (kuch bhi rakh sakte hain)
+//   file = assets folder mein mp3 ka naam
+// Naya meme: ek line copy karke naam aur file badal dein. Hatana ho to line mita dein.
+const MEMES = [
+    { name: "Chin Tapak Dum Dum", file: "assets/chin_tapak_dum_dum.mp3" },
+    { name: "Mujhay Anday Wala Burger", file: "assets/mujhay-anday-wala-burger.mp3" },
+    { name: "Paisa He Paisa", file: "assets/paisa_he_paisa.mp3" },
+    { name: "Ya Marhaba", file: "assets/ya_marhaba.mp3" }
+];
+
+// Bada order: is raqam ya us se upar ke order par ye khaas meme bajega (0 likhein to band)
+const BIG_ORDER_AMOUNT = 3000;
+const BIG_ORDER_MEME = "Paisa He Paisa";   // MEMES mein jo name likha hai bilkul wahi
+let orderTotalNow = 0;                     // order ka total (khud set hota hai)
+
+// Chuna hua meme: number (MEMES ka number), "random" ya "off"
+let memeSel = lsGet("bsMemeSel", 0);
+if (typeof memeSel === "number" && !MEMES[memeSel]) memeSel = 0;
+let memeAudio = null;
+
+// Memes pehle se load rehte hain taake order par der na lage
+const memeCache = {};
+function getMemeAudio(file) {
+    if (!memeCache[file]) {
+        const a = new Audio();
+        a.preload = "auto";
+        a.src = file;
+        memeCache[file] = a;
+    }
+    return memeCache[file];
+}
+setTimeout(() => MEMES.forEach(m => getMemeAudio(m.file)), 2000);
+
+function pickMeme() {
+    if (memeSel === "off" || !MEMES.length) return null;
+    if (memeSel === "random") return MEMES[Math.floor(Math.random() * MEMES.length)];
+    return MEMES[memeSel] || MEMES[0];
+}
+
+// Chal rahi meme aur bolti awaz dono band
+function stopAllSound() {
+    if (memeAudio) { try { memeAudio.pause(); memeAudio.currentTime = 0; } catch (e) { } }
+    try {
+        if ("speechSynthesis" in window && (speechSynthesis.speaking || speechSynthesis.pending)) speechSynthesis.cancel();
+    } catch (e) { }
+}
+
+// Speaker band ho to kuch nahi bajta
+function playMeme() {
+    if (!soundOn) return;
+    let m = pickMeme();
+    if (!m) return;
+    // Bada order ho to khaas meme
+    if (BIG_ORDER_AMOUNT > 0 && orderTotalNow >= BIG_ORDER_AMOUNT) {
+        const big = MEMES.find(x => x.name === BIG_ORDER_MEME);
+        if (big) m = big;
+    }
+    stopAllSound();
+    memeAudio = getMemeAudio(m.file);
+    try { memeAudio.currentTime = 0; } catch (e) { }
+    memeAudio.play().catch(err => console.log("Meme play nahi hui:", err));
+}
+
+// Speaker button band karne par meme bhi band
+(function () {
+    const btn = $("soundBtn");
+    if (!btn) return;
+    const prev = btn.onclick;
+    btn.onclick = function (e) {
+        if (prev) prev.call(this, e);
+        if (!soundOn) stopAllSound();
+    };
+})();
+
+// Header mein 🎭 button: har click par agla meme (phir Random, phir Band)
+(function () {
+    const box = document.querySelector(".hb-in .social");
+    if (!box) return;
+    const b = document.createElement("button");
+    b.type = "button";
+    b.id = "memeBtn";
+    b.title = "Meme badlein";
+    b.setAttribute("aria-label", "Meme badlein");
+    b.textContent = "🎭";
+
+    const label = () =>
+        memeSel === "off" ? "Meme band 🚫"
+            : memeSel === "random" ? "Meme: Random 🎲"
+                : "Meme: " + (MEMES[memeSel] || MEMES[0]).name;
+
+    b.onclick = () => {
+        const order = [...MEMES.map((_, i) => i), "random", "off"];
+        const at = order.indexOf(memeSel);
+        memeSel = order[(at + 1) % order.length];
+        lsSet("bsMemeSel", memeSel);
+        toast(label() + (soundOn ? "" : " (speaker band hai)"));
+        playMeme();   // jhalak
+    };
+    box.insertBefore(b, box.firstChild);
+})();
 
 // =========================================================
 //  ORDER PLACE
@@ -776,88 +874,44 @@ function placeOrder() {
     if (!cartCount()) return;
     const snap = { ...cart }, t = totals(), no = nextOrderNo(), now = new Date();
     const dt = now.toLocaleDateString("en-GB");
-    const tm = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+    const tm = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
     const type = val("type") || "Dine-in";
 
-    lastMeta = {
-        no, dt, tm, type, t,
-        paid: parseFloat(val("paid")) || 0,
-        lines: Object.entries(snap).map(([id, n]) => ({ id, n, m: { ...itemById(id) } })),
-        items: Object.entries(snap).map(([id, n]) => ({ id: +id, name: itemById(id).name, q: n }))
-    };
+    lastMeta = { no, dt, tm, type, items: snap, paid: parseFloat(val("paid")) || 0 };
+    buildReceipt(snap, t, lastMeta);
 
-    orders.push({ no, t: Date.now(), total: t.total, disc: t.disc, type, items: lastMeta.items });
-    lastMeta.lines.forEach(l => {
-        if (!CUSTOM[l.id]) stock[l.id] = Math.max(0, stockOf(l.id) - l.n);
+    orders.push({
+        no, t: Date.now(), total: t.total, disc: t.disc, type,
+        items: Object.entries(snap).map(([id, n]) => ({ id: +id, name: MENU.find(m => m.id == id).name, q: n }))
     });
+    Object.entries(snap).forEach(([id, n]) => { stock[id] = Math.max(0, (stock[id] || 0) - n); });
     lsSet("bsOrders", orders);
     lsSet("bsStock", stock);
 
-    $("receipt").innerHTML = buildSlips(lastMeta, PRINT_LOGO ? "assets/img/logo.jpeg" : "")
-        .map(s => `<div class="slip">${s}</div>`).join("");
     $("overlay").classList.add("show");
-    orderTotalNow = t.total;
+    orderTotalNow = t.total;         // bade order wali meme ke liye
 
-    setTimeout(printReceipt, 0);                                  // pehle print
-    setTimeout(() => { sfx("order"); playMeme(); }, 30);          // phir awaz
-    updateStats();
-    confetti();
+    // 1) PRINT sab se pehle
+    setTimeout(printReceipt, 0);
+    // 2) Baaki sab kuch print ke baad
+    setTimeout(() => { sfx("order"); playMeme(); }, 60);
+    setTimeout(updateStats, 100);
+    setTimeout(confetti, 900);
 }
 
 // =========================================================
-//  STATS
+//  STATS (numbers in the header bar)
 // =========================================================
 function updateStats() {
     const to = todayOrders();
     setStat("statOrders", String(to.length));
     setStat("statPay", fmt(sumTotal(to)));
-    const low = MENU.filter(m => stockOf(m.id) <= 5).length;
+    const low = MENU.filter(m => (stock[m.id] ?? 0) <= 5).length;
     const s = $("statStock");
     if (s) {
         setStat("statStock", low ? low + " low" : "OK");
         s.className = low ? "warn" : "";
     }
-}
-
-// =========================================================
-//  REPORTS
-// =========================================================
-function printReport() {
-    const to = todayOrders();
-    const types = ["Dine-in", "Takeaway", "Delivery"].map(tp => {
-        const l = to.filter(o => o.type === tp);
-        return `<div class="r"><span>${tp} (${l.length})</span><span>${fmt(sumTotal(l))}</span></div>`;
-    }).join("");
-    const cnt = {};
-    to.forEach(o => o.items.forEach(i => { cnt[i.name] = (cnt[i.name] || 0) + i.q; }));
-    const items = Object.entries(cnt).sort((a, b) => b[1] - a[1])
-        .map(([n, qty]) => `<div class="r"><span>${esc(n)}</span><span>x ${qty}</span></div>`).join("");
-    printSlips([`
-    <h2>${esc(RESTAURANT.name)}</h2>
-    <div class="c">TODAY'S REPORT<br>${new Date().toLocaleDateString("en-GB")}</div>
-    <hr>
-    <div class="r"><span>Total orders</span><span>${to.length}</span></div>
-    <div class="r"><span>Discount</span><span>${fmt(to.reduce((s, o) => s + o.disc, 0))}</span></div>
-    <div class="r b"><span>TOTAL SALE</span><span>${fmt(sumTotal(to))}</span></div>
-    <hr>${types}<hr>
-    <div class="c">Items sold</div>
-    ${items || '<div class="c">No orders yet</div>'}`]);
-}
-
-function downloadCSV() {
-    const rows = [["Order", "Date", "Type", "Items", "Discount", "Total"]];
-    orders.forEach(o => rows.push([
-        o.no, new Date(o.t).toLocaleString("en-GB"), o.type,
-        o.items.map(i => i.q + " x " + i.name).join(" | "),
-        Math.round(o.disc), Math.round(o.total)
-    ]));
-    const csv = "\uFEFF" + rows.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(",")).join("\n");
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-    a.download = "bs-smart-report-" + new Date().toISOString().slice(0, 10) + ".csv";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
 }
 
 // =========================================================
@@ -868,13 +922,6 @@ function openPanel(type) {
     if (type === "menu") { renderMenuEditor(); return; }
 
     const to = todayOrders();
-    const clearBtns = `
-      <div class="clear-box">
-        <button type="button" class="btn-lite" data-act="printReport">🖨️ Print today's report</button>
-        <button type="button" class="btn-lite" data-act="csv">📥 Excel (CSV) download</button>
-        <button type="button" class="cbtn-warn" data-act="clearToday">Clear today's records</button>
-        <button type="button" class="cbtn-danger" data-act="clearAll">Clear everything</button>
-      </div>`;
     let title = "", html = "";
 
     if (type === "orders") {
@@ -890,7 +937,10 @@ function openPanel(type) {
       </div>
       ${rows ? `<div class="tblwrap"><table class="ptable"><thead><tr><th>Order</th><th>Time</th><th>Items</th><th class="num">Total</th></tr></thead><tbody>${rows}</tbody></table></div>`
                 : `<p class="pnote">No orders yet today.</p>`}
-      ${clearBtns}`;
+      <div class="clear-box">
+        <button type="button" class="cbtn-warn" data-act="clearToday">Clear today's records</button>
+        <button type="button" class="cbtn-danger" data-act="clearAll">Clear everything</button>
+      </div>`;
     }
 
     if (type === "payment") {
@@ -899,6 +949,8 @@ function openPanel(type) {
             const l = to.filter(o => o.type === tp);
             return `<tr><td>${tp}</td><td class="num">${l.length}</td><td class="num">${fmt(sumTotal(l))}</td></tr>`;
         }).join("");
+
+        // Din ke hisaab se record (naya se purana)
         const days = {};
         orders.forEach(o => {
             const k = dayKey(o.t);
@@ -908,28 +960,36 @@ function openPanel(type) {
         });
         const dayRows = Object.values(days).sort((a, b) => b.t - a.t).map(d => {
             const dt = new Date(d.t);
-            return `<tr><td>${dt.getDate()}-${dt.getMonth() + 1}-${dt.getFullYear()}</td>
-        <td class="num">${d.n}</td><td class="num">${fmt(d.sum)}</td></tr>`;
+            return `<tr>
+        <td>${dt.getDate()}-${dt.getMonth() + 1}-${dt.getFullYear()}</td>
+        <td class="num">${d.n}</td>
+        <td class="num">${fmt(d.sum)}</td></tr>`;
         }).join("");
+
         html = `<div class="stats">
         <div class="stat"><span>Today's sales</span><strong>${fmt(sumTotal(to))}</strong></div>
         <div class="stat"><span>All-time sales</span><strong>${fmt(sumTotal(orders))}</strong></div>
         <div class="stat"><span>Today's discount</span><strong>${fmt(to.reduce((s, o) => s + o.disc, 0))}</strong></div>
       </div>
       <div class="tblwrap"><table class="ptable"><thead><tr><th>Order type</th><th class="num">Orders</th><th class="num">Amount</th></tr></thead><tbody>${types}</tbody></table></div>
+
       <h3 class="hist-t">📅 Daily Record</h3>
       ${dayRows
                 ? `<div class="tblwrap"><table class="ptable"><thead><tr><th>Date</th><th class="num">Orders</th><th class="num">Amount</th></tr></thead><tbody>${dayRows}</tbody></table></div>`
                 : `<p class="pnote">No record exists yet.</p>`}
-      ${clearBtns}`;
+
+      <div class="clear-box">
+        <button type="button" class="cbtn-warn" data-act="clearToday">Clear today's records</button>
+        <button type="button" class="cbtn-danger" data-act="clearAll">Clear everything</button>
+      </div>`;
     }
 
     if (type === "stock") {
         title = "Stock";
-        const rows = MENU.map(m => `<tr class="${stockOf(m.id) <= 5 ? "low" : ""}">
+        const rows = MENU.map(m => `<tr class="${(stock[m.id] ?? 0) <= 5 ? "low" : ""}">
       <td>${esc(m.name)}</td><td>${esc(m.cat)}</td>
-      <td class="num"><input type="number" min="0" data-sid="${m.id}" value="${stockOf(m.id)}" aria-label="${esc(m.name)} stock"></td></tr>`).join("");
-        html = `<p class="pnote">Stock har order par khud kam hota hai. Naya maal aaye to number badal dein. 5 ya kam wale laal dikhte hain.</p>
+      <td class="num"><input type="number" min="0" data-sid="${m.id}" value="${stock[m.id] ?? 0}" aria-label="${esc(m.name)} stock"></td></tr>`).join("");
+        html = `<p class="pnote">Stock decreases automatically with each order. Update the number when new stock arrives. Items with 5 or fewer are marked red.</p>
       <div class="tblwrap"><table class="ptable"><thead><tr><th>Item</th><th>Category</th><th class="num">Stock</th></tr></thead><tbody>${rows}</tbody></table></div>
       <div class="clear-box">
         <button type="button" class="cbtn-warn" data-act="resetStock">Reset stock (every item ${DEFAULT_STOCK})</button>
@@ -939,13 +999,12 @@ function openPanel(type) {
     $("panelTitle").textContent = title;
     $("panelBody").innerHTML = html;
     $("panel").classList.add("show");
-    $("panel").scrollTop = 0;
 }
 
 // ----- Menu editor -----
 function saveMenu() {
     const ok = lsSet("bsMenu", MENU);
-    if (!ok) alert("Menu save nahi ho saka (storage full). Chhoti photos use karein.");
+    if (!ok) alert("Could not save the menu (storage full). Use fewer or smaller photos.");
     return ok;
 }
 
@@ -953,7 +1012,7 @@ function refreshMenuUI() {
     ensureStock();
     favs = favs.filter(id => MENU.find(m => m.id == id));
     lsSet("bsFavs", favs);
-    Object.keys(cart).forEach(id => { if (!itemById(id)) delete cart[id]; });
+    Object.keys(cart).forEach(id => { if (!MENU.find(m => m.id == id)) delete cart[id]; });
     renderTabs();
     renderMenu();
     renderCart();
@@ -975,7 +1034,7 @@ function readPhoto(file, cb) {
             ctx.drawImage(im, 0, 0, c.width, c.height);
             cb(c.toDataURL("image/jpeg", 0.8));
         };
-        im.onerror = () => alert("Ye photo khul nahi saki. Doosri chunein.");
+        im.onerror = () => alert("This photo could not be opened. Please choose another.");
         im.src = fr.result;
     };
     fr.readAsDataURL(file);
@@ -988,7 +1047,7 @@ function renderMenuForm(msg) {
     <div class="mform">
       <h3>${it ? "Edit item" : "Add new item"}</h3>
       ${msg ? `<p class="mmsg">${esc(msg)}</p>` : ""}
-      <p class="pnote">Deal banane ke liye category mein <strong>Deals</strong> likhein.</p>
+      <p class="pnote">To make a deal, type <strong>Deals</strong> as the category.</p>
       <div class="mgrid">
         <div class="full">
           <label for="mName">Item name</label>
@@ -1009,7 +1068,7 @@ function renderMenuForm(msg) {
         </div>
         <div>
           <label for="mStock">Stock</label>
-          <input id="mStock" type="number" min="0" value="${it ? stockOf(it.id) : DEFAULT_STOCK}">
+          <input id="mStock" type="number" min="0" value="${it ? (stock[it.id] ?? DEFAULT_STOCK) : DEFAULT_STOCK}">
         </div>
         <div>
           <label>Photo (optional)</label>
@@ -1027,8 +1086,12 @@ function renderMenuForm(msg) {
     </div>`;
 }
 
+let mq = "";   // Manage Menu ki search
+
 function renderMenuList() {
-    const list = MENU.filter(m => (m.name + " " + m.cat + " " + (m.desc || "")).toLowerCase().includes(mq));
+    const list = MENU.filter(m =>
+        (m.name + " " + m.cat + " " + (m.desc || "")).toLowerCase().includes(mq));
+
     const rows = list.map(m => `<tr>
       <td>${m.img ? `<img class="mthumb" src="${esc(m.img)}" alt="">` : ""}</td>
       <td><strong>${esc(m.name)}</strong><br><span class="pnote">${esc(m.cat)}</span></td>
@@ -1070,8 +1133,8 @@ function saveMenuItem() {
     const desc = $("mDesc").value.trim();
     const st = parseInt($("mStock").value);
 
-    if (!name) { alert("Item ka naam likhein."); return; }
-    if (!(price > 0)) { alert("Sahi price likhein."); return; }
+    if (!name) { alert("Please enter the item name."); return; }
+    if (!(price > 0)) { alert("Please enter a valid price."); return; }
 
     let id = editId;
     if (editId) {
@@ -1088,47 +1151,46 @@ function saveMenuItem() {
     editId = null;
     formImg = "";
     refreshMenuUI();
-    renderMenuEditor(wasEdit ? "Item save ho gaya." : "Naya item add ho gaya.");
+    renderMenuEditor(wasEdit ? "Item saved." : "New item added.");
 }
 
 function deleteItem(id) {
     const i = MENU.findIndex(m => m.id == id);
     if (i < 0) return;
-    if (!confirm('"' + MENU[i].name + '" menu se hata diya jayega. Jari rakhein?')) return;
+    if (!confirm('"' + MENU[i].name + '" will be removed from the menu. Continue?')) return;
     MENU.splice(i, 1);
     delete cart[id];
     delete stock[id];
     lsSet("bsStock", stock);
     saveMenu();
-    if (editId == id) { editId = null; formImg = ""; }
+    if (editId == id) { editId = null; formImg = ""; renderMenuForm(); }
     refreshMenuUI();
-    renderMenuEditor();
+    renderMenuList();
 }
 
-// Panel ke buttons (event delegation: ek hi listener)
+// ----- All buttons inside the panel -----
 $("panelBody").addEventListener("click", e => {
     const b = e.target.closest("[data-act]");
     if (!b) return;
     const act = b.dataset.act, id = b.dataset.id;
 
-    if (act === "printReport") return printReport();
-    if (act === "csv") return downloadCSV();
     if (act === "clearToday") {
-        if (!confirm("Aaj ke sab orders aur payments clear ho jayenge. Pakka?")) return;
+        if (!confirm("All of today's orders and payments will be cleared. Are you sure?")) return;
         orders = orders.filter(o => dayKey(o.t) !== dayKey(Date.now()));
         lsSet("bsOrders", orders); updateStats(); openPanel(curPanel); return;
     }
     if (act === "clearAll") {
-        if (!confirm("Tamam records (orders aur payments) hamesha ke liye clear ho jayenge. Pakka?")) return;
+        if (!confirm("All records (orders and payments) will be permanently cleared. Are you sure?")) return;
         orders = [];
         try { localStorage.setItem("bsOrderNo", "0"); } catch (err) { }
         lsSet("bsOrders", orders); updateStats(); openPanel(curPanel); return;
     }
     if (act === "resetStock") {
-        if (!confirm("Har item ka stock " + DEFAULT_STOCK + " ho jayega. Pakka?")) return;
+        if (!confirm("Every item's stock will go back to " + DEFAULT_STOCK + ". Are you sure?")) return;
         MENU.forEach(m => { stock[m.id] = DEFAULT_STOCK; });
         lsSet("bsStock", stock); updateStats(); renderMenu(); openPanel(curPanel); return;
     }
+
     if (act === "save") saveMenuItem();
     if (act === "cancel") { editId = null; formImg = ""; renderMenuForm(); }
     if (act === "noimg") {
@@ -1146,13 +1208,13 @@ $("panelBody").addEventListener("click", e => {
     }
     if (act === "del") deleteItem(id);
     if (act === "resetmenu") {
-        if (!confirm("Menu original par wapas aa jayega, aur aap ke add kiye items hat jayenge. Pakka?")) return;
+        if (!confirm("The menu will go back to the original, and items you added will be removed. Are you sure?")) return;
         MENU.splice(0, MENU.length, ...JSON.parse(JSON.stringify(DEFAULT_MENU)));
         try { localStorage.removeItem("bsMenu"); } catch (err) { }
         editId = null;
         formImg = "";
         refreshMenuUI();
-        renderMenuEditor("Menu original par reset ho gaya.");
+        renderMenuEditor("Menu has been reset to the original.");
     }
 });
 
@@ -1187,73 +1249,50 @@ $("panelBody").addEventListener("input", e => {
 const closePanel = () => { mq = ""; $("panel").classList.remove("show"); };
 $("panelClose").onclick = closePanel;
 $("panel").onclick = e => { if (e.target === $("panel")) closePanel(); };
-document.addEventListener("click", e => {
-    const b = e.target.closest("[data-panel]");
-    if (b) openPanel(b.dataset.panel);
-});
+document.querySelectorAll("[data-panel]").forEach(b => b.onclick = () => openPanel(b.dataset.panel));
 
 // =========================================================
-//  EVENTS
+//  BUTTONS AND EVENTS
 // =========================================================
 function syncDelivery() {
-    const row = $("delRow");
     const isDel = val("type") === "Delivery";
+    const row = $("delRow");
     if (row) row.hidden = !isDel;
     if (!isDel) setVal("delFee", "");
     renderCart();
 }
 on("type", "change", syncDelivery);
-on("delFee", "input", renderCart);
-on("paid", "input", renderChange);
-on("disc", "input", renderCart);
-on("discType", "change", renderCart);
+on("delFee", "input", () => renderCart());
+on("paid", "input", () => renderChange());
 
+$("disc").oninput = () => renderCart();
+$("discType").onchange = () => renderCart();
+
+// Search: har key par nahi, thora ruk kar (hang se bachao)
 let searchT;
-on("search", "input", () => {
+$("search").oninput = () => {
     clearTimeout(searchT);
-    searchT = setTimeout(() => { q = $("search").value.trim().toLowerCase(); renderMenu(); }, 150);
-});
+    searchT = setTimeout(() => { q = $("search").value.trim().toLowerCase(); renderMenu(); }, 130);
+};
 
-on("go", "click", placeOrder);
-on("print", "click", printReceipt);
-on("close", "click", () => {
+$("go").onclick = () => placeOrder();
+$("print").onclick = () => printReceipt();
+$("close").onclick = () => {
     $("overlay").classList.remove("show");
     resetOrder();
     renderMenu();
-});
-on("clear", "click", resetOrder);
+};
+$("clear").onclick = resetOrder;
 
-$("menu").addEventListener("click", e => {
-    const f = e.target.closest(".fav");
-    if (f) { toggleFav(+f.dataset.id, f); return; }
-    const a = e.target.closest(".add");
-    if (a && !a.disabled) change(+a.dataset.id, 1, a);
-});
-$("special").addEventListener("click", e => {
-    const a = e.target.closest(".add");
-    if (a) change(+a.dataset.id, 1, a);
-});
-$("best").addEventListener("click", e => {
-    const c = e.target.closest(".chip");
-    if (c) change(+c.dataset.id, 1, c);
+$("menu").addEventListener("click", onItemClick);
+$("special").addEventListener("click", onItemClick);
+$("lines").addEventListener("click", e => {
+    const b = e.target.closest(".qty button");
+    if (b) change(+b.dataset.id, +b.dataset.d);
 });
 $("upsell").addEventListener("click", e => {
     const c = e.target.closest(".chip");
     if (c) change(+c.dataset.id, 1, c);
-});
-$("lines").addEventListener("click", e => {
-    const rm = e.target.closest(".rm");
-    if (rm) {
-        const id = rm.dataset.id;
-        const m = itemById(id);
-        delete cart[id];
-        if (CUSTOM[id]) delete CUSTOM[id];
-        renderCart();
-        toast(((m && m.name) || "Item") + " hata diya");
-        return;
-    }
-    const b = e.target.closest(".qty button");
-    if (b) change(+b.dataset.id, +b.dataset.d);
 });
 $("tabs").addEventListener("click", e => {
     const b = e.target.closest(".tab");
@@ -1266,55 +1305,388 @@ $("vswitch").addEventListener("click", e => {
     const b = e.target.closest(".vs-btn");
     if (b) setView(b.dataset.view);
 });
-on("menuBtn", "click", () => setView("menu", true));
-on("dealsBtn", "click", () => setView("deals", true));
+$("menuBtn").onclick = () => setView("menu", true);
+$("dealsBtn").onclick = () => setView("deals", true);
 
-on("soundBtn", "click", () => {
+$("soundBtn").onclick = () => {
     soundOn = !soundOn;
     lsSet("bsSound", soundOn);
     paintSound();
-    if (!soundOn) stopAllSound();
     sfx("add");
     toast(soundOn ? "Sound on 🔊" : "Sound off 🔇");
-});
+};
 paintSound();
 
-// Apni marzi ki item (custom)
-(function () {
-    const box = document.createElement("details");
-    box.className = "custom";
-    box.innerHTML = `
-    <summary>✍️ Apni marzi ki item</summary>
-    <p class="pnote">Koi bhi special item is order mein add karein. Naam aur price likhein.</p>
-    <div class="cust-row">
-      <input id="cName" placeholder="Item ka naam (e.g. Biryani)" autocomplete="off">
-      <input id="cPrice" type="number" min="0" step="any" inputmode="decimal" placeholder="Rs.">
-    </div>
-    <button type="button" class="cbtn-warn" id="cAdd">➕ Order mein add karein</button>`;
-    $("upsell").after(box);
+document.addEventListener("keydown", e => {
+    if (e.key === "Escape") closePanel();
+    if (e.key === "/" && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) {
+        e.preventDefault();
+        $("search").focus();
+    }
+});
 
-    const addCustom = () => {
-        const name = $("cName").value.trim();
-        const price = parseFloat($("cPrice").value);
-        if (!name) { toast("Item ka naam likhein"); return; }
-        if (!(price > 0)) { toast("Sahi price likhein"); return; }
-        const key = Object.keys(CUSTOM).find(k =>
-            CUSTOM[k].name.toLowerCase() === name.toLowerCase() && CUSTOM[k].price === price);
-        const id = key ? +key : ++customSeq;
-        if (!key) CUSTOM[id] = { id, cat: "Special Order", name, desc: "", price, img: "", custom: true };
-        cart[id] = (cart[id] || 0) + 1;
-        renderCart();
-        sfx("add");
-        toast(name + " add ho gaya");
-        $("cName").value = "";
-        $("cPrice").value = "";
-        $("cName").focus();
-    };
-    $("cAdd").onclick = addCustom;
-    [$("cName"), $("cPrice")].forEach(i => i.addEventListener("keydown", e => {
-        if (e.key === "Enter") { e.preventDefault(); addCustom(); }
-    }));
+const baseTitle = document.title;
+document.addEventListener("visibilitychange", () => {
+    document.title = document.hidden ? "Come back 🍔 BS Smart" : baseTitle;
+});
+
+// =========================================================
+//  WOW EFFECTS: ripple, 3D cards, hero, logo
+// =========================================================
+
+// Ripple on buttons
+document.addEventListener("pointerdown", e => {
+    const b = e.target.closest(".add,.go,.btn-gold,.btn-ghost,.nav-cta,.tab,.subnav button,.vs-btn");
+    if (!b || b.disabled || reduceMotion) return;
+    const r = b.getBoundingClientRect(), d = Math.max(r.width, r.height);
+    const s = document.createElement("span");
+    s.className = "ripple";
+    s.style.width = s.style.height = d + "px";
+    s.style.left = (e.clientX - r.left - d / 2) + "px";
+    s.style.top = (e.clientY - r.top - d / 2) + "px";
+    b.appendChild(s);
+    setTimeout(() => s.remove(), 600);
+});
+
+// 3D tilt on menu cards (sirf FANCY mode mein)
+(function () {
+    if (!FANCY || !canHover) return;
+    const grid = $("menu");
+    let cur = null;
+    const reset = c => { c.style.removeProperty("--rx"); c.style.removeProperty("--ry"); };
+    grid.addEventListener("pointermove", e => {
+        if (e.pointerType !== "mouse") return;
+        const c = e.target.closest(".item");
+        if (cur && cur !== c) reset(cur);
+        cur = c;
+        if (!c) return;
+        const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+        c.style.setProperty("--ry", ((x - .5) * 10).toFixed(2) + "deg");
+        c.style.setProperty("--rx", ((.5 - y) * 10).toFixed(2) + "deg");
+        c.style.setProperty("--mx", (x * 100) + "%");
+        c.style.setProperty("--my", (y * 100) + "%");
+    });
+    grid.addEventListener("pointerleave", () => { if (cur) reset(cur); cur = null; });
 })();
+
+// Hero: greeting, floating food (SMOOTH), spotlight/sparks/3D logo (FANCY)
+(function () {
+    const hero = document.querySelector(".hero");
+    if (!hero) return;
+
+    const g = $("greet");
+    if (g) {
+        const h = new Date().getHours();
+        g.textContent = h < 5 ? "Good night 🌙" : h < 12 ? "Good morning ☀️" : h < 16 ? "Lunch time 🍽️" : h < 19 ? "Good evening 🌇" : "Good night 🌙";
+    }
+
+    const fl = $("floaters");
+    if (fl && SMOOTH) {
+        const em = ["🍔", "🍕", "🍟", "🌭", "🥤", "🍗", "🌮", "🍩"];
+        const count = FANCY ? 14 : 8;
+        for (let i = 0; i < count; i++) {
+            const s = document.createElement("span");
+            s.textContent = em[i % em.length];
+            s.style.left = (Math.random() * 96) + "%";
+            s.style.fontSize = (18 + Math.random() * 26) + "px";
+            s.style.animationDuration = (9 + Math.random() * 9) + "s";
+            s.style.animationDelay = (-Math.random() * 14) + "s";
+            fl.appendChild(s);
+        }
+    }
+
+    // Hidden surprise: tap the logo 5 times quickly
+    const wrap = $("logoWrap");
+    let taps = 0, tapT;
+    if (wrap) wrap.addEventListener("click", () => {
+        taps++;
+        clearTimeout(tapT);
+        tapT = setTimeout(() => { taps = 0; }, 1500);
+        if (taps >= 5) { taps = 0; confetti(); sfx("order"); toast("Good Food, Good Mood 😄"); }
+    });
+
+    if (!FANCY || !canHover) return;
+
+    let last = 0;
+    hero.addEventListener("pointermove", e => {
+        const r = hero.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+        hero.style.setProperty("--hx", x + "px");
+        hero.style.setProperty("--hy", y + "px");
+        if (wrap) {
+            const w = wrap.getBoundingClientRect();
+            const dx = (e.clientX - (w.left + w.width / 2)) / r.width;
+            const dy = (e.clientY - (w.top + w.height / 2)) / r.height;
+            wrap.style.transform = `perspective(800px) rotateY(${(dx * 18).toFixed(2)}deg) rotateX(${(-dy * 18).toFixed(2)}deg)`;
+        }
+        const now = performance.now();
+        if (now - last > 45) { last = now; spark(hero, x, y); }
+    });
+    hero.addEventListener("pointerleave", () => { if (wrap) wrap.style.transform = ""; });
+
+    // Hero buttons are pulled toward the mouse
+    hero.querySelectorAll(".magnetic").forEach(b => {
+        b.addEventListener("pointermove", e => {
+            const r = b.getBoundingClientRect();
+            b.style.transform = `translate(${((e.clientX - r.left - r.width / 2) * .2).toFixed(1)}px, ${((e.clientY - r.top - r.height / 2) * .3).toFixed(1)}px)`;
+        });
+        b.addEventListener("pointerleave", () => { b.style.transform = ""; });
+    });
+})();
+
+// =========================================================
+//  PAGE ANIMATIONS: ticker, splash, scroll, reveal
+// =========================================================
+(function () {
+    const t = $("tickerTrack");
+    if (!t) return;
+    const items = ["🔥 Hot deals running now", "🍔 Fresh & piping hot", "🛵 Dine-in · Takeaway · Delivery", "⭐ Good Food, Good Mood"];
+    const half = [].concat(items, items, items).map(s => `<span>${s}</span>`).join("");
+    t.innerHTML = half + half;
+})();
+
+(function () {
+    const s = $("splash");
+    if (!s) return;
+    let seen = false;
+    try { seen = sessionStorage.getItem("bsSplash") === "1"; sessionStorage.setItem("bsSplash", "1"); } catch (e) { }
+    if (seen) { s.remove(); return; }
+    setTimeout(() => { s.classList.add("hide"); setTimeout(() => s.remove(), 600); }, ANIM === "fast" ? 500 : 1000);
+})();
+
+const navEl = document.querySelector(".nav");
+const prog = $("progress");
+const toTop = document.createElement("button");
+toTop.id = "toTop";
+toTop.type = "button";
+toTop.setAttribute("aria-label", "Back to top");
+toTop.textContent = "↑";
+toTop.onclick = () => window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+document.body.appendChild(toTop);
+
+// Scroll handler: ek frame mein sirf ek baar chalta hai
+let scrollTick = false;
+function onScroll() {
+    const y = window.scrollY, h = document.documentElement.scrollHeight - window.innerHeight;
+    if (navEl) navEl.classList.toggle("scrolled", y > 10);
+    toTop.classList.toggle("show", y > 500);
+    if (prog) prog.style.width = (h > 0 ? y / h * 100 : 0) + "%";
+}
+window.addEventListener("scroll", () => {
+    if (scrollTick) return;
+    scrollTick = true;
+    requestAnimationFrame(() => { scrollTick = false; onScroll(); });
+}, { passive: true });
+
+(function () {
+    const rev = document.querySelectorAll(".sec-title,.vswitch,.search,.tabs,.foot-info,.foot-bottom");
+    rev.forEach(el => el.classList.add("reveal"));
+    const feats = $("features");
+    const all = feats ? [...rev, feats] : [...rev];
+    if (!("IntersectionObserver" in window)) { all.forEach(el => el.classList.add("in")); return; }
+    const io = new IntersectionObserver(es => es.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+    }), { threshold: .12 });
+    all.forEach(el => io.observe(el));
+})();
+
+// Hide the mobile cart bar when the order box is in view
+if ("IntersectionObserver" in window) {
+    new IntersectionObserver(es => {
+        orderVisible = es[0].isIntersecting;
+        updateCartbar(cartCount());
+    }, { threshold: .15 }).observe($("order"));
+}
+
+// =========================================================
+//  CLOCK
+// =========================================================
+function tickClock() {
+    if (document.hidden) return;
+    const n = new Date();
+    const t = $("clockTime"), d = $("clockDate");
+    if (t) t.textContent = n.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
+    if (d) d.textContent = n.toLocaleDateString("en-GB", { weekday: "short", day: "2-digit", month: "short", year: "numeric" });
+}
+
+// =========================================================
+//  START
+// =========================================================
+setView("menu", false);
+renderCart();
+updateStats();
+tickClock();
+setInterval(tickClock, 1000);
+onScroll();
+
+// =========================================================
+//  EXTRA ANIMATIONS: cursor trail, add burst, fireworks (sirf FANCY)
+// =========================================================
+
+// Food emoji trail behind the mouse
+(function () {
+    if (!FANCY || !canHover) return;
+    const em = ["✨", "🍔", "🍕", "🍟", "⭐"];
+    let last = 0;
+    document.addEventListener("pointermove", e => {
+        if (e.pointerType !== "mouse") return;
+        const n = performance.now();
+        if (n - last < 70) return;
+        last = n;
+        const s = document.createElement("i");
+        s.className = "trail";
+        s.textContent = em[Math.random() * em.length | 0];
+        s.style.left = e.clientX + "px";
+        s.style.top = e.clientY + "px";
+        s.style.setProperty("--tx", (Math.random() * 60 - 30) + "px");
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 900);
+    });
+})();
+
+// Emoji burst when Add / chip is pressed
+document.addEventListener("pointerdown", e => {
+    if (!FANCY || !e.target.closest(".add:not(:disabled),.chip")) return;
+    const em = ["🍔", "🍟", "🍕", "⭐", "✨", "🔥"];
+    for (let i = 0; i < 10; i++) {
+        const s = document.createElement("i");
+        s.className = "pb";
+        s.textContent = em[i % em.length];
+        const a = Math.PI * 2 * i / 10, d = 50 + Math.random() * 50;
+        s.style.left = e.clientX + "px";
+        s.style.top = e.clientY + "px";
+        s.style.setProperty("--bx", Math.cos(a) * d + "px");
+        s.style.setProperty("--by", Math.sin(a) * d + "px");
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 850);
+    }
+});
+
+// Fireworks when an order is placed
+function fireworks() {
+    if (!FANCY) return;
+    const c = document.createElement("canvas");
+    c.className = "fw";
+    c.width = innerWidth;
+    c.height = innerHeight;
+    document.body.appendChild(c);
+    const x = c.getContext("2d"), P = [];
+    const boom = (bx, by) => {
+        const col = `hsl(${Math.random() * 360},100%,60%)`;
+        for (let i = 0; i < 70; i++) {
+            const a = Math.PI * 2 * i / 70, v = 2 + Math.random() * 4;
+            P.push({ x: bx, y: by, vx: Math.cos(a) * v, vy: Math.sin(a) * v, l: 1, col });
+        }
+    };
+    [0, 350, 700, 1050].forEach(t => setTimeout(
+        () => boom(c.width * (.2 + Math.random() * .6), c.height * (.15 + Math.random() * .35)), t));
+    const end = performance.now() + 2600;
+    (function f() {
+        x.clearRect(0, 0, c.width, c.height);
+        P.forEach(p => {
+            p.x += p.vx; p.y += p.vy; p.vy += .05; p.vx *= .985; p.l -= .012;
+            x.globalAlpha = Math.max(p.l, 0);
+            x.fillStyle = p.col;
+            x.beginPath(); x.arc(p.x, p.y, 2.5, 0, 7); x.fill();
+        });
+        if (performance.now() < end) requestAnimationFrame(f); else c.remove();
+    })();
+}
+const _oldConfetti = confetti;
+confetti = function () { _oldConfetti(); fireworks(); };
+
+// =========================================================
+//  EXTRAS: dark mode, cart badge, counter, repeat order
+// =========================================================
+
+// Grid animation when switching Menu/Deals or category
+function swap() {
+    const g = $("menu");
+    g.classList.remove("swap");
+    void g.offsetWidth;
+    g.classList.add("swap");
+}
+const _setView = setView;
+setView = function (v, s) { _setView(v, s); swap(); };
+$("tabs").addEventListener("click", swap);
+
+// "x2" badge on cards that are in the cart
+function paintBags() {
+    document.querySelectorAll("#menu .item").forEach(it => {
+        const b = it.querySelector(".add");
+        if (!b) return;
+        const n = cart[b.dataset.id] || 0;
+        let tag = it.querySelector(".inbag");
+        if (!n) { if (tag) tag.remove(); return; }
+        if (!tag) { tag = document.createElement("span"); tag.className = "inbag"; it.appendChild(tag); }
+        const t = "×" + n;
+        if (tag.textContent !== t) {
+            tag.textContent = t;
+            tag.style.animation = "none";
+            void tag.offsetWidth;
+            tag.style.animation = "";
+        }
+    });
+}
+
+// Best sellers (top 3 from real orders)
+function renderBest() {
+    const box = $("best");
+    if (!box) return;
+    const cnt = {};
+    orders.forEach(o => o.items.forEach(i => { cnt[i.id] = (cnt[i.id] || 0) + i.q; }));
+    const top = Object.entries(cnt).sort((a, b) => b[1] - a[1])
+        .map(([id, n]) => ({ m: MENU.find(x => x.id == id), n }))
+        .filter(x => x.m && !isDeal(x.m) && (stock[x.m.id] ?? 0) > 0)
+        .slice(0, 3);
+    box.innerHTML = view === "menu" && !q && top.length
+        ? `<p class="up-t">🏆 Best sellers</p><div class="chips">${top.map(({ m, n }) =>
+            `<button type="button" class="chip" data-id="${m.id}">${esc(m.name)} <b>${n} sold</b></button>`).join("")}</div>`
+        : "";
+}
+const bestBox = $("best");
+if (bestBox) bestBox.addEventListener("click", e => {
+    const c = e.target.closest(".chip");
+    if (c) change(+c.dataset.id, 1, c);
+});
+
+const _renderMenu = renderMenu;
+renderMenu = function () { _renderMenu(); paintBags(); renderBest(); };
+renderBest();
+
+// Total counts up smoothly
+let shownTotal = 0;
+function countTo(el, a, b) {
+    const t0 = performance.now(), dur = 450;
+    (function f(now) {
+        const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+        el.textContent = fmt(a + (b - a) * e);
+        if (p < 1) requestAnimationFrame(f);
+    })(t0);
+}
+const _renderCart = renderCart;
+renderCart = function () {
+    _renderCart();
+    paintBags();
+    const to = totals().total;
+    const el = document.querySelector("#totals .tot.big span:last-child");
+    if (el && SMOOTH) countTo(el, shownTotal, to);
+    shownTotal = to;
+};
+
+// Card and order box flash when an item is added
+const _change = change;
+change = function (id, d, btn) {
+    const had = cart[id] || 0;
+    _change(id, d, btn);
+    if (d > 0 && (cart[id] || 0) > had) {
+        const a = document.querySelector(`#menu .add[data-id="${id}"]`);
+        const it = a && a.closest(".item");
+        if (it) { it.classList.add("flash"); setTimeout(() => it.classList.remove("flash"), 450); }
+        const o = $("order");
+        o.classList.add("glow");
+        setTimeout(() => o.classList.remove("glow"), 450);
+    }
+};
 
 // "Repeat last order" button
 (function () {
@@ -1323,36 +1695,28 @@ paintSound();
     b.className = "clear";
     b.textContent = "🔁 Repeat last order";
     b.onclick = () => {
-        if (!lastMeta) { toast("Abhi koi pichla order nahi"); return; }
-        lastMeta.lines.forEach(l => {
-            if (CUSTOM[l.id] || !itemById(l.id)) return;
-            cart[l.id] = Math.min((cart[l.id] || 0) + l.n, stockOf(l.id));
+        if (!lastMeta) { toast("No previous order yet"); return; }
+        Object.entries(lastMeta.items).forEach(([id, n]) => {
+            const k = Math.min(n, stock[id] ?? 0);
+            if (MENU.find(m => m.id == id) && k > 0) cart[id] = k;
         });
         renderCart();
         sfx("add");
-        toast("Pichla order wapas add ho gaya 🔁");
+        toast("Last order added back 🔁");
     };
     $("clear").after(b);
 })();
 
-// Best sellers box, tab, cart bar aur order box
-const bestBox = $("best");
-if (bestBox) bestBox.style.margin = "0 0 12px";
-
-// =========================================================
-//  HEADER BUTTONS: dark mode, meme, weather
-// =========================================================
-const socialBox = document.querySelector(".hb-in .social");
-
-// Dark mode
+// Dark mode button
 (function () {
     document.body.classList.toggle("dark", !!lsGet("bsDark", false));
-    if (!socialBox) return;
+    const box = document.querySelector(".hb-in .social");
+    if (!box) return;
     const b = document.createElement("button");
     b.type = "button";
     b.id = "darkBtn";
     b.title = "Dark mode";
-    b.setAttribute("aria-label", "Dark mode");
+    b.setAttribute("aria-label", "Toggle dark mode");
     const paint = () => { b.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙"; };
     b.onclick = () => {
         document.body.classList.toggle("dark");
@@ -1361,35 +1725,528 @@ const socialBox = document.querySelector(".hb-in .social");
         sfx("fav");
     };
     paint();
-    socialBox.insertBefore(b, socialBox.firstChild);
+    box.insertBefore(b, box.firstChild);
 })();
 
-// Meme button: har click par agla meme, phir Random, phir Band
+// Animation level button (🐇 fast / ✨ smooth / 🎆 full)
 (function () {
-    if (!socialBox) return;
+    const box = document.querySelector(".hb-in .social");
+    if (!box) return;
+    const ICON = { fast: "🐇", smooth: "✨", full: "🎆" };
+    const NAME = { fast: "Fast (sab se tez)", smooth: "Smooth (halki animations)", full: "Full (saari animations)" };
+    const ORDER = ["fast", "smooth", "full"];
     const b = document.createElement("button");
     b.type = "button";
-    b.id = "memeBtn";
-    b.title = "Meme badlein";
-    b.setAttribute("aria-label", "Meme badlein");
-    b.textContent = "🎭";
-    const label = () =>
-        memeSel === "off" ? "Meme band 🚫"
-            : memeSel === "random" ? "Meme: Random 🎲"
-                : "Meme: " + (MEMES[memeSel] || MEMES[0]).name;
+    b.id = "animBtn";
+    b.title = "Animation level badlein";
+    b.setAttribute("aria-label", "Animation level badlein");
+    b.textContent = ICON[ANIM];
     b.onclick = () => {
-        const order = [...MEMES.map((_, i) => i), "random", "off"];
-        memeSel = order[(order.indexOf(memeSel) + 1) % order.length];
-        lsSet("bsMemeSel", memeSel);
-        toast(label() + (soundOn ? "" : " (speaker band hai)"));
-        playMeme();
+        const next = ORDER[(ORDER.indexOf(ANIM) + 1) % ORDER.length];
+        lsSet("bsAnim", next);
+        toast(ICON[next] + " " + NAME[next]);
+        setTimeout(() => location.reload(), 500);
     };
-    socialBox.insertBefore(b, socialBox.firstChild);
+    box.insertBefore(b, box.firstChild);
 })();
 
-// Weather: Auto (asli mausam) ya apni marzi ka
+// =========================================================
+//  REPORTS: print today's report and CSV download
+// =========================================================
+function printReport() {
+    const to = todayOrders();
+    const types = ["Dine-in", "Takeaway", "Delivery"].map(tp => {
+        const l = to.filter(o => o.type === tp);
+        return `<div class="r"><span>${tp} (${l.length})</span><span>${fmt(sumTotal(l))}</span></div>`;
+    }).join("");
+    const cnt = {};
+    to.forEach(o => o.items.forEach(i => { cnt[i.name] = (cnt[i.name] || 0) + i.q; }));
+    const items = Object.entries(cnt).sort((a, b) => b[1] - a[1])
+        .map(([n, qty]) => `<div class="r"><span>${esc(n)}</span><span>x ${qty}</span></div>`).join("");
+    printHTMLDoc(`<div class="slip">
+    <h2>${esc(RESTAURANT.name)}</h2>
+    <div class="c">TODAY'S REPORT<br>${new Date().toLocaleDateString("en-GB")}</div>
+    <hr>
+    <div class="r"><span>Total orders</span><span>${to.length}</span></div>
+    <div class="r"><span>Discount</span><span>${fmt(to.reduce((s, o) => s + o.disc, 0))}</span></div>
+    <div class="r"><b>TOTAL SALE</b><b>${fmt(sumTotal(to))}</b></div>
+    <hr>${types}<hr>
+    <div class="c">Items sold</div>
+    ${items || '<div class="c">No orders yet</div>'}</div>`);
+}
+
+function downloadCSV() {
+    const rows = [["Order", "Date", "Type", "Items", "Discount", "Total"]];
+    orders.forEach(o => rows.push([
+        o.no, new Date(o.t).toLocaleString("en-GB"), o.type,
+        o.items.map(i => i.q + " x " + i.name).join(" | "),
+        Math.round(o.disc), Math.round(o.total)
+    ]));
+    const csv = "\uFEFF" + rows.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(",")).join("\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    a.download = "bs-smart-report-" + new Date().toISOString().slice(0, 10) + ".csv";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+}
+
+const _openPanel = openPanel;
+openPanel = function (type) {
+    _openPanel(type);
+    if (type !== "orders" && type !== "payment") return;
+    const box = document.querySelector("#panelBody .clear-box");
+    if (!box) return;
+    const p = document.createElement("button");
+    p.type = "button"; p.className = "btn-lite"; p.textContent = "🖨️ Print today's report"; p.onclick = printReport;
+    const c = document.createElement("button");
+    c.type = "button"; c.className = "btn-lite"; c.textContent = "📥 Excel (CSV) download"; c.onclick = downloadCSV;
+    box.prepend(p, c);
+};
+
+// =========================================================
+//  SMALL EXTRAS
+// =========================================================
+// Ctrl+Enter places the order
+document.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter" && !$("go").disabled && !$("overlay").classList.contains("show")) placeOrder();
+});
+// Light vibration on phones when adding
+document.addEventListener("pointerdown", e => {
+    if (navigator.vibrate && e.target.closest(".add:not(:disabled),.chip")) navigator.vibrate(15);
+});
+// Footer year
+const yr = $("yr");
+if (yr) yr.textContent = new Date().getFullYear();
+
+// =========================================================
+//  ANIMATIONS EXTRA
+// =========================================================
+
+// 1) Logo ke gird ghoomte food emojis (SMOOTH + FULL)
 (function () {
+    const w = $("logoWrap");
+    if (!w || !SMOOTH) return;
+    const o = document.createElement("div");
+    o.className = "orbit";
+    const list = ["🍔", "🍕", "🍟", "🍗", "🥤", "🌮"];
+    list.forEach((e, i) => {
+        const s = document.createElement("span"), a = Math.PI * 2 * i / list.length;
+        s.style.left = (50 + 50 * Math.cos(a)) + "%";
+        s.style.top = (50 + 50 * Math.sin(a)) + "%";
+        s.innerHTML = "<i>" + e + "</i>";
+        o.appendChild(s);
+    });
+    w.appendChild(o);
+})();
+
+// 2) Delivery scooter hero mein (SMOOTH + FULL)
+(function () {
+    const hero = document.querySelector(".hero");
+    if (!hero || !SMOOTH) return;
+    const s = document.createElement("div");
+    s.className = "scooter";
+    s.innerHTML = "<i>🛵</i>";
+    hero.appendChild(s);
+})();
+
+// 3) Mouse ke peeche sunehri roshni (FULL)
+(function () {
+    if (!FANCY || !canHover) return;
+    const g = document.createElement("div");
+    g.className = "cglow";
+    document.body.appendChild(g);
+    let x = innerWidth / 2, y = innerHeight / 2, tx = x, ty = y, running = false;
+    addEventListener("pointermove", e => {
+        tx = e.clientX; ty = e.clientY; g.style.opacity = 1;
+        if (!running) { running = true; requestAnimationFrame(f); }
+    });
+    document.addEventListener("mouseleave", () => { g.style.opacity = 0; });
+    // Loop sirf tab chalta hai jab roshni ko hilna ho
+    function f() {
+        x += (tx - x) * .12;
+        y += (ty - y) * .12;
+        g.style.transform = `translate(${x}px,${y}px)`;
+        if (Math.abs(tx - x) > .5 || Math.abs(ty - y) > .5) requestAnimationFrame(f);
+        else running = false;
+    }
+})();
+
+// 4) Search box mein khud type hota hua placeholder (SMOOTH + FULL)
+(function () {
+    const inp = $("search");
+    if (!inp || !SMOOTH) return;
+    const words = ["burger", "pizza", "biryani", "zinger", "chai", "fries"];
+    let w = 0, c = 0, del = false;
+    (function loop() {
+        let d = 110;
+        if (!document.hidden && view === "menu" && document.activeElement !== inp && !inp.value) {
+            const word = words[w];
+            c += del ? -1 : 1;
+            inp.placeholder = "Search food: " + word.slice(0, c) + "|";
+            if (!del && c === word.length) { del = true; d = 1200; }
+            else if (del && c === 0) { del = false; w = (w + 1) % words.length; d = 300; }
+        }
+        setTimeout(loop, d);
+    })();
+})();
+
+// 5) Header ke numbers ginti ki tarah chalte hain (Orders / Payment) (SMOOTH + FULL)
+(function () {
+    if (!SMOOTH) return;
+    const _set = setStat;
+    setStat = function (id, text) {
+        const e = $(id);
+        if (!e || id === "statStock" || e.textContent === text) return _set(id, text);
+        const from = parseInt(e.textContent.replace(/\D/g, "")) || 0;
+        const to = parseInt(text.replace(/\D/g, "")) || 0;
+        _set(id, text);
+        const t0 = performance.now(), dur = 600;
+        (function f(now) {
+            const p = Math.min(1, (now - t0) / dur), v = Math.round(from + (to - from) * (1 - Math.pow(1 - p, 3)));
+            e.textContent = p < 1 ? (id === "statPay" ? fmt(v) : String(v)) : text;
+            if (p < 1) requestAnimationFrame(f);
+        })(t0);
+    };
+})();
+
+// 6) Panels: rows ek ek karke + stat numbers count-up (SMOOTH + FULL)
+(function () {
+    const _op = openPanel;
+    openPanel = function (type) {
+        _op(type);
+        if (!SMOOTH) return;
+        document.querySelectorAll("#panelBody .ptable tbody tr").forEach((r, i) => {
+            r.style.animationDelay = Math.min(i, 12) * 40 + "ms";
+        });
+        document.querySelectorAll("#panelBody .stat strong").forEach(el => {
+            const text = el.textContent, n = parseInt(text.replace(/\D/g, "")) || 0;
+            if (!n) return;
+            const money = text.indexOf(CURRENCY) === 0, t0 = performance.now(), dur = 700;
+            (function f(now) {
+                const p = Math.min(1, (now - t0) / dur), v = Math.round(n * (1 - Math.pow(1 - p, 3)));
+                el.textContent = p < 1 ? (money ? fmt(v) : String(v)) : text;
+                if (p < 1) requestAnimationFrame(f);
+            })(t0);
+        });
+    };
+})();
+
+// 7) "Kyun BS Smart" cards mouse par 3D tilt (FULL)
+(function () {
+    if (!FANCY || !canHover) return;
+    document.querySelectorAll(".feat").forEach(c => {
+        c.addEventListener("pointermove", e => {
+            const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+            c.style.setProperty("--ry", ((x - .5) * 14).toFixed(2) + "deg");
+            c.style.setProperty("--rx", ((.5 - y) * 14).toFixed(2) + "deg");
+        });
+        c.addEventListener("pointerleave", () => { c.style.removeProperty("--rx"); c.style.removeProperty("--ry"); });
+    });
+})();
+
+// 8) Item add hone par cart bar aur My order button hilte hain
+(function () {
+    const _c = change;
+    change = function (id, d, btn) {
+        const had = cart[id] || 0;
+        _c(id, d, btn);
+        if (d > 0 && (cart[id] || 0) > had) {
+            [$("cartbar"), document.querySelector(".nav-cta")].forEach(el => {
+                if (!el) return;
+                el.classList.remove("wig");
+                void el.offsetWidth;
+                el.classList.add("wig");
+            });
+        }
+    };
+})();
+
+// =========================================================
+//  APNI MARZI KI ITEM + POORI ITEM HATANE KA BUTTON
+// =========================================================
+
+// Ye items sirf is order ke liye hoti hain, menu ya stock mein nahi jatin
+const CUSTOM = {};
+let customSeq = Date.now();
+const isCustomId = id => Object.prototype.hasOwnProperty.call(CUSTOM, id);
+
+// MENU.find ab custom items ko bhi dhoondh leta hai
+const _findBase = Array.prototype.find;
+MENU.find = function (fn, thisArg) {
+    const r = _findBase.call(this, fn, thisArg);
+    return r || _findBase.call(Object.values(CUSTOM), fn, thisArg);
+};
+
+function addCustom(name, price) {
+    name = String(name || "").trim();
+    if (!name) { toast("Please enter the item name"); return false; }
+    if (!(price > 0)) { toast("Please enter a valid price"); return false; }
+
+    // Wahi naam aur qeemat dobara likhi to quantity badh jaye
+    const key = Object.keys(CUSTOM).find(k =>
+        CUSTOM[k].name.toLowerCase() === name.toLowerCase() && CUSTOM[k].price === price);
+    const id = key ? +key : ++customSeq;
+    if (!key) CUSTOM[id] = { id, cat: "Special Order", name, desc: "", price, img: "", custom: true };
+
+    cart[id] = (cart[id] || 0) + 1;
+    renderCart();
+    sfx("add");
+    toast(name + " add ho gaya");
+    return true;
+}
+
+// Custom item par +/- : stock ki koi hadd nahi, 0 hone par hat jaye
+const _changeCustom = change;
+change = function (id, d, btn) {
+    if (isCustomId(id)) {
+        cart[id] = (cart[id] || 0) + d;
+        if (cart[id] <= 0) { delete cart[id]; delete CUSTOM[id]; }
+        renderCart();
+        return;
+    }
+    _changeCustom(id, d, btn);
+};
+
+// Order ke baad custom items ke stock ke nishan saaf karo
+const _placeOrderCustom = placeOrder;
+placeOrder = function () {
+    _placeOrderCustom();
+    Object.keys(CUSTOM).forEach(k => { delete stock[k]; });
+    lsSet("bsStock", stock);
+};
+
+// Har line ke saath 🗑️ button
+const _renderCartRm = renderCart;
+renderCart = function () {
+    _renderCartRm();
+    document.querySelectorAll("#lines .line").forEach(line => {
+        if (line.querySelector(".rm")) return;
+        const first = line.querySelector(".qty button");
+        if (!first) return;
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "rm";
+        b.dataset.id = first.dataset.id;
+        b.title = "Poori item hata dein";
+        b.setAttribute("aria-label", "Remove item");
+        b.textContent = "🗑️";
+        line.appendChild(b);
+    });
+};
+
+$("lines").addEventListener("click", e => {
+    const b = e.target.closest(".rm");
+    if (!b) return;
+    const id = b.dataset.id;
+    const m = MENU.find(x => x.id == id);
+    delete cart[id];
+    if (isCustomId(id)) delete CUSTOM[id];
+    renderCart();
+    toast(((m && m.name) || "Item") + " hata diya");
+});
+
+(function () {
+    const box = document.createElement("details");
+    box.className = "custom";
+    box.innerHTML = `
+    <summary>✍️ Add a custom item</summary>
+    <p class="pnote">Add any special item to this order. Just type its name and price.</p>
+    <div class="cust-row">
+      <input id="cName" placeholder="Item name (e.g. Biryani)" autocomplete="off">
+      <input id="cPrice" type="number" min="0" step="any" inputmode="decimal" placeholder="Rs.">
+    </div>
+    <button type="button" class="cbtn-warn" id="cAdd">➕ Add to order</button>`;
+    $("upsell").after(box);
+
+    const add = () => {
+        if (addCustom($("cName").value, parseFloat($("cPrice").value))) {
+            $("cName").value = "";
+            $("cPrice").value = "";
+            $("cName").focus();
+        }
+    };
+    $("cAdd").onclick = add;
+    [$("cName"), $("cPrice")].forEach(i => i.addEventListener("keydown", e => {
+        if (e.key === "Enter" && !e.ctrlKey && !e.metaKey) { e.preventDefault(); add(); }
+    }));
+})();
+
+// =========================================================
+//  EK CLICK = EK ITEM (dobara judne se bachao)
+// =========================================================
+const GUARD_MS = 250;   // is waqt ke andar wahi item dobara add na ho
+let lastAdd = { id: null, t: 0 };
+const _changeGuard = change;
+change = function (id, d, btn) {
+    if (d > 0) {
+        const now = performance.now();
+        if (lastAdd.id == id && now - lastAdd.t < GUARD_MS) return;
+        lastAdd = { id, t: now };
+    }
+    _changeGuard(id, d, btn);
+};
+
+// =========================================================
+//  SPACE MODE: Dark mode mein stars, planets, black hole
+//  (animation loop sirf dark mode mein chalta hai)
+// =========================================================
+(function () {
+    const sp = document.createElement("div");
+    sp.id = "space";
+    sp.innerHTML = `
+    <canvas></canvas>
+    <div class="pl jupiter"></div>
+    <div class="pl mars"></div>
+    <div class="pl venus"></div>
+    <div class="pl neptune"></div>
+    <div class="pl saturn"></div>
+    <div class="earthsys"><div class="earth"></div><div class="moonorb"><i></i></div></div>
+    <div class="pl blackhole"></div>`;
+    document.body.prepend(sp);
+
+    const cv = sp.querySelector("canvas"), c = cv.getContext("2d");
+    const isDark = () => document.body.classList.contains("dark");
+    let W, H, stars = [], shoot = null, raf = 0;
+
+    function size() {
+        W = cv.width = innerWidth;
+        H = cv.height = innerHeight;
+        const n = Math.min(LITE_MODE ? 120 : 260, Math.round(W * H / 7000));
+        stars = Array.from({ length: n }, () => ({
+            x: Math.random() * W, y: Math.random() * H,
+            r: Math.random() * 1.4 + .2,
+            ph: Math.random() * 6.28, sp: .5 + Math.random() * 1.5
+        }));
+        if (reduceMotion) paint(0);
+    }
+
+    function paint(now) {
+        c.clearRect(0, 0, W, H);
+        c.fillStyle = "#fff";
+        stars.forEach(s => {
+            c.globalAlpha = reduceMotion ? .8 : .35 + .65 * Math.abs(Math.sin(now / 1000 * s.sp + s.ph));
+            c.beginPath();
+            c.arc(s.x, s.y, s.r, 0, 7);
+            c.fill();
+        });
+
+        // Toota hua tara (shooting star)
+        if (!reduceMotion) {
+            if (!shoot && Math.random() < .004) {
+                shoot = { x: Math.random() * W * .8, y: Math.random() * H * .4, vx: 9, vy: 4, l: 1 };
+            }
+            if (shoot) {
+                c.globalAlpha = shoot.l;
+                c.strokeStyle = "#fff";
+                c.lineWidth = 2;
+                c.beginPath();
+                c.moveTo(shoot.x, shoot.y);
+                c.lineTo(shoot.x - shoot.vx * 7, shoot.y - shoot.vy * 7);
+                c.stroke();
+                shoot.x += shoot.vx;
+                shoot.y += shoot.vy;
+                shoot.l -= .02;
+                if (shoot.l <= 0) shoot = null;
+            }
+        }
+        c.globalAlpha = 1;
+    }
+
+    function frame(now) {
+        raf = 0;
+        if (!isDark()) return;                       // light mode: loop band
+        if (!document.hidden && !document.body.classList.contains("printing")) paint(now);
+        if (!reduceMotion) raf = requestAnimationFrame(frame);
+    }
+
+    function sync() { if (isDark() && !raf) raf = requestAnimationFrame(frame); }
+
+    size();
+    addEventListener("resize", size);
+    new MutationObserver(sync).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+    sync();
+})();
+
+// =========================================================
+//  DAY SKY: badal, parinde, ghubbare (SMOOTH + FULL)
+// =========================================================
+(function () {
+    if (!SMOOTH) return;
+    const d = document.createElement("div");
+    d.id = "daysky";
+
+    let html = `<div class="sun"></div>`;
+
+    // Clouds: top %, size, speed, start delay
+    const clouds = [[8, 1.2, 80, -10], [20, .8, 55, -35], [34, 1.5, 100, -60], [13, .6, 45, -5], [48, 1, 70, -50]];
+    (FANCY ? clouds : clouds.slice(0, 3)).forEach(([t, s, du, dl]) => {
+        html += `<div class="cloud" style="top:${t}%;--s:${s};--d:${du}s;--dl:${dl}s"></div>`;
+    });
+
+    if (FANCY) {
+        // Birds
+        const bird = `<svg viewBox="0 0 40 20"><path d="M2 14 Q10 0 20 12 Q30 0 38 14"/></svg>`;
+        [[16, 26, -4], [22, 32, -14], [11, 38, -22], [28, 30, -9]].forEach(([t, du, dl]) => {
+            html += `<div class="bird" style="top:${t}%;--d:${du}s;--dl:${dl}s">${bird}</div>`;
+        });
+
+        // Balloons
+        [["🎈", 8, 44, -6, 70, 40], ["🎈", 55, 55, -28, -80, 34], ["🎈", 85, 48, -16, 40, 46]]
+            .forEach(([e, l, du, dl, sw, fs]) => {
+                html += `<div class="balloon" style="left:${l}%;--d:${du}s;--dl:${dl}s;--sw:${sw}px;--fs:${fs}px"><i>${e}</i></div>`;
+            });
+    }
+
+    d.innerHTML = html;
+    document.body.prepend(d);
+})();
+
+// =========================================================
+//  NIGHT EXTRAS: astronaut, rocket, UFO, comet (rocket/UFO sirf FULL)
+// =========================================================
+(function () {
+    const sp = document.getElementById("space");
+    if (!sp) return;
+
+    const a = document.createElement("div");
+    a.className = "astro";
+    a.textContent = "🧑‍🚀";
+    sp.appendChild(a);
+
+    if (!FANCY) return;
+
+    function fly(kind, emoji) {
+        const e = document.createElement("div");
+        e.className = "fly " + kind;
+        e.textContent = emoji;
+        if (kind === "comet") e.style.right = (Math.random() * 40 - 10) + "%";
+        if (kind === "rocket") e.style.left = (Math.random() * 40 - 5) + "%";
+        if (kind === "ufo") e.style.top = (10 + Math.random() * 40) + "%";
+        sp.appendChild(e);
+        e.addEventListener("animationend", () => e.remove());
+    }
+
+    const active = () => document.body.classList.contains("dark") && !document.hidden;
+
+    setInterval(() => { if (active()) fly("rocket", "🚀"); }, 17000);
+    setInterval(() => { if (active()) fly("ufo", "🛸"); }, 29000);
+    setInterval(() => { if (active() && Math.random() < .7) fly("comet", "☄️"); }, 9000);
+
+    // Dark mode on karte hi kuch dikhao
+    const obs = new MutationObserver(() => {
+        if (document.body.classList.contains("dark")) setTimeout(() => fly("comet", "☄️"), 800);
+    });
+    obs.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+})();
+
+// =========================================================
+//  WEATHER: Auto (asli mausam) ya apni marzi ka
+// =========================================================
+(function () {
+    // Karachi (North Karachi) ki location, Auto mode ke liye
     const LAT = 24.98, LON = 67.06;
+
     const MODES = ["auto", "clear", "cloudy", "rain", "storm", "snow", "fog"];
     const ICON = { auto: "📡", clear: "☀️", cloudy: "☁️", rain: "🌧️", storm: "⛈️", snow: "❄️", fog: "🌫️" };
     const NAME = { auto: "Auto (asli mausam)", clear: "Saaf mausam", cloudy: "Badal", rain: "Baarish", storm: "Toofan", snow: "Barf", fog: "Dhund" };
@@ -1401,25 +2258,39 @@ const socialBox = document.querySelector(".hb-in .social");
     const box = document.createElement("div");
     box.id = "weather";
     box.innerHTML = `<canvas></canvas><div class="fogl"></div><div class="flash"></div>`;
-    document.body.appendChild(box);
+    document.body.appendChild(box);   // sab se aakhir mein, taake asmaan ke upar nazar aaye
 
     const cv = box.querySelector("canvas"), c = cv.getContext("2d");
     const flash = box.querySelector(".flash");
     let W = 0, H = 0, parts = [], running = false, boltT = null, raf = 0;
-    const K = LITE_MODE ? .4 : 1;
+    const K = LITE_MODE ? .5 : 1;   // lite mode mein kam boondein / barf
+
     const eff = () => mode === "auto" ? live : mode;
+
+    function size() {
+        W = cv.width = innerWidth;
+        H = cv.height = innerHeight;
+        spawn();
+    }
 
     function spawn() {
         const e = eff();
         parts = [];
         if (reduceMotion) return;
         if (e === "rain" || e === "storm") {
-            const n = Math.round(Math.min(e === "storm" ? 300 : 200, W * H / (e === "storm" ? 5000 : 8000)) * K);
-            for (let i = 0; i < n; i++) parts.push({ x: Math.random() * W, y: Math.random() * H, l: 10 + Math.random() * 12, v: 12 + Math.random() * 8 });
+            const n = Math.round(Math.min(e === "storm" ? 420 : 240, Math.round(W * H / (e === "storm" ? 4500 : 8000))) * K);
+            for (let i = 0; i < n; i++) parts.push({
+                x: Math.random() * W, y: Math.random() * H,
+                l: 10 + Math.random() * 14, v: 12 + Math.random() * 10
+            });
         }
         if (e === "snow") {
-            const n = Math.round(Math.min(160, W * H / 11000) * K);
-            for (let i = 0; i < n; i++) parts.push({ x: Math.random() * W, y: Math.random() * H, r: 1.5 + Math.random() * 3, v: .6 + Math.random() * 1.2, ph: Math.random() * 6.28, sw: .4 + Math.random() * .8 });
+            const n = Math.round(Math.min(180, Math.round(W * H / 11000)) * K);
+            for (let i = 0; i < n; i++) parts.push({
+                x: Math.random() * W, y: Math.random() * H,
+                r: 1.5 + Math.random() * 3, v: .6 + Math.random() * 1.4,
+                ph: Math.random() * 6.28, sw: .4 + Math.random() * .9
+            });
         }
     }
 
@@ -1427,7 +2298,9 @@ const socialBox = document.querySelector(".hb-in .social");
         if (!running) return;
         const e = eff(), dark = document.body.classList.contains("dark");
         c.clearRect(0, 0, W, H);
-        if (e === "rain" || e === "storm") {
+        const skip = document.hidden || document.body.classList.contains("printing");
+
+        if ((e === "rain" || e === "storm") && !skip) {
             c.strokeStyle = dark ? "rgba(170,195,255,.55)" : "rgba(50,90,150,.55)";
             c.lineWidth = e === "storm" ? 1.6 : 1.2;
             c.beginPath();
@@ -1441,7 +2314,8 @@ const socialBox = document.querySelector(".hb-in .social");
             });
             c.stroke();
         }
-        if (e === "snow") {
+
+        if (e === "snow" && !skip) {
             c.fillStyle = "#fff";
             parts.forEach(p => {
                 p.y += p.v;
@@ -1465,7 +2339,7 @@ const socialBox = document.querySelector(".hb-in .social");
                 flash.classList.add("go");
             }
             lightning();
-        }, 4000 + Math.random() * 6000);
+        }, 3500 + Math.random() * 6000);
     }
 
     function apply() {
@@ -1476,9 +2350,10 @@ const socialBox = document.querySelector(".hb-in .social");
         if (needs && !running) { running = true; raf = requestAnimationFrame(draw); }
         if (!needs) { running = false; cancelAnimationFrame(raf); c.clearRect(0, 0, W, H); }
         lightning();
-        btn.textContent = ICON[mode];
+        paint();
     }
 
+    // Asli mausam (Open-Meteo, free)
     function getLive() {
         if (document.hidden) return;
         fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=weather_code&timezone=auto`)
@@ -1490,17 +2365,20 @@ const socialBox = document.querySelector(".hb-in .social");
                         : (k === 45 || k === 48) ? "fog"
                             : (k >= 71 && k <= 77) || k === 85 || k === 86 ? "snow"
                                 : k >= 95 ? "storm"
-                                    : "rain";
+                                    : "rain";   // 51-67 aur 80-82 baarish
                 if (mode === "auto") apply();
             })
             .catch(() => { });
     }
 
+    // Header ka button
+    const social = document.querySelector(".hb-in .social");
     const btn = document.createElement("button");
     btn.type = "button";
     btn.id = "weatherBtn";
     btn.title = "Weather badlein";
     btn.setAttribute("aria-label", "Weather badlein");
+    function paint() { btn.textContent = ICON[mode]; }
     btn.onclick = () => {
         mode = MODES[(MODES.indexOf(mode) + 1) % MODES.length];
         lsSet("bsWeather", mode);
@@ -1508,256 +2386,11 @@ const socialBox = document.querySelector(".hb-in .social");
         toast(ICON[mode] + " " + NAME[mode] + (mode === "auto" ? ": " + NAME[live] : ""));
         sfx("fav");
     };
-    if (socialBox) socialBox.insertBefore(btn, socialBox.firstChild);
+    if (social) social.insertBefore(btn, social.firstChild);
 
-    function size() { W = cv.width = innerWidth; H = cv.height = innerHeight; spawn(); }
     size();
     addEventListener("resize", size);
     apply();
     getLive();
     setInterval(getLive, 30 * 60 * 1000);
 })();
-
-// =========================================================
-//  SPACE (dark mode): stars, planets, astronaut
-//  Lite mode mein ek hi baar draw hota hai (loop nahi)
-// =========================================================
-(function () {
-    const sp = document.createElement("div");
-    sp.id = "space";
-    sp.innerHTML = `
-    <canvas></canvas>
-    <div class="pl jupiter"></div>
-    <div class="pl mars"></div>
-    <div class="pl venus"></div>
-    <div class="pl neptune"></div>
-    <div class="pl saturn"></div>
-    <div class="earthsys"><div class="earth"></div><div class="moonorb"><i></i></div></div>
-    <div class="pl blackhole"></div>
-    <div class="astro">🧑‍🚀</div>`;
-    document.body.prepend(sp);
-
-    const cv = sp.querySelector("canvas"), c = cv.getContext("2d");
-    const isDark = () => document.body.classList.contains("dark");
-    let W = 0, H = 0, stars = [], shoot = null, raf = 0;
-
-    function size() {
-        W = cv.width = innerWidth;
-        H = cv.height = innerHeight;
-        const n = Math.min(LITE_MODE ? 100 : 240, Math.round(W * H / 8000));
-        stars = Array.from({ length: n }, () => ({
-            x: Math.random() * W, y: Math.random() * H,
-            r: Math.random() * 1.4 + .2, ph: Math.random() * 6.28, sp: .5 + Math.random() * 1.5
-        }));
-        paint(0);
-    }
-
-    function paint(now) {
-        c.clearRect(0, 0, W, H);
-        c.fillStyle = "#fff";
-        stars.forEach(s => {
-            c.globalAlpha = reduceMotion ? .8 : .35 + .65 * Math.abs(Math.sin(now / 1000 * s.sp + s.ph));
-            c.beginPath();
-            c.arc(s.x, s.y, s.r, 0, 7);
-            c.fill();
-        });
-        if (FANCY && shoot) {
-            c.globalAlpha = shoot.l;
-            c.strokeStyle = "#fff";
-            c.lineWidth = 2;
-            c.beginPath();
-            c.moveTo(shoot.x, shoot.y);
-            c.lineTo(shoot.x - shoot.vx * 7, shoot.y - shoot.vy * 7);
-            c.stroke();
-            shoot.x += shoot.vx; shoot.y += shoot.vy; shoot.l -= .02;
-            if (shoot.l <= 0) shoot = null;
-        }
-        c.globalAlpha = 1;
-    }
-
-    function frame(now) {
-        raf = 0;
-        if (!isDark()) return;
-        paint(now);
-        if (FANCY && !document.hidden) raf = requestAnimationFrame(frame);
-    }
-
-    function sync() {
-        if (!isDark()) return;
-        if (FANCY) { if (!raf) raf = requestAnimationFrame(frame); }
-        else paint(0);
-    }
-
-    size();
-    addEventListener("resize", size);
-    new MutationObserver(sync).observe(document.body, { attributes: true, attributeFilter: ["class"] });
-    sync();
-
-    if (FANCY) {
-        const fly = (kind, emoji) => {
-            const e = document.createElement("div");
-            e.className = "fly " + kind;
-            e.textContent = emoji;
-            if (kind === "comet") e.style.right = (Math.random() * 40 - 10) + "%";
-            if (kind === "ufo") e.style.top = (10 + Math.random() * 40) + "%";
-            sp.appendChild(e);
-            e.addEventListener("animationend", () => e.remove());
-        };
-        setInterval(() => { if (isDark() && !document.hidden) fly("rocket", "🚀"); }, 17000);
-        setInterval(() => { if (isDark() && !document.hidden) fly("ufo", "🛸"); }, 29000);
-        setInterval(() => { if (isDark() && !document.hidden && Math.random() < .6) fly("comet", "☄️"); }, 9000);
-    }
-})();
-
-// =========================================================
-//  HERO, TICKER, SPLASH, SCROLL, REVEAL, CLOCK
-// =========================================================
-(function () {
-    const g = $("greet");
-    if (g) {
-        const h = new Date().getHours();
-        g.textContent = h < 5 ? "Good night 🌙" : h < 12 ? "Good morning ☀️" : h < 16 ? "Lunch time 🍽️" : h < 19 ? "Good evening 🌇" : "Good night 🌙";
-    }
-
-    // Logo par 5 baar jaldi tap: surprise
-    const wrap = $("logoWrap");
-    let taps = 0, tapT;
-    if (wrap) wrap.addEventListener("click", () => {
-        taps++;
-        clearTimeout(tapT);
-        tapT = setTimeout(() => { taps = 0; }, 1500);
-        if (taps >= 5) { taps = 0; confetti(); sfx("order"); toast("Good Food, Good Mood 😄"); }
-    });
-
-    const fl = $("floaters");
-    if (fl && FANCY) {
-        const em = ["🍔", "🍕", "🍟", "🌭", "🥤", "🍗", "🌮", "🍩"];
-        for (let i = 0; i < 12; i++) {
-            const s = document.createElement("span");
-            s.textContent = em[i % em.length];
-            s.style.left = (Math.random() * 96) + "%";
-            s.style.fontSize = (18 + Math.random() * 22) + "px";
-            s.style.animationDuration = (9 + Math.random() * 9) + "s";
-            s.style.animationDelay = (-Math.random() * 14) + "s";
-            fl.appendChild(s);
-        }
-    }
-
-    const t = $("tickerTrack");
-    if (t) {
-        const items = ["🔥 Hot deals running now", "🍔 Fresh & piping hot", "🛵 Dine-in · Takeaway · Delivery", "⭐ Good Food, Good Mood"];
-        const half = [].concat(items, items, items).map(s => `<span>${s}</span>`).join("");
-        t.innerHTML = half + half;
-    }
-
-    const s = $("splash");
-    if (s) {
-        let seen = false;
-        try { seen = sessionStorage.getItem("bsSplash") === "1"; sessionStorage.setItem("bsSplash", "1"); } catch (e) { }
-        if (seen) s.remove();
-        else setTimeout(() => { s.classList.add("hide"); setTimeout(() => s.remove(), 500); }, LITE_MODE ? 500 : 1200);
-    }
-
-    // Scroll progress, navbar shadow, back-to-top (ek frame mein ek baar)
-    const navEl = document.querySelector(".nav");
-    const prog = $("progress");
-    const toTop = document.createElement("button");
-    toTop.id = "toTop";
-    toTop.type = "button";
-    toTop.setAttribute("aria-label", "Upar jayein");
-    toTop.textContent = "↑";
-    toTop.onclick = () => window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
-    document.body.appendChild(toTop);
-
-    let scrollTick = false;
-    function onScroll() {
-        const y = window.scrollY, h = document.documentElement.scrollHeight - window.innerHeight;
-        if (navEl) navEl.classList.toggle("scrolled", y > 10);
-        toTop.classList.toggle("show", y > 500);
-        if (prog) prog.style.width = (h > 0 ? y / h * 100 : 0) + "%";
-    }
-    window.addEventListener("scroll", () => {
-        if (scrollTick) return;
-        scrollTick = true;
-        requestAnimationFrame(() => { scrollTick = false; onScroll(); });
-    }, { passive: true });
-    onScroll();
-
-    const rev = document.querySelectorAll(".sec-title,.vswitch,.search,.tabs,.foot-info,.foot-bottom");
-    rev.forEach(el => el.classList.add("reveal"));
-    const feats = $("features");
-    const all = feats ? [...rev, feats] : [...rev];
-    if (!("IntersectionObserver" in window)) all.forEach(el => el.classList.add("in"));
-    else {
-        const io = new IntersectionObserver(es => es.forEach(e => {
-            if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
-        }), { threshold: .12 });
-        all.forEach(el => io.observe(el));
-        new IntersectionObserver(es => {
-            orderVisible = es[0].isIntersecting;
-            updateCartbar(cartCount());
-        }, { threshold: .15 }).observe($("order"));
-    }
-
-    function tickClock() {
-        if (document.hidden) return;
-        const n = new Date();
-        const ct = $("clockTime"), cd = $("clockDate");
-        if (ct) ct.textContent = n.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
-        if (cd) cd.textContent = n.toLocaleDateString("en-GB", { weekday: "short", day: "2-digit", month: "short", year: "numeric" });
-    }
-    tickClock();
-    setInterval(tickClock, 1000);
-})();
-
-// =========================================================
-//  KEYBOARD, TITLE, FOOTER, FANCY EXTRAS
-// =========================================================
-document.addEventListener("keydown", e => {
-    if (e.key === "Escape") closePanel();
-    if (e.key === "/" && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) {
-        e.preventDefault();
-        $("search").focus();
-    }
-    if ((e.ctrlKey || e.metaKey) && e.key === "Enter" && !$("go").disabled && !$("overlay").classList.contains("show")) placeOrder();
-});
-
-const baseTitle = document.title;
-document.addEventListener("visibilitychange", () => {
-    document.title = document.hidden ? "Come back 🍔 BS Smart" : baseTitle;
-});
-
-document.addEventListener("pointerdown", e => {
-    if (navigator.vibrate && e.target.closest(".add:not(:disabled),.chip")) navigator.vibrate(15);
-});
-
-const yr = $("yr");
-if (yr) yr.textContent = new Date().getFullYear();
-
-// Sirf FANCY mode mein: mouse ke peeche emoji trail
-if (FANCY && canHover) {
-    const em = ["✨", "🍔", "🍕", "🍟", "⭐"];
-    let last = 0;
-    document.addEventListener("pointermove", e => {
-        if (e.pointerType !== "mouse") return;
-        const n = performance.now();
-        if (n - last < 90) return;
-        last = n;
-        const s = document.createElement("i");
-        s.className = "trail";
-        s.textContent = em[Math.random() * em.length | 0];
-        s.style.left = e.clientX + "px";
-        s.style.top = e.clientY + "px";
-        s.style.setProperty("--tx", (Math.random() * 60 - 30) + "px");
-        document.body.appendChild(s);
-        setTimeout(() => s.remove(), 900);
-    });
-}
-
-// =========================================================
-//  INITIAL RENDER
-// =========================================================
-setView("menu", false);
-renderCart();
-updateStats();
-EOF_END_OF_SCRIPT_PLACEHOLDER_REMOVE_ME
