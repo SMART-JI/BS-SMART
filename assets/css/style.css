@@ -3794,3 +3794,17 @@
   html[data-anim="smooth"] .add::after {
       animation-iteration-count: 1 !important
   }
+
+  body.printing *,
+body.printing *::before,
+body.printing *::after {
+    animation: none !important;
+    transition: none !important;
+}
+body.printing #space,
+body.printing #weather,
+body.printing #daysky,
+body.printing .confetti,
+body.printing .fw {
+    display: none !important;
+}
