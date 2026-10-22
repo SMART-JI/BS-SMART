@@ -332,7 +332,9 @@ function setView(v, scroll) {
 
 function renderTabs() {
     const box = $("tabs");
-    box.style.display = view === "deals" ? "none" : "";
+    // Tabs ke aas-paas ka sticky bar (arrows wala) ho to poora wahi chhupta/dikhta hai
+    const host = box.closest(".tabsbar") || box;
+    host.style.display = view === "deals" ? "none" : "";
     const cats = catList();
     if (!cats.includes(cat)) cat = "All";
     box.innerHTML = cats.map(c =>
@@ -2442,7 +2444,7 @@ change = function (id, d, btn) {
     setInterval(getLive, 30 * 60 * 1000);
 })();
 
-// Category tabs ko menu ke left side par rakho (vertical)
+// Category tabs aur menu ek wrapper mein
 (function () {
     if (document.querySelector(".menuwrap")) return;
     const wrap = document.createElement("div");
@@ -2450,11 +2452,14 @@ change = function (id, d, btn) {
     $("menu").before(wrap);
     wrap.append($("tabs"), $("menu"));
 })();
-// Active category bar ke andar nazar aaye
+// Active category bar ke andar nazar aaye (sirf bar scroll ho, poora page nahi)
 $("tabs").addEventListener("click", () => {
     setTimeout(() => {
-        const a = document.querySelector("#tabs .tab[aria-pressed='true']");
-        if (a) a.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+        const t = $("tabs");
+        const a = t.querySelector(".tab[aria-pressed='true']");
+        if (!a) return;
+        const left = a.offsetLeft - (t.clientWidth - a.offsetWidth) / 2;
+        t.scrollTo({ left, behavior: "smooth" });
     }, 0);
 });
 
@@ -2487,7 +2492,7 @@ $("tabs").addEventListener("click", () => {
         if (ti < PHOTOS.length) back.src = PHOTOS[ti];
         else {
             flip.classList.add("nophoto");   // photo na mile to sirf logo
-            console.log("Photo nahi mili. Check karein:assets/nabeel.jpeg (naam ke chhote/bade letters bhi)");
+            console.log("Photo nahi mili. Check karein: assets/nabeel.jpeg (naam ke chhote/bade letters bhi)");
         }
     };
     back.src = PHOTOS[0];
@@ -2500,11 +2505,16 @@ $("tabs").addEventListener("click", () => {
     });
 })();
 
-// Category bar ke dono taraf aage-peeche ke arrow buttons
+// Category bar: tabs + dono taraf arrow, sab ek hi sticky box ke andar
 (function () {
     const wrap = document.querySelector(".menuwrap");
     const tabs = $("tabs");
-    if (!wrap || !tabs || wrap.querySelector(".tabarrow")) return;
+    if (!wrap || !tabs || $("tabsbar")) return;
+
+    const bar = document.createElement("div");
+    bar.id = "tabsbar";
+    bar.className = "tabsbar";
+    tabs.before(bar);
 
     const mk = (cls, txt, label) => {
         const b = document.createElement("button");
@@ -2516,23 +2526,23 @@ $("tabs").addEventListener("click", () => {
     };
     const L = mk("tl", "‹", "Pichli categories");
     const R = mk("tr", "›", "Agli categories");
-    wrap.prepend(L);
-    wrap.prepend(R);
+    bar.append(L, tabs, R);
 
     const step = () => Math.max(160, tabs.clientWidth * 0.6);
     L.onclick = () => tabs.scrollBy({ left: -step(), behavior: "smooth" });
     R.onclick = () => tabs.scrollBy({ left: step(), behavior: "smooth" });
 
-    // Jahan scroll ki zarurat na ho wahan arrow chhup jaye
+    // Jahan scroll ki zarurat na ho wahan arrow dhundhle ho jayen
     function sync() {
         const max = tabs.scrollWidth - tabs.clientWidth;
-        const hidden = tabs.style.display === "none" || max <= 2;
-        L.classList.toggle("off", hidden || tabs.scrollLeft <= 2);
-        R.classList.toggle("off", hidden || tabs.scrollLeft >= max - 2);
+        const none = max <= 2;
+        L.classList.toggle("off", none || tabs.scrollLeft <= 2);
+        R.classList.toggle("off", none || tabs.scrollLeft >= max - 2);
     }
     tabs.addEventListener("scroll", sync, { passive: true });
     addEventListener("resize", sync);
-    new MutationObserver(sync).observe(tabs, { childList: true, attributes: true });
+    new MutationObserver(sync).observe(tabs, { childList: true });
     sync();
     setTimeout(sync, 300);
+    renderTabs();   // bar ab ban chuka hai, deals/menu ka chhupna sahi ho jaye
 })();
