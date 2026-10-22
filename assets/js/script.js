@@ -2499,3 +2499,40 @@ $("tabs").addEventListener("click", () => {
         flip.classList.toggle("flipped");
     });
 })();
+
+// Category bar ke dono taraf aage-peeche ke arrow buttons
+(function () {
+    const wrap = document.querySelector(".menuwrap");
+    const tabs = $("tabs");
+    if (!wrap || !tabs || wrap.querySelector(".tabarrow")) return;
+
+    const mk = (cls, txt, label) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "tabarrow " + cls;
+        b.textContent = txt;
+        b.setAttribute("aria-label", label);
+        return b;
+    };
+    const L = mk("tl", "‹", "Pichli categories");
+    const R = mk("tr", "›", "Agli categories");
+    wrap.prepend(L);
+    wrap.prepend(R);
+
+    const step = () => Math.max(160, tabs.clientWidth * 0.6);
+    L.onclick = () => tabs.scrollBy({ left: -step(), behavior: "smooth" });
+    R.onclick = () => tabs.scrollBy({ left: step(), behavior: "smooth" });
+
+    // Jahan scroll ki zarurat na ho wahan arrow chhup jaye
+    function sync() {
+        const max = tabs.scrollWidth - tabs.clientWidth;
+        const hidden = tabs.style.display === "none" || max <= 2;
+        L.classList.toggle("off", hidden || tabs.scrollLeft <= 2);
+        R.classList.toggle("off", hidden || tabs.scrollLeft >= max - 2);
+    }
+    tabs.addEventListener("scroll", sync, { passive: true });
+    addEventListener("resize", sync);
+    new MutationObserver(sync).observe(tabs, { childList: true, attributes: true });
+    sync();
+    setTimeout(sync, 300);
+})();
