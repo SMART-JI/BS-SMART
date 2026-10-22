@@ -2487,7 +2487,7 @@ $("tabs").addEventListener("click", () => {
         if (ti < PHOTOS.length) back.src = PHOTOS[ti];
         else {
             flip.classList.add("nophoto");   // photo na mile to sirf logo
-            console.log("Photo nahi mili. Check karein: assets/nabeel.jpeg (naam ke chhote/bade letters bhi)");
+            console.log("Photo nahi mili. Check karein:assets/nabeel.jpeg (naam ke chhote/bade letters bhi)");
         }
     };
     back.src = PHOTOS[0];
