@@ -168,7 +168,11 @@ const DEFAULT_MENU = [
     { id: 96, cat: "Drinks", name: "1.5 ltr Coldrink", desc: "1.5 litre cold drink", price: 220, img: "" },
     { id: 97, cat: "Drinks", name: "Jumbo Coldrink", desc: "Jumbo size cold drink", price: 270, img: "" },
     { id: 98, cat: "Drinks", name: "Water 500ml", desc: "500ml mineral water", price: 60, img: "" },
-    { id: 99, cat: "Drinks", name: "Water 1.5 Ltr", desc: "1.5 litre mineral water", price: 120, img: "" }
+    { id: 99, cat: "Drinks", name: "Water 1.5 Ltr", desc: "1.5 litre mineral water", price: 120, img: "" },
+      { id: 114, cat: "Plater", name: "Plater 01", desc: "Plater 01", price: 1499, img: "" },
+    { id: 115, cat: "Plater", name: "Plater 02", desc: "Plater 02", price: 1299, img: "" },
+    { id: 116, cat: "Plater", name: "Plater 03", desc: "Plater 03", price: 850, img: "" },
+    { id: 117, cat: "Plater", name: "Plater 04", desc: "Plater 04", price: 799, img: "" },
 ];
 
 // =========================================================
