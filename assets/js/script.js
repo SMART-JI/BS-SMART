@@ -11,6 +11,9 @@ const TAX_RATE = 0;          // use 0.13 for 13% tax
 const CURRENCY = "Rs.";
 const DEFAULT_STOCK = 50;    // starting stock of every item
 
+// Edit button: false = sirf Deals ke cards par, true = har card par
+const EDIT_ON_ALL_CARDS = false;
+
 // ====== ANIMATION LEVEL (header ke 🐇 / ✨ / 🎆 button se bhi badal sakte hain) ======
 // "fast"   = sab se tez, bhaari animations band
 // "smooth" = halki animations, lag nahi (pasandida)
@@ -25,7 +28,7 @@ document.documentElement.dataset.anim = ANIM;
 const LITE_MODE = ANIM !== "full";
 
 // ====== PRINT / SLIP SETTINGS ======
-const PRINT_LOGO = false;                              // true = customer slip par logo (print dheema karta hai)
+const PRINT_LOGO = true;                               // true = customer slip par logo
 const LOGO_PRINT_FILE = "assets/img/logo-print.png";   // chhota black-white logo (200px). Na ho to khud bana liya jata hai
 const KITCHEN_ONE_SLIP = false;                        // false = har category ki alag slip, true = saari items ek slip par
 
@@ -129,10 +132,14 @@ const DEFAULT_MENU = [
     { id: 70, cat: "BBQ", name: "Broast (LEG)", desc: "Crispy broast leg piece", price: 450, img: "" },
 
     // ---------- Deals ----------
-    { id: 71, cat: "Deals", name: "Deal 1", desc: "Half Kg Pulao (Sada), Leg Tikka, Bihari Boti (Half), Malai Boti (Half), Seekh Kabab (Half), Turkish Kabab (Half), 1 Ltr Drink, Raita", price: 1499, img: "" },
-    { id: 72, cat: "Deals", name: "Deal 2", desc: "Bihari Boti (Half), Seekh Kabab (Half), Chicken Reshmi Kabab (Half), Chicken Tikka (Leg), 2 Paratha, 1 Ltr Drink, Raita", price: 1199, img: "" },
-    { id: 73, cat: "Deals", name: "Deal 3", desc: "Afghani Boti (6 Seekh), Turkish Kabab (Half), 2 Paratha, 1 Ltr Drink, Raita", price: 850, img: "" },
-    { id: 74, cat: "Deals", name: "Deal 4", desc: "Pulao (Half Kg), Tikka (Chest), 2 Drinks (300ml), Raita", price: 799, img: "" },
+    { id: 100, cat: "Deals", name: "Deal 1", desc: "4 Zinger Burger with Fries", price: 999, img: "" },
+    { id: 101, cat: "Deals", name: "Deal 2", desc: "2 Zinger Burger with Fries, 2 x 300ml Coldrink", price: 699, img: "" },
+    { id: 102, cat: "Deals", name: "Deal 3", desc: "2 Zinger Burger with Fries, 1 Medium Pizza", price: 999, img: "" },
+    { id: 103, cat: "Deals", name: "Deal 4", desc: "2 Zinger Burger with Fries, 1 Broast Chest, 1 Medium Pizza, 1 Ltr Coldrink", price: 1499, img: "" },
+    { id: 104, cat: "Deals", name: "Deal 5", desc: "2 Club Sandwich, 2 Zinger Burger, Fries, 1 Ltr Coldrink", price: 1399, img: "" },
+    { id: 105, cat: "Deals", name: "Deal 6", desc: "1 Zinger Burger, 1 Club Sandwich, 1 Fries, 1 Small Pizza", price: 799, img: "" },
+    { id: 106, cat: "Deals", name: "Deal 7", desc: "2 Medium Pizza, 1 Pizza Fries (Small), 1 Ltr Coldrink", price: 1299, img: "" },
+    { id: 107, cat: "Deals", name: "Deal 8", desc: "1 Large Pizza, 1 Medium Pizza, 1 Small Pizza Fries", price: 1349, img: "" },
 
     // ---------- Biryani ----------
     { id: 75, cat: "Biryani", name: "Chicken Biryani (1 KG)", desc: "Chicken biryani 1 kg", price: 560, img: "" },
@@ -344,15 +351,19 @@ function visibleItems() {
     });
 }
 
+// Aaj ki special deal: poori box par click karne se add hoti hai
 function renderSpecial() {
     const box = $("special");
     const deals = MENU.filter(m => isDeal(m) && (stock[m.id] ?? DEFAULT_STOCK) > 0);
-    if (view !== "deals" || !deals.length || q) { box.className = "special"; box.innerHTML = ""; return; }
+    if (view !== "deals" || !deals.length || q) {
+        box.className = "special"; box.innerHTML = ""; delete box.dataset.id; return;
+    }
     const m = deals[Math.floor(Date.now() / 864e5) % deals.length];   // a different deal every day
     box.className = "special show";
+    box.dataset.id = m.id;
     box.innerHTML = `
     <div class="sp-l"><small>⭐ TODAY'S SPECIAL DEAL</small><h3>${esc(m.name)}</h3><p>${esc(m.desc || "")}</p></div>
-    <div class="sp-r"><span class="price">${fmt(m.price)}</span><button class="add" data-id="${m.id}">Add</button></div>`;
+    <div class="sp-r"><span class="price">${fmt(m.price)}</span><span class="tapadd">Tap to add</span></div>`;
 }
 
 function renderMenu() {
@@ -367,15 +378,17 @@ function renderMenu() {
 
     $("menu").innerHTML = list.length ? list.map((m, i) => {
         const s = stock[m.id] ?? DEFAULT_STOCK, sold = s <= 0, on = favs.includes(m.id);
-        return `<article class="item${isDeal(m) ? " deal" : ""}${sold ? " sold" : ""}" style="animation-delay:${Math.min(i, 14) * 45}ms">
+        const showEdit = isDeal(m) || EDIT_ON_ALL_CARDS;
+        return `<article class="item${isDeal(m) ? " deal" : ""}${sold ? " sold" : ""}" data-id="${m.id}" tabindex="0" role="button" aria-label="${esc(m.name)} add karein" style="animation-delay:${Math.min(i, 14) * 45}ms">
       ${isDeal(m) ? "" : `<button class="fav${on ? " on" : ""}" data-id="${m.id}" aria-pressed="${on}" aria-label="Favourite">${on ? "♥" : "♡"}</button>`}
+      ${showEdit ? `<button type="button" class="cedit" data-id="${m.id}" aria-label="Edit ${esc(m.name)}">✏️ Edit</button>` : ""}
       ${m.img ? `<img class="em" src="${esc(m.img)}" alt="" loading="lazy" onerror="this.style.display='none'">` : ""}
       <h3>${esc(m.name)}</h3>
       <p>${esc(m.desc || "")}</p>
       ${!sold && s <= 5 ? `<span class="lowtag">Only ${s} left</span>` : ""}
       <div class="row">
         <span class="price">${fmt(m.price)}</span>
-        <button class="add" data-id="${m.id}"${sold ? " disabled" : ""}>${sold ? "Sold out" : "Add"}</button>
+        <span class="tapadd">${sold ? "Sold out" : "Tap to add"}</span>
       </div>
     </article>`;
     }).join("") : `<div class="no-result">${empty}</div>`;
@@ -395,11 +408,26 @@ function toggleFav(id, btn) {
     if (isOn) sfx("fav");
 }
 
+// Edit: Manage Menu us item ke saath khul jata hai
+function openEdit(id) {
+    const m = MENU.find(x => x.id == id);
+    if (!m) return;
+    curPanel = "menu";
+    editId = m.id;
+    formImg = m.img || "";
+    renderMenuEditor();
+}
+
+// Card par kahin bhi click = item add (heart aur edit button alag kaam karte hain)
 function onItemClick(e) {
     const f = e.target.closest(".fav");
     if (f) { toggleFav(+f.dataset.id, f); return; }
-    const a = e.target.closest(".add");
-    if (a && !a.disabled) change(+a.dataset.id, 1, a);
+    const ed = e.target.closest(".cedit");
+    if (ed) { openEdit(+ed.dataset.id); return; }
+    const card = e.target.closest(".item, .special.show");
+    if (!card || card.classList.contains("sold")) return;
+    const id = +card.dataset.id;
+    if (id) change(id, 1, card);
 }
 
 // =========================================================
@@ -422,10 +450,16 @@ function change(id, d, btn) {
         flyFrom(rect);
         sfx("add");
         toast(m.name + " added");
-        const old = btn.textContent;
-        btn.textContent = "✓ Added";
-        btn.classList.add("added");
-        setTimeout(() => { btn.textContent = old; btn.classList.remove("added"); }, 700);
+        if (btn.classList.contains("item") || btn.classList.contains("special")) {
+            // Card: andar ka text nahi badalna, sirf nishan
+            btn.classList.add("added");
+            setTimeout(() => btn.classList.remove("added"), 500);
+        } else {
+            const old = btn.textContent;
+            btn.textContent = "✓ Added";
+            btn.classList.add("added");
+            setTimeout(() => { btn.textContent = old; btn.classList.remove("added"); }, 700);
+        }
     }
 }
 
@@ -501,7 +535,7 @@ function renderCart() {
       </span>
       <span>${fmt(m.price * n)}</span>
     </div>`;
-    }).join("") : `<div class="empty">No items yet. Tap "Add" on the menu.</div>`;
+    }).join("") : `<div class="empty">No items yet. Tap an item on the menu.</div>`;
 
     const t = totals();
     const showSub = t.disc > 0 || TAX_RATE > 0 || t.del > 0;
@@ -581,23 +615,34 @@ function customerSlipHTML(snap, t, meta) {
     <div class="c tag">--- Customer Copy ---</div>`;
 }
 
-// Deal ke har hisse ki category pehchano (description se)
+// Deal ke har hisse ki category pehchano (description se).
+// "4 Zinger Burger with Fries" -> [4 Zinger Burger (FastFood), Fries (FastFood)]
+// "2 x 300ml Coldrink" -> 2 Coldrink (Drinks)
 function dealParts(m) {
-    return String(m.desc || "").split(",").map(s => s.trim()).filter(Boolean).map(text => {
-        const t = text.toLowerCase();
-        let cat = "Deals";
-        if (/pulao|biryani/.test(t)) cat = "Biryani";
-        else if (/drink|ltr|\bml\b|cola|sting|water/.test(t)) cat = "Drinks";
-        else if (/paratha|chapati|naan|raita|salad|chutney/.test(t)) cat = "EXTRAS";
-        else if (/pizza/.test(t)) cat = "Pizza";
-        else if (/burger|sandwich|fries/.test(t)) cat = "FastFood";
-        else if (/tikka|boti|kabab|seekh|broast|roll/.test(t)) cat = "BBQ";
-        return { cat, text };
+    const out = [];
+    String(m.desc || "").split(",").forEach(chunk => {
+        chunk.split(/\s+with\s+/i).forEach(s => {
+            const text = s.trim();
+            if (!text) return;
+            const t = text.toLowerCase();
+            let c = "Deals";
+            if (/coldrink|cold drink|drink|ltr|litre|\d\s*ml|sting|water/.test(t)) c = "Drinks";
+            else if (/pizza/.test(t)) c = "Pizza";
+            else if (/pulao|biryani/.test(t)) c = "Biryani";
+            else if (/paratha|chapati|naan|raita|salad|chutney/.test(t)) c = "EXTRAS";
+            else if (/broast|tikka|boti|kabab|seekh|roll/.test(t)) c = "BBQ";
+            else if (/burger|sandwich|fries/.test(t)) c = "FastFood";
+
+            // shuru ka number alag karo (300ml jaise na toote, isliye space zaroori hai)
+            const mm = text.match(/^(\d+)\s+(?:x\s+)?(.+)$/i);
+            out.push({ cat: c, q: mm ? parseInt(mm[1]) : 1, name: mm ? mm[2] : text });
+        });
     });
+    return out;
 }
 
 // Kitchen slips: no logo, normal items ki price nahi. Custom item ki price aati hai.
-// Deal ke hisse bhi apni category ki slip par jate hain.
+// Deal ke hisse apni category ki slip par jate hain (quantity deals ki tadaad se multiply).
 function kitchenSlipsHTML() {
     if (!lastMeta) return "";
     const groups = {};
@@ -606,7 +651,7 @@ function kitchenSlipsHTML() {
         if (!m) return;
         if (isDeal(m)) {
             dealParts(m).forEach(p => {
-                (groups[p.cat] = groups[p.cat] || []).push({ m, n, part: p.text });
+                (groups[p.cat] = groups[p.cat] || []).push({ m, n, part: p });
             });
             return;
         }
@@ -614,8 +659,8 @@ function kitchenSlipsHTML() {
     });
 
     const line = ({ m, n, part }) => part
-        ? `<div class="k-item">${esc(part)}${n > 1 ? " x " + n : ""}</div>` +
-          `<div class="k-desc">(${esc(m.name)})</div>`
+        ? `<div class="k-item">${part.q * n} x ${esc(part.name)}</div>` +
+        `<div class="k-desc">(${esc(m.name)}${n > 1 ? " x" + n : ""})</div>`
         : m.custom
             ? `<div class="r k-item"><span>${n} x ${esc(m.name)}</span><span>${fmt(m.price * n)}</span></div>`
             : `<div class="k-item">${n} x ${esc(m.name)}</div>`;
@@ -649,6 +694,10 @@ function buildReceipt(snap, t, meta) {
     $("receipt").innerHTML = itemSlipsHTML();
 }
 
+// ----- Logo for print -----
+// Page khulte hi logo chhota black-white bana kar data URL mein rakh liya jata hai,
+// taake print ke waqt load ka intezar na ho.
+// Pehle logo-print.png, na mile to logo.jpeg, dono na hon to logo print nahi hota.
 const LOGO_THRESHOLD = 190;   // logo bahut kala aaye to barhao (200), bahut halka aaye to ghatao (150)
 let logoData = "";            // "" = abhi tayyar nahi, "none" = logo nahi
 if (PRINT_LOGO) (function () {
@@ -670,13 +719,12 @@ if (PRINT_LOGO) (function () {
                     p[i] = p[i + 1] = p[i + 2] = v;
                 }
                 x.putImageData(img, 0, 0);
-                logoData = c.toDataURL("image/png");   // data URL: print ke waqt load ka intezar nahi
-            } catch (e) { logoData = src; }            // file:// par canvas rok de to seedha file use hogi
+                logoData = c.toDataURL("image/png");
+            } catch (e) { logoData = src; }   // file:// par canvas rok de to seedha file use hogi
         };
         im.onerror = next;
         im.src = src;
     }
-    // Pehle chhota logo-print.png, na mile to bada logo.jpeg, dono na hon to logo nahi
     load(LOGO_PRINT_FILE, () => load("assets/img/logo.jpeg", () => { logoData = "none"; }));
 })();
 
@@ -732,7 +780,7 @@ function printHTMLDoc(body) {
         try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { }
         setTimeout(() => document.body.classList.remove("printing"), 1500);
     };
-    // Sirf tab intezar karo jab koi image abhi load ho rahi ho (logo)
+    // Sirf tab intezar karo jab koi image abhi load ho rahi ho
     const pending = [...d.images].filter(im => !im.complete);
     if (!pending.length) { go(); return; }
     Promise.all(pending.map(im => new Promise(res => { im.onload = im.onerror = res; }))).then(go);
@@ -749,7 +797,7 @@ function printReceipt() {
         if (logoData && logoData !== "none") {
             html = html.split('src="assets/img/logo.jpeg"').join('src="' + logoData + '"');
         } else {
-            // chhota logo tayyar nahi: bada logo print mein dene se behtar hai ke logo na ho
+            // logo tayyar nahi: bada logo print mein dene se behtar hai ke logo na ho
             html = html.replace(/<img class="logo"[^>]*>/g, "");
         }
     }
@@ -1281,6 +1329,13 @@ $("clear").onclick = resetOrder;
 
 $("menu").addEventListener("click", onItemClick);
 $("special").addEventListener("click", onItemClick);
+// Keyboard: card par Enter / Space = add
+$("menu").addEventListener("keydown", e => {
+    if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("item")) {
+        e.preventDefault();
+        if (!e.target.classList.contains("sold")) change(+e.target.dataset.id, 1, e.target);
+    }
+});
 $("lines").addEventListener("click", e => {
     const b = e.target.closest(".qty button");
     if (b) change(+b.dataset.id, +b.dataset.d);
@@ -1331,7 +1386,7 @@ document.addEventListener("visibilitychange", () => {
 
 // Ripple on buttons
 document.addEventListener("pointerdown", e => {
-    const b = e.target.closest(".add,.go,.btn-gold,.btn-ghost,.nav-cta,.tab,.subnav button,.vs-btn");
+    const b = e.target.closest(".go,.btn-gold,.btn-ghost,.nav-cta,.tab,.subnav button,.vs-btn");
     if (!b || b.disabled || reduceMotion) return;
     const r = b.getBoundingClientRect(), d = Math.max(r.width, r.height);
     const s = document.createElement("span");
@@ -1538,9 +1593,9 @@ onScroll();
     });
 })();
 
-// Emoji burst when Add / chip is pressed
+// Emoji burst when a card / chip is pressed
 document.addEventListener("pointerdown", e => {
-    if (!FANCY || !e.target.closest(".add:not(:disabled),.chip")) return;
+    if (!FANCY || !e.target.closest(".item:not(.sold),.chip") || e.target.closest(".fav,.cedit")) return;
     const em = ["🍔", "🍟", "🍕", "⭐", "✨", "🔥"];
     for (let i = 0; i < 10; i++) {
         const s = document.createElement("i");
@@ -1607,9 +1662,7 @@ $("tabs").addEventListener("click", swap);
 // "x2" badge on cards that are in the cart
 function paintBags() {
     document.querySelectorAll("#menu .item").forEach(it => {
-        const b = it.querySelector(".add");
-        if (!b) return;
-        const n = cart[b.dataset.id] || 0;
+        const n = cart[it.dataset.id] || 0;
         let tag = it.querySelector(".inbag");
         if (!n) { if (tag) tag.remove(); return; }
         if (!tag) { tag = document.createElement("span"); tag.className = "inbag"; it.appendChild(tag); }
@@ -1674,8 +1727,7 @@ change = function (id, d, btn) {
     const had = cart[id] || 0;
     _change(id, d, btn);
     if (d > 0 && (cart[id] || 0) > had) {
-        const a = document.querySelector(`#menu .add[data-id="${id}"]`);
-        const it = a && a.closest(".item");
+        const it = document.querySelector(`#menu .item[data-id="${id}"]`);
         if (it) { it.classList.add("flash"); setTimeout(() => it.classList.remove("flash"), 450); }
         const o = $("order");
         o.classList.add("glow");
@@ -1808,7 +1860,7 @@ document.addEventListener("keydown", e => {
 });
 // Light vibration on phones when adding
 document.addEventListener("pointerdown", e => {
-    if (navigator.vibrate && e.target.closest(".add:not(:disabled),.chip")) navigator.vibrate(15);
+    if (navigator.vibrate && e.target.closest(".item:not(.sold),.chip") && !e.target.closest(".fav,.cedit")) navigator.vibrate(15);
 });
 // Footer year
 const yr = $("yr");
@@ -2388,4 +2440,62 @@ change = function (id, d, btn) {
     apply();
     getLive();
     setInterval(getLive, 30 * 60 * 1000);
+})();
+
+// Category tabs ko menu ke left side par rakho (vertical)
+(function () {
+    if (document.querySelector(".menuwrap")) return;
+    const wrap = document.createElement("div");
+    wrap.className = "menuwrap";
+    $("menu").before(wrap);
+    wrap.append($("tabs"), $("menu"));
+})();
+// Active category bar ke andar nazar aaye
+$("tabs").addEventListener("click", () => {
+    setTimeout(() => {
+        const a = document.querySelector("#tabs .tab[aria-pressed='true']");
+        if (a) a.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+    }, 0);
+});
+
+// Logo ghoomta hai: ek side logo, doosri side photo
+(function () {
+    // Photo in jagahon par dhoondi jati hai (pehli jo mile)
+    const PHOTOS = [
+        "assets/nabeel.jpeg",
+        "assets/img/nabeel.jpeg",
+        "assets/nabeel.jpg",
+        "assets/img/nabeel.jpg"
+    ];
+    const wrap = $("logoWrap");
+    if (!wrap) return;
+    const logo = wrap.querySelector("img");
+    if (!logo || wrap.querySelector(".flipper")) return;
+
+    const flip = document.createElement("div");
+    flip.className = "flipper";
+    logo.before(flip);
+    logo.classList.add("face", "front");
+    flip.appendChild(logo);
+
+    const back = document.createElement("img");
+    back.className = "face back";
+    back.alt = "";
+    let ti = 0;
+    back.onerror = () => {
+        ti++;
+        if (ti < PHOTOS.length) back.src = PHOTOS[ti];
+        else {
+            flip.classList.add("nophoto");   // photo na mile to sirf logo
+            console.log("Photo nahi mili. Check karein: assets/nabeel.jpeg (naam ke chhote/bade letters bhi)");
+        }
+    };
+    back.src = PHOTOS[0];
+    flip.appendChild(back);
+
+    // Dabane par: khud ghoomna ruk jata hai, phir har click par palatta hai
+    wrap.addEventListener("click", () => {
+        flip.classList.add("manual");
+        flip.classList.toggle("flipped");
+    });
 })();
