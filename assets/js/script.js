@@ -53,11 +53,14 @@ const DEFAULT_MENU = [
     { id: 9, cat: "FastFood", name: "Plan Fries", desc: "Fries", price: 150, img: "" },
     { id: 10, cat: "FastFood", name: "Mayo Fries", desc: "Mayo Yammi Fries", price: 200, img: "" },
     { id: 11, cat: "FastFood", name: "Cheese Fries", desc: "Cheese Yammi Fries", price: 200, img: "" },
+    { id: 111, cat: "FastFood", name: "Plan Fries Small", desc: "Fries small", price: 100, img: "" },
+    { id: 113, cat: "FastFood", name: "Zinger Roll Jumbo", desc: "Jumbo crispy chicken zinger roll", price: 280, img: "" },
 
     // ---------- EXTRAS ----------
     { id: 12, cat: "EXTRAS", name: "Paratha (SMALL)", desc: "Yammi", price: 50, img: "" },
     { id: 13, cat: "EXTRAS", name: "Paratha (LARGE)", desc: "Yammi", price: 100, img: "" },
     { id: 14, cat: "EXTRAS", name: "Chapati", desc: "Yammi", price: 20, img: "" },
+    { id: 110, cat: "EXTRAS", name: "Chai", desc: "Hot chai", price: 80, img: "" },
 
     // ---------- BBQ Rolls ----------
     { id: 15, cat: "BBQ", name: "Zinger Roll", desc: "Crispy chicken zinger roll", price: 150, img: "" },
@@ -106,6 +109,9 @@ const DEFAULT_MENU = [
     { id: 48, cat: "Pizza", name: "Special (BS Smart) (MEDIUM)", desc: "Special signature pizza", price: 700, img: "" },
     { id: 49, cat: "Pizza", name: "Special (BS Smart) (LARGE)", desc: "Special signature pizza", price: 1000, img: "" },
 
+    { id: 108, cat: "Pizza", name: "Pizza Fries Small", desc: "Pizza fries small", price: 300, img: "" },
+    { id: 109, cat: "Pizza", name: "Pizza Fries Large", desc: "Pizza fries large", price: 500, img: "" },
+
     // ---------- BBQ Plates & Seekh ----------
     { id: 50, cat: "BBQ", name: "Chicken Tikka (Chest)", desc: "Chicken tikka chest piece", price: 350, img: "" },
     { id: 51, cat: "BBQ", name: "Chicken Tikka (Leg)", desc: "Chicken tikka leg piece", price: 300, img: "" },
@@ -126,8 +132,9 @@ const DEFAULT_MENU = [
     { id: 66, cat: "BBQ", name: "Seekh Kabab (Seekh)", desc: "Seekh kabab seekh", price: 100, img: "" },
     { id: 67, cat: "BBQ", name: "Chicken Boti (Seekh)", desc: "Classic chicken boti seekh", price: 100, img: "" },
     { id: 68, cat: "BBQ", name: "Chicken Balochi Boti (Seekh)", desc: "Balochi style chicken boti seekh", price: 100, img: "" },
+    { id: 112, cat: "BBQ", name: "Gola Kabab (Stick)", desc: "Gola kabab stick", price: 100, img: "" },
 
-    // ---------- BBQ Broast (NEW) ----------
+    // ---------- BBQ Broast ----------
     { id: 69, cat: "BBQ", name: "Broast (CHEST)", desc: "Crispy broast chest piece", price: 500, img: "" },
     { id: 70, cat: "BBQ", name: "Broast (LEG)", desc: "Crispy broast leg piece", price: 450, img: "" },
 
@@ -157,6 +164,12 @@ const DEFAULT_MENU = [
     { id: 87, cat: "Biryani", name: "Beef Pulao (1 Pao)", desc: "Beef pulao 1 pao", price: 190, img: "" },
     { id: 88, cat: "Biryani", name: "Beef Pulao (Plate)", desc: "Beef pulao single plate", price: 280, img: "" },
 
+    // ---------- Plater ----------
+    { id: 114, cat: "Plater", name: "Plater 01", desc: "Plater 01", price: 1499, img: "" },
+    { id: 115, cat: "Plater", name: "Plater 02", desc: "Plater 02", price: 1299, img: "" },
+    { id: 116, cat: "Plater", name: "Plater 03", desc: "Plater 03", price: 850, img: "" },
+    { id: 117, cat: "Plater", name: "Plater 04", desc: "Plater 04", price: 799, img: "" },
+
     // ---------- Drinks ----------
     { id: 89, cat: "Drinks", name: "REG Cold Drink", desc: "Regular cold drink", price: 70, img: "" },
     { id: 90, cat: "Drinks", name: "REG Cold Drink Sting", desc: "Regular Sting", price: 80, img: "" },
@@ -168,11 +181,7 @@ const DEFAULT_MENU = [
     { id: 96, cat: "Drinks", name: "1.5 ltr Coldrink", desc: "1.5 litre cold drink", price: 220, img: "" },
     { id: 97, cat: "Drinks", name: "Jumbo Coldrink", desc: "Jumbo size cold drink", price: 270, img: "" },
     { id: 98, cat: "Drinks", name: "Water 500ml", desc: "500ml mineral water", price: 60, img: "" },
-    { id: 99, cat: "Drinks", name: "Water 1.5 Ltr", desc: "1.5 litre mineral water", price: 120, img: "" },
-      { id: 114, cat: "Plater", name: "Plater 01", desc: "Plater 01", price: 1499, img: "" },
-    { id: 115, cat: "Plater", name: "Plater 02", desc: "Plater 02", price: 1299, img: "" },
-    { id: 116, cat: "Plater", name: "Plater 03", desc: "Plater 03", price: 850, img: "" },
-    { id: 117, cat: "Plater", name: "Plater 04", desc: "Plater 04", price: 799, img: "" },
+    { id: 99, cat: "Drinks", name: "Water 1.5 Ltr", desc: "1.5 litre mineral water", price: 120, img: "" }
 ];
 
 // =========================================================
@@ -189,6 +198,7 @@ const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); retu
 const dayKey = d => new Date(d).toDateString();
 const sumTotal = list => list.reduce((s, o) => s + o.total, 0);
 const isDeal = m => m.cat === "Deals";
+const itemKey = m => m.cat + "|" + m.name;      // item ki pehchan (naam + category)
 const reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
 const canHover = window.matchMedia && matchMedia("(hover:hover)").matches;
 // SMOOTH = halki animations (smooth + full). FANCY = bhaari mouse effects (sirf full)
@@ -200,7 +210,23 @@ const FANCY = ANIM === "full" && !reduceMotion;
 // =========================================================
 const MENU = JSON.parse(JSON.stringify(DEFAULT_MENU));
 const savedMenu = lsGet("bsMenu", null);
-if (Array.isArray(savedMenu) && savedMenu.length) MENU.splice(0, MENU.length, ...savedMenu);
+if (Array.isArray(savedMenu) && savedMenu.length) {
+    // Code mein jo naye items add kiye wo bhi aa jayen.
+    // Jo item Manage Menu se delete kiya, wo wapis nahi aayega.
+    const deleted = lsGet("bsDeleted", []);
+    let maxId = savedMenu.reduce((mx, m) => Math.max(mx, m.id), 0);
+    const usedIds = new Set(savedMenu.map(m => m.id));
+    DEFAULT_MENU.forEach(d => {
+        if (deleted.includes(itemKey(d))) return;
+        if (savedMenu.some(s => s.name === d.name && s.cat === d.cat)) return;
+        const copy = { ...d };
+        if (usedIds.has(copy.id)) copy.id = ++maxId;     // id takrae to naya id
+        usedIds.add(copy.id);
+        savedMenu.push(copy);
+    });
+    MENU.splice(0, MENU.length, ...savedMenu);
+    lsSet("bsMenu", MENU);
+}
 
 let orders = lsGet("bsOrders", []);
 let stock = lsGet("bsStock", {});
@@ -481,16 +507,16 @@ function totals() {
     return { sub, disc, val: dv, isPct, tax, del, total: after + tax + del };
 }
 
-// "Add these too": suggest a drink or snack if the cart has none
+// "Add these too": suggest a drink if the cart has none
 function renderUpsell() {
     const box = $("upsell");
     if (!box) return;
     if (!cartCount()) { box.innerHTML = ""; return; }
     const hasCat = c => Object.keys(cart).some(id => (MENU.find(m => m.id == id) || {}).cat === c);
     const pool = [];
-    ["Drinks", "Snacks"].filter(c => !hasCat(c)).forEach(c => {
+    ["Drinks"].filter(c => !hasCat(c)).forEach(c => {
         MENU.filter(m => m.cat === c && !cart[m.id] && (stock[m.id] ?? DEFAULT_STOCK) > 0)
-            .slice(0, 2).forEach(m => pool.push(m));
+            .slice(0, 3).forEach(m => pool.push(m));
     });
     const list = pool.slice(0, 3);
     box.innerHTML = list.length
@@ -878,17 +904,6 @@ function playMeme() {
     memeAudio.play().catch(err => console.log("Meme play nahi hui:", err));
 }
 
-// Speaker button band karne par meme bhi band
-(function () {
-    const btn = $("soundBtn");
-    if (!btn) return;
-    const prev = btn.onclick;
-    btn.onclick = function (e) {
-        if (prev) prev.call(this, e);
-        if (!soundOn) stopAllSound();
-    };
-})();
-
 // Header mein 🎭 button: har click par agla meme (phir Random, phir Band)
 (function () {
     const box = document.querySelector(".hb-in .social");
@@ -1191,6 +1206,9 @@ function saveMenuItem() {
     } else {
         id = MENU.reduce((mx, m) => Math.max(mx, m.id), 0) + 1;
         MENU.push({ id, cat: catv, name, desc, price, img: formImg });
+        // Pehle delete kiya hua item dobara add kiya to delete-list se hata do
+        const del = lsGet("bsDeleted", []).filter(k => k !== catv + "|" + name);
+        lsSet("bsDeleted", del);
     }
     stock[id] = isNaN(st) ? DEFAULT_STOCK : Math.max(0, st);
     lsSet("bsStock", stock);
@@ -1207,6 +1225,11 @@ function deleteItem(id) {
     const i = MENU.findIndex(m => m.id == id);
     if (i < 0) return;
     if (!confirm('"' + MENU[i].name + '" will be removed from the menu. Continue?')) return;
+    // Yaad rakho ke ye delete hua, taake code ke default se wapis na aaye
+    const del = lsGet("bsDeleted", []);
+    const key = itemKey(MENU[i]);
+    if (!del.includes(key)) del.push(key);
+    lsSet("bsDeleted", del);
     MENU.splice(i, 1);
     delete cart[id];
     delete stock[id];
@@ -1259,7 +1282,7 @@ $("panelBody").addEventListener("click", e => {
     if (act === "resetmenu") {
         if (!confirm("The menu will go back to the original, and items you added will be removed. Are you sure?")) return;
         MENU.splice(0, MENU.length, ...JSON.parse(JSON.stringify(DEFAULT_MENU)));
-        try { localStorage.removeItem("bsMenu"); } catch (err) { }
+        try { localStorage.removeItem("bsMenu"); localStorage.removeItem("bsDeleted"); } catch (err) { }
         editId = null;
         formImg = "";
         refreshMenuUI();
@@ -1364,10 +1387,12 @@ $("vswitch").addEventListener("click", e => {
 $("menuBtn").onclick = () => setView("menu", true);
 $("dealsBtn").onclick = () => setView("deals", true);
 
+// Speaker button: on/off, band karne par chal rahi meme bhi band
 $("soundBtn").onclick = () => {
     soundOn = !soundOn;
     lsSet("bsSound", soundOn);
     paintSound();
+    if (!soundOn) stopAllSound();
     sfx("add");
     toast(soundOn ? "Sound on 🔊" : "Sound off 🔇");
 };
@@ -2269,9 +2294,10 @@ change = function (id, d, btn) {
 
     if (!FANCY) return;
 
+    // Class "sfly" (space fly): "fly" naam udte gole (add-to-cart) ke liye hai
     function fly(kind, emoji) {
         const e = document.createElement("div");
-        e.className = "fly " + kind;
+        e.className = "sfly " + kind;
         e.textContent = emoji;
         if (kind === "comet") e.style.right = (Math.random() * 40 - 10) + "%";
         if (kind === "rocket") e.style.left = (Math.random() * 40 - 5) + "%";
