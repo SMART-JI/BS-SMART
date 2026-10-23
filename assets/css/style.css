@@ -4072,3 +4072,12 @@
     .tabarrow { width: 30px; height: 30px; top: 14px; }
 }
 body.dark .tabarrow { border-color: var(--gold); }
+
+/* Receipt aur panel hamesha sab se upar */
+#overlay { z-index: 100000; }
+#panel   { z-index: 100001; }
+
+/* Receipt khulte hi tabs bar aur cart bar chhup jayein */
+body:has(#overlay.show) .tabsbar,
+body:has(#overlay.show) #cartbar,
+body:has(#overlay.show) #toTop { visibility: hidden; }
