@@ -37,6 +37,20 @@ const PRINT_LEFT_MM = 0;     // slip left se kate to 2 ya 3 karein
 const PRINT_FONT_PX = 13;    // font ka size
 const PRINT_WEIGHT = 400;    // 400 normal, 700 bold
 
+// FIX: receipt / panel ka z-index aur category bar ka masla (CSS file ko chhedna nahi padta)
+(function () {
+    const st = document.createElement("style");
+    st.textContent = `
+    #overlay { z-index: 100000 !important; }
+    #panel { z-index: 100001 !important; }
+    body.modal-open .tabsbar,
+    body.modal-open .tabarrow,
+    body.modal-open #cartbar,
+    body.modal-open #toTop,
+    body.modal-open .cglow { visibility: hidden !important; }`;
+    document.head.appendChild(st);
+})();
+
 // Starting menu (can be changed later from Manage Menu).
 // Items with category "Deals" only show in the Deals view.
 // Har item ka id alag hona chahiye.
@@ -211,20 +225,45 @@ const FANCY = ANIM === "full" && !reduceMotion;
 const MENU = JSON.parse(JSON.stringify(DEFAULT_MENU));
 const savedMenu = lsGet("bsMenu", null);
 if (Array.isArray(savedMenu) && savedMenu.length) {
-    // Code mein jo naye items add kiye wo bhi aa jayen.
-    // Jo item Manage Menu se delete kiya, wo wapis nahi aayega.
+    // FIX: duplicate items ka masla.
+    // "bsSeen" = wo default items jo pehle menu mein aa chuke. Edit karke naam/category badalne
+    // par bhi original item dobara nahi aayega. Jo item Manage Menu se delete kiya wo bhi wapis nahi aayega.
     const deleted = lsGet("bsDeleted", []);
+
+    let seen = lsGet("bsSeen", null);
+    if (!Array.isArray(seen)) {
+        // pehli dafa: jo defaults pehle se saved menu mein hain (id ya naam se) unhe "seen" maan lo
+        seen = DEFAULT_MENU
+            .filter(d => savedMenu.some(s => s.id === d.id || (s.name === d.name && s.cat === d.cat)))
+            .map(itemKey);
+    }
+
     let maxId = savedMenu.reduce((mx, m) => Math.max(mx, m.id), 0);
     const usedIds = new Set(savedMenu.map(m => m.id));
+
     DEFAULT_MENU.forEach(d => {
-        if (deleted.includes(itemKey(d))) return;
+        const k = itemKey(d);
+        if (seen.includes(k)) return;                    // pehle aa chuka
+        seen.push(k);
+        if (deleted.includes(k)) return;                 // user ne delete kiya tha
         if (savedMenu.some(s => s.name === d.name && s.cat === d.cat)) return;
         const copy = { ...d };
         if (usedIds.has(copy.id)) copy.id = ++maxId;     // id takrae to naya id
         usedIds.add(copy.id);
         savedMenu.push(copy);
     });
-    MENU.splice(0, MENU.length, ...savedMenu);
+    lsSet("bsSeen", seen);
+
+    // Bilkul same item (naam + category + price) do dafa ho to ek rakho
+    const dupe = new Set();
+    const clean = savedMenu.filter(m => {
+        const k = itemKey(m) + "|" + m.price;
+        if (dupe.has(k)) return false;
+        dupe.add(k);
+        return true;
+    });
+
+    MENU.splice(0, MENU.length, ...clean);
     lsSet("bsMenu", MENU);
 }
 
@@ -716,14 +755,16 @@ function kitchenSlipsHTML() {
     </div>`).join("");
 }
 
-// Customer slip first, then the kitchen slips
+// Customer slip first, then the kitchen slips (print ke liye)
 function itemSlipsHTML() {
     return `<div class="slip">${lastCustomer}</div>` + kitchenSlipsHTML();
 }
 
+// FIX: screen par popup mein sirf customer copy dikhti hai (item double nazar aata tha).
+// Print mein customer + kitchen dono slips jati hain.
 function buildReceipt(snap, t, meta) {
     lastCustomer = customerSlipHTML(snap, t, meta);
-    $("receipt").innerHTML = itemSlipsHTML();
+    $("receipt").innerHTML = `<div class="slip">${lastCustomer}</div>`;
 }
 
 // ----- Logo for print -----
@@ -1282,7 +1323,8 @@ $("panelBody").addEventListener("click", e => {
     if (act === "resetmenu") {
         if (!confirm("The menu will go back to the original, and items you added will be removed. Are you sure?")) return;
         MENU.splice(0, MENU.length, ...JSON.parse(JSON.stringify(DEFAULT_MENU)));
-        try { localStorage.removeItem("bsMenu"); localStorage.removeItem("bsDeleted"); } catch (err) { }
+        // FIX: bsSeen bhi saaf
+        try { localStorage.removeItem("bsMenu"); localStorage.removeItem("bsDeleted"); localStorage.removeItem("bsSeen"); } catch (err) { }
         editId = null;
         formImg = "";
         refreshMenuUI();
@@ -1322,6 +1364,16 @@ const closePanel = () => { mq = ""; $("panel").classList.remove("show"); };
 $("panelClose").onclick = closePanel;
 $("panel").onclick = e => { if (e.target === $("panel")) closePanel(); };
 document.querySelectorAll("[data-panel]").forEach(b => b.onclick = () => openPanel(b.dataset.panel));
+
+// FIX: receipt ya panel khula ho to body par "modal-open" class (tabs bar chhupane ke liye)
+(function () {
+    const sync = () => document.body.classList.toggle("modal-open",
+        $("overlay").classList.contains("show") || $("panel").classList.contains("show"));
+    const mo = new MutationObserver(sync);
+    mo.observe($("overlay"), { attributes: true, attributeFilter: ["class"] });
+    mo.observe($("panel"), { attributes: true, attributeFilter: ["class"] });
+    sync();
+})();
 
 // =========================================================
 //  BUTTONS AND EVENTS
